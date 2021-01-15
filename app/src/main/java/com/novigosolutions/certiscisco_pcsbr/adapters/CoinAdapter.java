@@ -1,6 +1,5 @@
 package com.novigosolutions.certiscisco_pcsbr.adapters;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +8,8 @@ import android.widget.TextView;
 import com.novigosolutions.certiscisco_pcsbr.R;
 
 import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class CoinAdapter extends RecyclerView.Adapter<CoinAdapter.MyViewHolder> {
     List<String> currancyNames;

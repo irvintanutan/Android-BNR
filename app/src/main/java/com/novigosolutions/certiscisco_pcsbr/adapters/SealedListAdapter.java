@@ -1,7 +1,6 @@
 package com.novigosolutions.certiscisco_pcsbr.adapters;
 
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,8 @@ import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 
 import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class SealedListAdapter extends RecyclerView.Adapter<SealedListAdapter.MyViewHolder> {
     List<Delivery> deliveries;

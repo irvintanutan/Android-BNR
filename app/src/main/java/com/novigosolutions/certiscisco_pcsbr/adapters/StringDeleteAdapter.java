@@ -1,6 +1,5 @@
 package com.novigosolutions.certiscisco_pcsbr.adapters;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,8 @@ import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener;
 
 import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class StringDeleteAdapter extends RecyclerView.Adapter<StringDeleteAdapter.MyViewHolder> {
     List<String> values;

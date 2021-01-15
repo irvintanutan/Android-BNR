@@ -1,27 +1,22 @@
 package com.novigosolutions.certiscisco_pcsbr.activites;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.os.Bundle;
-import android.support.v7.content.res.AppCompatResources;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.Animation;
@@ -29,12 +24,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.izettle.html2bitmap.Html2Bitmap;
-import com.izettle.html2bitmap.content.WebViewContent;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.BluetoothPairedListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.BluetoothScannedListAdapter;
@@ -45,7 +37,6 @@ import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
-import com.novigosolutions.certiscisco_pcsbr.zebra.Print;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Printer;
 
 import java.lang.reflect.Method;
@@ -54,8 +45,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import static com.novigosolutions.certiscisco_pcsbr.applications.CertisCISCO.getContext;
 
 public class PrinterConfigurationActivity extends BaseActivity implements View.OnClickListener, RecyclerViewClickListner3, NetworkChangekListener, PrintCallBack {
     ImageView imgnetwork, refresh;

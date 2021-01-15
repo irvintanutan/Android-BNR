@@ -2,7 +2,6 @@ package com.novigosolutions.certiscisco_pcsbr.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +16,8 @@ import com.novigosolutions.certiscisco_pcsbr.models.Break;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 
 import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class BreakListAdapter extends RecyclerView.Adapter<BreakListAdapter.MyViewHolder> {
     List<Break> breakList;
