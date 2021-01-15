@@ -1,7 +1,6 @@
 package com.novigosolutions.certiscisco_pcsbr.adapters;
 
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,8 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListene
 import com.novigosolutions.certiscisco_pcsbr.models.ChatMessage;
 
 import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> {
     List<ChatMessage> chatMessageList;

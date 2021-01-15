@@ -5,11 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -22,7 +17,6 @@ import com.novigosolutions.certiscisco_pcsbr.adapters.ChatAdapter;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.MessageClickListener;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
-import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener;
 import com.novigosolutions.certiscisco_pcsbr.models.ChatMessage;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
@@ -35,6 +29,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ChatActivity extends BaseActivity implements View.OnClickListener, MessageClickListener, NetworkChangekListener, ApiCallback {
     EditText edt_message;

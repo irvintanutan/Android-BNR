@@ -3,7 +3,6 @@ package com.novigosolutions.certiscisco_pcsbr.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Environment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,6 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;

@@ -2,14 +2,8 @@ package com.novigosolutions.certiscisco_pcsbr.applications;
 
 import android.app.Application;
 import android.content.Context;
-//import android.support.multidex.MultiDex;
-//import android.support.*;
 import android.text.TextUtils;
-import android.support.multidex.MultiDexApplication;
 
-import android.content.Context;
-import android.support.multidex.MultiDex;
-import android.support.multidex.MultiDexApplication;
 
 
 
@@ -29,6 +23,8 @@ import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
+
+import androidx.multidex.MultiDex;
 
 /**
  * Created by dhanrajk on 23-06-17.

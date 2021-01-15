@@ -3,10 +3,9 @@ package com.novigosolutions.certiscisco_pcsbr.activites.dialogs;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.novigosolutions.certiscisco_pcsbr.activites.BaseActivity;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.IOnScannerData;
 import com.symbol.emdk.EMDKManager;
@@ -21,6 +20,8 @@ import com.symbol.emdk.barcode.StatusData;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.Nullable;
 
 public abstract class BarCodeScanActivity extends BaseActivity implements
         EMDKManager.EMDKListener, Scanner.DataListener, Scanner.StatusListener,

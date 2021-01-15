@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +15,8 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListene
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 
 import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class CollectionDetailAdapter extends RecyclerView.Adapter<CollectionDetailAdapter.MyViewHolder> {
     List<Job> jobs;

@@ -4,13 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -29,7 +22,6 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.IOnScannerData;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
-import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
@@ -38,12 +30,18 @@ import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
-import com.symbol.emdk.barcode.ScannerException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerData, View.OnClickListener, ApiCallback, DialogResult, NetworkChangekListener, UnsealedListAdapter.UnsealedClickCallback {
     TextView txt_customer_name, txt_functional_code,txt_branch_name;// txt_street_tower, txt_town_pin;

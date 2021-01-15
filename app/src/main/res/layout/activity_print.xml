@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".activites.PrintActivity">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -158,5 +158,5 @@
                 android:visibility="gone"/>
         </LinearLayout>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.ConstraintLayout>
 </android.support.design.widget.CoordinatorLayout>

@@ -3,7 +3,6 @@ package com.novigosolutions.certiscisco_pcsbr.adapters;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +19,8 @@ import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 
 import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class CollectionSummaryAdapter extends RecyclerView.Adapter<CollectionSummaryAdapter.MyViewHolder> {
     List<Summary> collectionSummaries;

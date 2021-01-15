@@ -8,8 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.os.SystemClock;
-import android.support.v4.content.LocalBroadcastManager;
+
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -17,24 +16,19 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.activites.ChatActivity;
-import com.novigosolutions.certiscisco_pcsbr.activites.HomeActivity;
-import com.novigosolutions.certiscisco_pcsbr.activites.LoginActivity;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Break;
 import com.novigosolutions.certiscisco_pcsbr.models.ChatMessage;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.service.BreakService;
-import com.novigosolutions.certiscisco_pcsbr.service.SyncMessageService;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Modifier;
@@ -42,6 +36,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;

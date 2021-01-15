@@ -1,9 +1,7 @@
 package com.novigosolutions.certiscisco_pcsbr.activites;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +15,9 @@ import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 public class ConfirmationActivity extends AppCompatActivity implements NetworkChangekListener {
     TextView txtJobId,txtCustomerName,txtBranchName,txtAddress,txtTime,txtDropOff,txtDropAddress;

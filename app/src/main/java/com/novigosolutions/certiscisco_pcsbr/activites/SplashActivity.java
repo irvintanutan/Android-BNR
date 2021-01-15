@@ -1,9 +1,6 @@
 package com.novigosolutions.certiscisco_pcsbr.activites;
 
-import android.app.ActivityManager;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Window;
@@ -25,18 +21,15 @@ import com.novigosolutions.certiscisco_pcsbr.BuildConfig;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.applications.CertisCISCO;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
-import com.novigosolutions.certiscisco_pcsbr.models.Break;
 import com.novigosolutions.certiscisco_pcsbr.objects.Download;
-import com.novigosolutions.certiscisco_pcsbr.service.BreakService;
 import com.novigosolutions.certiscisco_pcsbr.service.DownloadService;
-import com.novigosolutions.certiscisco_pcsbr.service.SignalRService;
-import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
 
 import java.io.File;
-import java.util.Date;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * SplashActivity.java - class that loads first.
