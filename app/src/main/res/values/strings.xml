@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">CertisCISCO_PCSBR</string>
+    <string name="no_internet">No internet</string>
+    <string name="pressback">Press BACK again to exit</string>
+    <string name="networkerror">Network Error</string>
+    <string name="autherror">Authentication Error</string>
+    <string name="datakerror">Data Error</string>
+    <string name="title_activity_admin">AdminActivity</string>
+
+    <string name="invalid_scan_title">Invalid barcode</string>
+    <string name="title_activity_summary">SummaryActivity</string>
+    <string name="item_count">%1$d/%2$d items</string>
+</resources>

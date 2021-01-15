@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/img_delete"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:padding="4dp"
+        android:tint="@color/colorPrimary"
+        app:srcCompat="@drawable/ic_round_delete_24px" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_toLeftOf="@+id/img_delete">
+        <TextView
+            android:id="@+id/txt_string"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="xvzxvszv"
+            android:layout_weight="1"
+            android:layout_marginLeft="3dp"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/txt_string"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginLeft="4dp"-->
+    <!--        android:layout_centerVertical="true"-->
+    <!--        android:text="xvzxvszv"-->
+    <!--        android:textColor="@color/black" />-->
+
+</RelativeLayout>
