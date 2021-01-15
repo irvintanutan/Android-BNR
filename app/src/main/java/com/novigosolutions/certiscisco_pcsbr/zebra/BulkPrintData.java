@@ -41,7 +41,7 @@ public class BulkPrintData extends AsyncTask<Void,Void, List<Print>> {
     protected List<Print> doInBackground(Void... voids) {
         printer=new Printer(context);
         List<Print> printList=new ArrayList<>();
-
+        this.list.add("\n\n");
         try {
             for (int i = 0; i < list.size(); i++) {
                 Branch branch = Branch.getSingle(String.valueOf(list.get(i)));
