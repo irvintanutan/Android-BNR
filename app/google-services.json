@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "225606075519",
+    "project_id": "android-bnr",
+    "storage_bucket": "android-bnr.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:225606075519:android:029f1cba23bd37834d2b4a",
+        "android_client_info": {
+          "package_name": "com.novigosolutions.certiscisco_pcsbr"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "225606075519-i1llgh2763jh930b1kda45cijk7gqugj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQ-XHUwS1DAgDS-GmrbFlP2hCb5P8UzP4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "225606075519-i1llgh2763jh930b1kda45cijk7gqugj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
