@@ -51,6 +51,7 @@ public class Template {
                 "   </style>" +
                 "</head>\n" +
                 "    <body>\n" +
+                "        <br><br><br>\n" +
                 "        <img src=\"data:image/jpg;base64," + print.getLogo() + "\">\n" +
                 "\n" +
                 "<p>" + print.getCertisAddress() + "</p>\n" +
