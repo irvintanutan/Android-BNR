@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.icu.text.UnicodeSetSpanner;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Bundle;
@@ -213,14 +214,6 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
         Preferences.saveInt("PROGRESSPOINTID", -5, this);
     }
 
-//    private BroadcastReceiver offlineupdateReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            hideProgressDialog();
-//            Toast.makeText(GroupJobActivity.this, "Offline job updated", Toast.LENGTH_SHORT).show();
-//            refresh();
-//        }
-//    };
 
     private BroadcastReceiver offlineupdateReceiver = new NetworkChangeReceiver();
 

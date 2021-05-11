@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-<!--    <item-->
-<!--        android:id="@+id/action_logout"-->
-<!--        android:orderInCategory="100"-->
-<!--        android:title="info"-->
-<!--        app:showAsAction="always"-->
-<!--        android:icon="@drawable/logout18"/>-->
-    <item
-        android:id="@+id/action_info"
-        android:orderInCategory="300"
-        android:title="info"
-        app:showAsAction="always"
-        android:icon="@drawable/ic_info"/>
+
     <item
         android:id="@+id/action_sync"
-        android:orderInCategory="200"
         android:title="Sync"
-        app:showAsAction="always"
-        app:actionLayout="@layout/refresh_action_view"/>
+        app:actionLayout="@layout/refresh_action_view"
+        app:showAsAction="always" />
+
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="Settings"
+        android:icon="@drawable/ic_baseline_more_horiz_24"
+        app:showAsAction="always" >
+
+        <menu>
+            <item
+                android:id="@+id/action_legend"
+                android:title="Legend" />
+            <item
+                android:id="@+id/action_logout"
+                android:title="Logout" />
+        </menu>
+    </item>
+
+
 </menu>

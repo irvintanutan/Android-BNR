@@ -228,14 +228,6 @@ public class JobListActivity extends BaseActivity implements RecyclerViewClickLi
     };
 
     private List<Job> getJobList() {
-//        switch (status) {
-//            case "PENDING":
-//                return Branch.getBranchesByStatus("PENDING");
-//            case "COMPLETED":
-//                return Branch.getBranchesByStatus("COMPLETED");
-//            default:
-//                return Branch.getAllBranches();
-//        }
         if("ALL".equals(status)){
             return Job.getJobListByGroupKey(GroupKey);
         }else {
