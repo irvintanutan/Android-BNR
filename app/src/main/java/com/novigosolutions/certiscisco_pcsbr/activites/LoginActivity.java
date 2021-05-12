@@ -232,18 +232,14 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         }
         if (!failflag) {
             if (NetworkUtil.getConnectivityStatusString(LoginActivity.this)) {
-                try {
-                    JsonObject json = new JsonObject();
-                   // Preferences.saveString("DeviceID","TEST", LoginActivity.this);
-                    json.addProperty("DeviceId", Preferences.getString("DeviceID", LoginActivity.this));
-                    json.addProperty("UserCode", teamid);
-                    json.addProperty("Password", password);
-                    json.addProperty("LoginDate", false?"2020-06-19":sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
-                    Log.e("json", json.toString());
-                    login(json);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                JsonObject json = new JsonObject();
+                // Preferences.saveString("DeviceID","TEST", LoginActivity.this);
+                json.addProperty("DeviceId", Preferences.getString("DeviceID", LoginActivity.this));
+                json.addProperty("UserCode", teamid);
+                json.addProperty("Password", password);
+                json.addProperty("LoginDate", "2021-03-25");//false?"2020-06-19":sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
+                Log.e("json", json.toString());
+                login(json);
             } else {
                 raiseInternetSnakbar();
             }

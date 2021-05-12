@@ -138,7 +138,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
                         intent.putExtra("status", "PENDING");
                         break;
                     case 2:
-                        intent = new Intent(HomeActivity.this, GroupJobActivity.class);
+                        intent = new Intent(HomeActivity.this, SelectionActivity.class);
                         intent.putExtra("status", "COMPLETED");
                         break;
                     case 3:

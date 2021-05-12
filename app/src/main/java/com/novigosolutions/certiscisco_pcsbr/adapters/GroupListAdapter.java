@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener2;
@@ -102,6 +103,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
                 jobtype = 3;
             } else if (j.IsFloatDeliveryOrder) {
                 jobtype = 2;
+                Log.e("DELIVERY" , Integer.toString(position));
             } else if (j.IsCollectionOrder){
                 jobtype = 1;
             }
