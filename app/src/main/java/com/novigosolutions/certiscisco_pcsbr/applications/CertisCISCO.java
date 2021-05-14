@@ -5,8 +5,6 @@ import android.content.Context;
 import android.text.TextUtils;
 
 
-
-
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
 import com.novigosolutions.certiscisco_pcsbr.models.Bags;
@@ -32,16 +30,17 @@ import androidx.multidex.MultiDex;
 
 public class CertisCISCO extends Application {
     private static CertisCISCO mContext;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        Configuration dbConfiguration = new Configuration.Builder(this).setDatabaseName("certiscisco.db").setDatabaseVersion(3).addModelClasses(Job.class, Bags.class, Box.class, Envelope.class, EnvelopeBag.class, Currency.class, BoxBag.class, Branch.class, Delivery.class,ChatMessage.class,Break.class,Reschedule.class, CoinSeries.class).create();
+        Configuration dbConfiguration = new Configuration.Builder(this).setDatabaseName("certiscisco.db").setDatabaseVersion(3).addModelClasses(Job.class, Bags.class, Box.class, Envelope.class, EnvelopeBag.class, Currency.class, BoxBag.class, Branch.class, Delivery.class, ChatMessage.class, Break.class, Reschedule.class, CoinSeries.class).create();
         ActiveAndroid.initialize(dbConfiguration);
         mContext = this;
-        if(TextUtils.isEmpty(Preferences.getString("API_URL",mContext))){
-          //  Preferences.saveString("API_URL", "http://10.8.8.158", mContext);
-              Preferences.saveString("API_URL", "https://pcsbnr-api.certiscslops.local/", mContext);
-          //  Preferences.saveString("API_URL", "https://pcs-bnruatapi.certis-cslops-uat.com/", mContext);
+        if (TextUtils.isEmpty(Preferences.getString("API_URL", mContext))) {
+            //  Preferences.saveString("API_URL", "http://10.8.8.158", mContext);
+            // Preferences.saveString("API_URL", "https://pcsbnr-api.certiscslops.local/", mContext);
+            Preferences.saveString("API_URL", "https://pcs-bnruatapi.certis-cslops-uat.com/", mContext);
         }
     }
 

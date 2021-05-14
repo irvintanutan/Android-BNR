@@ -185,7 +185,7 @@ public class Job extends Model implements Comparable<Job> {
     @Column(name = "ActualFromTime")
     public String ActualFromTime;
 
-    @Column(name ="ActualToTime" )
+    @Column(name = "ActualToTime")
     public String ActualToTime;
 
     //Transcation officer signature
@@ -201,6 +201,8 @@ public class Job extends Model implements Comparable<Job> {
 
     @Column(name = "StaffID")
     public String StaffID;
+
+    private boolean isSelected;
 
 
     public static Job getSingle(int TransportMasterId) {
@@ -225,35 +227,43 @@ public class Job extends Model implements Comparable<Job> {
     }
 
     public static List<Job> getJobListByGroupKey(String GroupKey) {
-        List<Job> jl =  new Select().from(Job.class)
+        List<Job> jl = new Select().from(Job.class)
                 .where("GroupKey=? AND IsCollectionOrder=1", GroupKey)
                 .execute();
         List<Job> del = new Select().from(Job.class)
                 .where("GroupKey=? AND IsFloatDeliveryOrder=1", GroupKey)
                 .execute();
-        if(!del.isEmpty()){
+        if (!del.isEmpty()) {
             jl.add(del.get(0));
         }
         return jl;
     }
 
-    public static List<Job> getByGroupKeyAndStatus(String GroupKey,String Status) {
+    public static List<Job> getByGroupKeyAndStatus(String GroupKey, String Status) {
         return new Select().from(Job.class)
-                .where("GroupKey=? AND status=?", GroupKey,Status)
+                .where("GroupKey=? AND status=?", GroupKey, Status)
                 .execute();
 
     }
 
-    public static List<Job> getJobListByGroupKeyAndStatus(String GroupKey,String Status) {
-        List<Job> jl =  new Select().from(Job.class)
-                .where("GroupKey=? AND status=? AND IsCollectionOrder=1", GroupKey,Status)
+    public static List<Job> getJobListByGroupKeyAndStatus(String GroupKey, String Status) {
+        List<Job> jl = new Select().from(Job.class)
+                .where("GroupKey=? AND status=? AND IsCollectionOrder=1", GroupKey, Status)
                 .execute();
         List<Job> del = new Select().from(Job.class)
-                .where("GroupKey=? AND status=? AND IsFloatDeliveryOrder=1", GroupKey,Status)
+                .where("GroupKey=? AND status=? AND IsFloatDeliveryOrder=1", GroupKey, Status)
                 .execute();
-        if(!del.isEmpty()){
+        if (!del.isEmpty()) {
             jl.add(del.get(0));
         }
+        return jl;
+    }
+
+    public static List<Job> getJobListByType(int isDelivered, int isCollection) {
+        List<Job> jl = new Select().from(Job.class)
+                .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=?", "COMPLETED", isCollection, isDelivered)
+                .execute();
+
         return jl;
     }
 
@@ -283,19 +293,19 @@ public class Job extends Model implements Comparable<Job> {
 //                .execute();
 //    }
 
-    public static List<Job> getIncompleteCollectionJobsOfPoint(String  GroupKey) {
+    public static List<Job> getIncompleteCollectionJobsOfPoint(String GroupKey) {
         return new Select().from(Job.class)
                 .where("IsCollectionOrder=? AND GroupKey=? AND Status NOT IN ('COMPLETED')", 1, GroupKey)
                 .execute();
     }
 
-    public static List<Job> getFinishedIncompleteCollectionJobsOfPoint(String  GroupKey) {
+    public static List<Job> getFinishedIncompleteCollectionJobsOfPoint(String GroupKey) {
         return new Select().from(Job.class)
-                .where("IsCollectionOrder=? AND GroupKey=? AND finished=? AND Status NOT IN ('COMPLETED')", 1, GroupKey,1)
+                .where("IsCollectionOrder=? AND GroupKey=? AND finished=? AND Status NOT IN ('COMPLETED')", 1, GroupKey, 1)
                 .execute();
     }
 
-    public static void setIncompleteCollectionCollected(String  GroupKey) {
+    public static void setIncompleteCollectionCollected(String GroupKey) {
 //        List<Job> jlist = new Select().from(Job.class)
 //                .where("IsCollectionOrder=? AND GroupKey=? AND finished=? AND Status NOT IN ('COMPLETED')", 1, GroupKey,1)
 //                .execute();
@@ -312,15 +322,15 @@ public class Job extends Model implements Comparable<Job> {
 //
 //        Log.e("^^^^^OfflineUpdate", "setIncompleteCollectionCollected-updatequery: "+s);
         new Update(Job.class)
-                .set("isOfflineSaved=?, isCollected=?, Status=?", 0, 1,"COMPLETED")
-                .where("IsCollectionOrder=? AND GroupKey=? AND finished=? AND Status NOT IN ('COMPLETED')", 1, GroupKey,1)
+                .set("isOfflineSaved=?, isCollected=?, Status=?", 0, 1, "COMPLETED")
+                .where("IsCollectionOrder=? AND GroupKey=? AND finished=? AND Status NOT IN ('COMPLETED')", 1, GroupKey, 1)
                 .execute();
     }
 
     public static void setPendingDeliveryDelivered(String GroupKey) {
         new Update(Job.class)
-                .set("isOfflineSaved=?, Status=?", 0,"COMPLETED")
-                .where("IsFloatDeliveryOrder=? AND GroupKey=? AND finished=? AND Status NOT IN ('COMPLETED')", 1, GroupKey,1)
+                .set("isOfflineSaved=?, Status=?", 0, "COMPLETED")
+                .where("IsFloatDeliveryOrder=? AND GroupKey=? AND finished=? AND Status NOT IN ('COMPLETED')", 1, GroupKey, 1)
                 .execute();
     }
 
@@ -363,7 +373,7 @@ public class Job extends Model implements Comparable<Job> {
 
     public static List<Job> getFinishedPendingDeliveryJobsOfPoint(String GroupKey) {
         return new Select().from(Job.class)
-                .where("IsFloatDeliveryOrder=? AND GroupKey=? AND finished=? AND Status NOT IN ('COMPLETED')", 1, GroupKey,1)
+                .where("IsFloatDeliveryOrder=? AND GroupKey=? AND finished=? AND Status NOT IN ('COMPLETED')", 1, GroupKey, 1)
                 .execute();
     }
 
@@ -389,11 +399,11 @@ public class Job extends Model implements Comparable<Job> {
     public static String getAllOrderNos(String GroupKey, String status) {
         String ordernos = "";
         List<Job> jobs;
-        if("ALL".equals(status)) {
+        if ("ALL".equals(status)) {
             jobs = new Select().from(Job.class)
                     .where("GroupKey=?", GroupKey)
                     .execute();
-        }else{
+        } else {
             jobs = new Select().from(Job.class)
                     .where("GroupKey=? AND status=?", GroupKey, status)
                     .execute();
@@ -434,11 +444,11 @@ public class Job extends Model implements Comparable<Job> {
 
     public static String getMinimumSequenceNo(String GroupKey, String status) {
         List<Job> jobs;
-        if("ALL".equals(status)) {
+        if ("ALL".equals(status)) {
             jobs = new Select().from(Job.class)
                     .where("GroupKey=?", GroupKey)
                     .execute();
-        }else{
+        } else {
             jobs = new Select().from(Job.class)
                     .where("GroupKey=? AND status=?", GroupKey, status)
                     .execute();
@@ -466,7 +476,7 @@ public class Job extends Model implements Comparable<Job> {
 ////        return ordernos;
 ////    }
 
-    public static String getDeliveryOrderNos(String  GroupKey) {
+    public static String getDeliveryOrderNos(String GroupKey) {
         String ordernos = "";
         List<Job> jobs = new Select().from(Job.class)
                 .where("IsFloatDeliveryOrder=? AND GroupKey=?", 1, GroupKey)
@@ -503,7 +513,7 @@ public class Job extends Model implements Comparable<Job> {
                 .executeSingle() != null);
     }
 
-    public static boolean hasCollectionJobByStatus(String GroupKey,String Status) {
+    public static boolean hasCollectionJobByStatus(String GroupKey, String Status) {
         return (new Select().from(Job.class)
                 .where("IsCollectionOrder=? AND GroupKey=? AND Status=?", 1, GroupKey, Status)
                 .executeSingle() != null);
@@ -520,15 +530,15 @@ public class Job extends Model implements Comparable<Job> {
                 .executeSingle() != null);
     }
 
-    public static boolean hasDeliveryJobByStatus(String GroupKey,String Status) {
+    public static boolean hasDeliveryJobByStatus(String GroupKey, String Status) {
         return (new Select().from(Job.class)
                 .where("IsFloatDeliveryOrder=? AND GroupKey=? AND Status=?", 1, GroupKey, Status)
                 .executeSingle() != null);
     }
 
-    public static List<Job> hasCompletedJob(String groupKey){
+    public static List<Job> hasCompletedJob(String groupKey) {
         return new Select().from(Job.class)
-                .where("GroupKey=? AND Status=?",groupKey,"COMPLETED")
+                .where("GroupKey=? AND Status=?", groupKey, "COMPLETED")
                 .execute();
     }
 
@@ -553,33 +563,33 @@ public class Job extends Model implements Comparable<Job> {
                 .execute();
     }
 
-    public static void UpdateTime(int TransportMasterId,String startTime,String endTime){
+    public static void UpdateTime(int TransportMasterId, String startTime, String endTime) {
         new Update(Job.class)
-                .set("ActualFromTime=? , ActualToTime=? ", startTime,endTime)
+                .set("ActualFromTime=? , ActualToTime=? ", startTime, endTime)
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();
     }
 
     //update Transaction officer Signature
-    public static void UpdateSignature(int TransportMasterID,String signature){
+    public static void UpdateSignature(int TransportMasterID, String signature) {
         new Update(Job.class)
-                .set("CustomerSign=?",signature)
+                .set("CustomerSign=?", signature)
                 .where("TransportMasterId=?", TransportMasterID)
                 .execute();
     }
 
     //update customert signature part
-    public static void UpdateCustomerSignature(int TransportMasterID,String signature){
+    public static void UpdateCustomerSignature(int TransportMasterID, String signature) {
         new Update(Job.class)
-                .set("CustomerSignature=?",signature)
+                .set("CustomerSignature=?", signature)
                 .where("TransportMasterId=?", TransportMasterID)
                 .execute();
     }
 
 
-    public static void UpdateNameAndStaffID(int TransportMasterId,String name,String id) {
+    public static void UpdateNameAndStaffID(int TransportMasterId, String name, String id) {
         new Update(Job.class)
-                .set("CName=?, StaffID=? ", name,id)
+                .set("CName=?, StaffID=? ", name, id)
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();
     }
@@ -606,7 +616,7 @@ public class Job extends Model implements Comparable<Job> {
 //                .execute();
 //    }
 
-    public static void UpdatDeliveryCompleted(String  GroupKey) {
+    public static void UpdatDeliveryCompleted(String GroupKey) {
         new Update(Job.class)
                 .set("Status=?", "COMPLETED")
                 .where("IsFloatDeliveryOrder=1 AND GroupKey=?", GroupKey)
@@ -683,10 +693,10 @@ public class Job extends Model implements Comparable<Job> {
             collectionSummary.id = boxes.get(i).getId();
             collectionSummary.Head = "Box";
             // collectionSummary.Message = boxes.get(i).ProductName + "(" + boxes.get(i).count + ")";
-            if((boxes.get(i).CoinSeriesId)== 0) {
+            if ((boxes.get(i).CoinSeriesId) == 0) {
                 collectionSummary.Message = boxes.get(i).ProductName + "(" + boxes.get(i).count + ")";
-            }else{
-                collectionSummary.Message = boxes.get(i).ProductName + "(" + boxes.get(i).count + ")" + "(" +boxes.get(i).CoinSeries +")";
+            } else {
+                collectionSummary.Message = boxes.get(i).ProductName + "(" + boxes.get(i).count + ")" + "(" + boxes.get(i).CoinSeries + ")";
             }
             collection_summary.add(collectionSummary);
         }
@@ -698,10 +708,10 @@ public class Job extends Model implements Comparable<Job> {
             collectionSummary.id = boxBags.get(i).getId();
             collectionSummary.Head = "Coin Bag(" + boxBags.get(i).bagcode + ")";
 //            collectionSummary.Message = boxBags.get(i).ProductName;
-            if(boxBags.get(i).CoinSeriesId==0)
+            if (boxBags.get(i).CoinSeriesId == 0)
                 collectionSummary.Message = boxBags.get(i).ProductName;
             else
-                collectionSummary.Message = boxBags.get(i).ProductName+"("+boxBags.get(i).CoinSeries+")";
+                collectionSummary.Message = boxBags.get(i).ProductName + "(" + boxBags.get(i).CoinSeries + ")";
             collection_summary.add(collectionSummary);
         }
 
@@ -738,16 +748,16 @@ public class Job extends Model implements Comparable<Job> {
 
         //adding the box
         List<Box> boxes = Box.getBoxByTransportMasterId(transportMasterId);
-        if(!boxes.isEmpty()) {
+        if (!boxes.isEmpty()) {
             Content boxContent = new Content();
             boxContent.setDescription("Box");
             int boxQty = 0;
             List<String> boxSealNoList = new ArrayList<>();
             for (int i = 0; i < boxes.size(); i++) {
                 if (boxes.get(i).CoinSeriesId == 0)
-                    boxSealNoList.add(boxes.get(i).ProductName+"*"+boxes.get(i).count);
+                    boxSealNoList.add(boxes.get(i).ProductName + "*" + boxes.get(i).count);
                 else
-                    boxSealNoList.add(boxes.get(i).ProductName + "(" + boxes.get(i).CoinSeries + ")*"+boxes.get(i).count);
+                    boxSealNoList.add(boxes.get(i).ProductName + "(" + boxes.get(i).CoinSeries + ")*" + boxes.get(i).count);
                 boxQty += boxes.get(i).count;
             }
             boxContent.setQty(boxQty);
@@ -765,7 +775,7 @@ public class Job extends Model implements Comparable<Job> {
         if (!boxBags.isEmpty()) {
             for (int i = 0; i < boxBags.size(); i++) {
                 coinBagQty++;
-                boxBagSealNoList.add(boxBags.get(i).bagcode+":"+boxBags.get(i).ProductName + "(" + boxBags.get(i).CoinSeries + ")");
+                boxBagSealNoList.add(boxBags.get(i).bagcode + ":" + boxBags.get(i).ProductName + "(" + boxBags.get(i).CoinSeries + ")");
             }
             boxBagContent.setDescription("Coin Bag");
             boxBagContent.setQty(coinBagQty);
@@ -787,10 +797,10 @@ public class Job extends Model implements Comparable<Job> {
 
         //bags
         List<Bags> bags = Bags.getByTransportMasterId(transportMasterId);
-        if(!bags.isEmpty()) {
+        if (!bags.isEmpty()) {
             Content bagContent = new Content();
             List<String> bagSealNoList = new ArrayList<>();
-            int bagQty=0;
+            int bagQty = 0;
             for (int i = 0; i < bags.size(); i++) {
                 String message = bags.get(i).firstbarcode;
                 if (!bags.get(i).secondbarcode.isEmpty())
@@ -811,9 +821,9 @@ public class Job extends Model implements Comparable<Job> {
             Content envelopContent = new Content();
             Content envelopInBagContent = new Content();
             List<String> envSealNoList = new ArrayList<>();
-            List<Denomination> envelopDenomination=new ArrayList<>();
-            int envQty=0;
-            int enveInBagQty=0;
+            List<Denomination> envelopDenomination = new ArrayList<>();
+            int envQty = 0;
+            int enveInBagQty = 0;
 
 
             for (int j = 0; j < envelopeBags.size(); j++) {
@@ -827,26 +837,26 @@ public class Job extends Model implements Comparable<Job> {
                         envQty++;
                     }
                 } else {
-                    List<String> envelopList=new ArrayList<>();
+                    List<String> envelopList = new ArrayList<>();
                     for (int k = 0; k < envelopes.size(); k++) {
                         envelopList.add(envelopes.get(k).barcode);
                     }
-                    Denomination envelopDeno=new Denomination();
+                    Denomination envelopDeno = new Denomination();
                     enveInBagQty++;
-                    envelopDeno.setBagName("Bag "+enveInBagQty);
+                    envelopDeno.setBagName("Bag " + enveInBagQty);
                     envelopDeno.setSealNo(envelopeBag.bagcode);
                     envelopDeno.setEnvelopsList(envelopList);
                     envelopDenomination.add(envelopDeno);
 
                 }
             }
-            if (envQty>0){
+            if (envQty > 0) {
                 envelopContent.setDescription("Envelopes");
                 envelopContent.setQty(envQty);
                 envelopContent.setSealNoList(envSealNoList);
                 printContent.add(envelopContent);
             }
-            if (enveInBagQty>0){
+            if (enveInBagQty > 0) {
                 envelopInBagContent.setDescription("Envelope In Bag");
                 envelopInBagContent.setQty(enveInBagQty);
                 envelopInBagContent.setDenominationList(envelopDenomination);
@@ -855,7 +865,7 @@ public class Job extends Model implements Comparable<Job> {
 
         }
 
-        return  printContent;
+        return printContent;
     }
 
 
@@ -1009,28 +1019,28 @@ public class Job extends Model implements Comparable<Job> {
                 .execute();
     }
 
-    public static void updateJobStartTime(int TransportMasterId,String JobStartTime) {
+    public static void updateJobStartTime(int TransportMasterId, String JobStartTime) {
         new Update(Job.class)
                 .set("JobStartTime=?", JobStartTime)
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();
     }
 
-    public static void updateDeliveryJobsStartTime(String GroupKey,String JobStartTime) {
+    public static void updateDeliveryJobsStartTime(String GroupKey, String JobStartTime) {
         new Update(Job.class)
                 .set("JobStartTime=?", JobStartTime)
                 .where("IsFloatDeliveryOrder=1 AND GroupKey=?", GroupKey)
                 .execute();
     }
 
-    public static void updateJobEndTime(int TransportMasterId,String JobEndTime) {
+    public static void updateJobEndTime(int TransportMasterId, String JobEndTime) {
         new Update(Job.class)
                 .set("JobEndTime=?", JobEndTime)
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();
     }
 
-    public static void updateDeliveryJobsEndTime(String GroupKey,String JobEndTime) {
+    public static void updateDeliveryJobsEndTime(String GroupKey, String JobEndTime) {
         new Update(Job.class)
                 .set("JobEndTime=?", JobEndTime)
                 .where("IsFloatDeliveryOrder=1 AND GroupKey=?", GroupKey)
@@ -1053,7 +1063,7 @@ public class Job extends Model implements Comparable<Job> {
 
     public static void setCollected(int TransportMasterId) {
         new Update(Job.class)
-                .set("isCollected=?,Status=?", 1,"COMPLETED")
+                .set("isCollected=?,Status=?", 1, "COMPLETED")
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();
 //        Job.UpdateCollectionCompleted(TransportMasterId);
@@ -1081,7 +1091,7 @@ public class Job extends Model implements Comparable<Job> {
                 .execute();
     }
 
-    public static void setOfflineSaved(int TransportMasterId,int status) {
+    public static void setOfflineSaved(int TransportMasterId, int status) {
         new Update(Job.class)
                 .set("isOfflineSaved=?", status)
                 .where("TransportMasterId=?", TransportMasterId)
@@ -1120,5 +1130,13 @@ public class Job extends Model implements Comparable<Job> {
 //        }else {
         return this.SequenceNo.compareTo(o.SequenceNo);
 //        }
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

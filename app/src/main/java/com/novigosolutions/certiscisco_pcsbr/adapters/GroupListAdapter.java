@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener2;
@@ -102,6 +103,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
                 jobtype = 3;
             } else if (j.IsFloatDeliveryOrder) {
                 jobtype = 2;
+                Log.e("DELIVERY" , Integer.toString(position));
             } else if (j.IsCollectionOrder){
                 jobtype = 1;
             }
@@ -144,19 +146,6 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
             holder.txt_remarks.setVisibility(View.GONE);
         }
 
-//        String street_tower = branches.get(position).StreetName;
-//        if (!branches.get(position).Tower.isEmpty()) {
-//            if (street_tower.isEmpty()) street_tower = branches.get(position).Tower;
-//            else street_tower = street_tower + ", " + branches.get(position).Tower;
-//        }
-//        holder.txt_street_tower.setText(street_tower);
-//
-//        String town_pin = branches.get(position).Town;
-//        if (!branches.get(position).PinCode.isEmpty()) {
-//            if (town_pin.isEmpty()) town_pin = branches.get(position).PinCode;
-//            else town_pin = town_pin + ", " + branches.get(position).PinCode;
-//        }
-//        holder.txt_town_pin.setText(town_pin);
         if(!singleJob) {
             if ("ALL".equals(status)) {
                 jobtype = branches.get(position).getBranchJobType();

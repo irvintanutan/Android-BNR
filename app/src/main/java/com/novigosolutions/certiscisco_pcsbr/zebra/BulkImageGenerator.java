@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import com.izettle.html2bitmap.Html2Bitmap;
 import com.izettle.html2bitmap.content.WebViewContent;
 import com.novigosolutions.certiscisco_pcsbr.activites.PrintActivity;
+import com.novigosolutions.certiscisco_pcsbr.activites.PrintSelectedJobActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +73,10 @@ public class BulkImageGenerator extends AsyncTask<Void, Void, List<String>> {
         if (dialog != null) {
             dialog.dismiss();
         }
-        ((PrintActivity)context).setbulktemplateList(bulkPrintTemplate);
+        try {
+            ((PrintActivity) context).setbulktemplateList(bulkPrintTemplate);
+        } catch (Exception e) {
+            ((PrintSelectedJobActivity) context).setbulktemplateList(bulkPrintTemplate);
+        }
     }
 }

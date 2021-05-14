@@ -63,8 +63,6 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
     ImageView imgnetwork;
     Boolean legendisopen = false;
     TextView mTitle;
-    ImageView btnLogout;
-    //  CardView btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,14 +111,6 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         TextView UserName = (TextView) toolbar.findViewById(R.id.UserName);
         UserName.setText(Preferences.getString("UserName", HomeActivity.this));
         imgnetwork = (ImageView) toolbar.findViewById(R.id.imgnetwork);
-        btnLogout=(ImageView) toolbar.findViewById(R.id.im_logout_btn);
-        btnLogout.setVisibility(View.VISIBLE);
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                logout();
-            }
-        });
     }
 
     private void initializeviews() {
@@ -148,7 +138,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
                         intent.putExtra("status", "PENDING");
                         break;
                     case 2:
-                        intent = new Intent(HomeActivity.this, GroupJobActivity.class);
+                        intent = new Intent(HomeActivity.this, SelectionActivity.class);
                         intent.putExtra("status", "COMPLETED");
                         break;
                     case 3:
@@ -163,7 +153,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
 //                        break;
 
                     case 5:
-                        intent =new Intent(HomeActivity.this,PrinterConfigurationActivity.class);
+                        intent = new Intent(HomeActivity.this, PrinterConfigurationActivity.class);
                         break;
 
                     default:
@@ -190,7 +180,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         onNetworkChanged();
         IntentFilter filter = new IntentFilter(CONNECTIVITY_ACTION);
         filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        this.registerReceiver(offlineupdateReceiver,filter);
+        this.registerReceiver(offlineupdateReceiver, filter);
         LocalBroadcastManager.getInstance(this).registerReceiver(syncReceiver,
                 new IntentFilter("syncreciverevent"));
         LocalBroadcastManager.getInstance(this).registerReceiver(syncReceiver,
@@ -216,7 +206,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         animate.setDuration(100);
         legend.startAnimation(animate);
         legend.setVisibility(View.GONE);
-        menulegend.setIcon(R.drawable.ic_info);
+        menulegend.setIcon(R.drawable.ic_baseline_more_horiz_24);
         mTitle.setText("Home");
         legendisopen = false;
     }
@@ -278,7 +268,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        this.menulegend = menu.findItem(R.id.action_info);
+        this.menulegend = menu.findItem(R.id.action_settings);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -292,7 +282,6 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
                 onOptionsItemSelected(refreshItem);
             }
         });
-        //menu.findItem(R.id.action_user_name).setTitle(Preferences.getString("UserName", HomeActivity.this));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -306,13 +295,13 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             } else {
                 raiseInternetSnakbar();
             }
-        } else if (item.getItemId() == R.id.action_info) {
+        } else if (item.getItemId() == R.id.action_settings) {
             if (legendisopen) closeLegend();
-            else openLegend();
+        } else if (item.getItemId() == R.id.action_legend) {
+            openLegend();
+        } else if (item.getItemId() == R.id.action_logout) {
+            logout();
         }
-//        else if(item.getItemId()==R.id.action_logout){
-//            logout();
-//        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -396,7 +385,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
     @Override
     public void onResult(int api_code, int result_code, String result_data) {
         stopRefresh();
-         refreshItem.setVisible(true);
+        refreshItem.setVisible(true);
         if (result_code == 409) {
             authalert(this);
         } else if (result_code == 200) {

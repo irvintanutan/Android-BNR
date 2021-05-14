@@ -1,15 +1,16 @@
 package com.novigosolutions.certiscisco_pcsbr.activites;
 
+
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.icu.text.UnicodeSetSpanner;
 import android.net.wifi.WifiManager;
-import android.os.Handler;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,12 +22,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
-import com.novigosolutions.certiscisco_pcsbr.adapters.GroupGridAdapter;
-import com.novigosolutions.certiscisco_pcsbr.adapters.GroupListAdapter;
+import com.novigosolutions.certiscisco_pcsbr.adapters.JobGridAdapter;
+import com.novigosolutions.certiscisco_pcsbr.adapters.JobListAdapter;
+import com.novigosolutions.certiscisco_pcsbr.adapters.SelectedJobGridAdapter;
+import com.novigosolutions.certiscisco_pcsbr.adapters.SelectedJobListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.OfflineCallback;
-import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener2;
+import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
@@ -50,12 +53,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
 
-public class GroupJobActivity extends BaseActivity implements RecyclerViewClickListener2, ApiCallback, OfflineCallback, NetworkChangekListener {
+
+public class SelectedJobListActivity extends BaseActivity implements RecyclerViewClickListener, ApiCallback, OfflineCallback, NetworkChangekListener {
     private RecyclerView recyclerView;
-    private GroupListAdapter listAdapter;
-    private GroupGridAdapter gridAdapter;
+    private SelectedJobListAdapter listAdapter;
+    private SelectedJobGridAdapter gridAdapter;
     String status = "";
-    List<Branch> jobList;
+    List<Job> jobList;
     CardView cardnodata;
     protected MenuItem refreshItem = null;
     protected MenuItem print = null;
@@ -64,11 +68,12 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
     boolean isgridview = false;
     Handler handler;
     Runnable runnable;
+    int isCollection, isDelivered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_job);
+        setContentView(R.layout.activity_job_list);
         initializeviews();
         setuptoolbar();
     }
@@ -80,12 +85,8 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
         getSupportActionBar().setHomeButtonEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
-        if (status.equals("PENDING"))
-            mTitle.setText("PENDING JOBS");
-        else if (status.equals("COMPLETED"))
-            mTitle.setText("COMPLETED JOBS");
-        else
-            mTitle.setText("ALL JOBS");
+
+        mTitle.setText(status);
         TextView UserName = (TextView) toolbar.findViewById(R.id.UserName);
         UserName.setText(Preferences.getString("UserName", this));
         imgnetwork = (ImageView) toolbar.findViewById(R.id.imgnetwork);
@@ -97,7 +98,14 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
         cl = (CoordinatorLayout) findViewById(R.id.cl);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            status = extras.getString("status");
+            isCollection = extras.getInt("isCollection");
+            isDelivered = extras.getInt("isDelivered");
+
+            if (isCollection == 1) {
+                status = "Collection List";
+            } else {
+                status = "Delivery List";
+            }
         }
         isgridview = Preferences.getBoolean("isgridview", this);
     }
@@ -109,75 +117,62 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
     }
 
     @Override
-    public void recyclerViewListClicked(String GroupKey) {
-        gotoprocessjob(GroupKey);
+    public void recyclerViewListClicked(int position) {
+        gotoprocessjob(position);
     }
 
-    private void gotoprocessjob(String GroupKey) {
+    private void gotoprocessjob(int position) {
+        Job job = jobList.get(position);
+        String GroupKey = job.GroupKey;
+        int TransportMasterId = job.TransportMasterId;
         Branch branch = Branch.getSingle(GroupKey);
-        int branchType = 0;
-        if("ALL".equals(status)) {
-            branchType = branch.getBranchJobType();
-        }else{
-            branchType = branch.getBranchJobTypeByStatus(status);
-        }
-        branch.updateJobStartTime(CommonMethods.getCurrentDateTime(this));
-        Intent intent = null;
-        List<Job> jobsList;
-        if("ALL".equals(status)) {
-            jobsList = Job.getByGroupKey(GroupKey);
-        }else {
-            jobsList = Job.getByGroupKeyAndStatus(GroupKey,status);
-        }
-        Job j =jobsList.get(0);
         int jobtype = 0;
-        if(j.IsCollectionOrder && j.IsFloatDeliveryOrder ) {
+        if (job.IsCollectionOrder && job.IsFloatDeliveryOrder) {
             jobtype = 3;
-        } else if (j.IsFloatDeliveryOrder) {
+        } else if (job.IsFloatDeliveryOrder) {
             jobtype = 2;
-        } else if (j.IsCollectionOrder){
+        } else if (job.IsCollectionOrder) {
             jobtype = 1;
         }
-        if(branchType != 2 && jobsList.size()>1 ){
-            intent = new Intent(GroupJobActivity.this, JobListActivity.class);
-            intent.putExtra("GroupKey", GroupKey);
-            intent.putExtra("status", status);
-        } else if (j.Status.equals("COMPLETED") || (jobtype == 1 && j.isOfflineSaved) || (jobtype == 2 && (j.isOfflineSaved || Reschedule.isOfflineRescheduled(GroupKey))) || (branchType == 3 && j.isOfflineSaved && Reschedule.isOfflineRescheduled(GroupKey))) {
-            intent = new Intent(GroupJobActivity.this, SummaryActivity.class);
-            intent.putExtra("TransportMasterId", j.TransportMasterId);
+
+        List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey);
+        branch.updateJobStartTime(CommonMethods.getCurrentDateTime(this));
+        Intent intent = null;
+        if (job.Status.equals("COMPLETED") || (jobtype == 1 && job.isOfflineSaved) || (jobtype == 2 && (job.isOfflineSaved || Reschedule.isOfflineRescheduled(GroupKey))) || (jobtype == 3 && job.isOfflineSaved && Reschedule.isOfflineRescheduled(GroupKey))) {
+            intent = new Intent(SelectedJobListActivity.this, SummaryActivity.class);
+            intent.putExtra("TransportMasterId", TransportMasterId);
             intent.putExtra("GroupKey", GroupKey);
             intent.putExtra("summaryType", jobtype);
-            intent.putExtra("isSummary",true);
-        } else if (jobtype == 1 ) {
-//            || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey).size() == 0 || branch.isDelOffline))
-            Job.updateJobStartTime(j.TransportMasterId,CommonMethods.getCurrentDateTime(this));
-            intent = new Intent(GroupJobActivity.this, ConfirmationActivity.class);
-            intent.putExtra("TransportMasterId", j.TransportMasterId);
+            intent.putExtra("isSummary", true);
+        } else if (jobtype == 1 || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey).size() == 0 || branch.isDelOffline))) {
+            Job.updateJobStartTime(job.TransportMasterId, CommonMethods.getCurrentDateTime(this));
+            intent = new Intent(SelectedJobListActivity.this, ConfirmationActivity.class);
+            intent.putExtra("TransportMasterId", TransportMasterId);
             intent.putExtra("GroupKey", GroupKey);
             Preferences.saveString("PROGRESSGROUPKEY", GroupKey, this);
         } else if (jobtype == 2 || jobtype == 3) {
             int tmp = 0;
-            for(Job jo:jobsList){
-                if (!TextUtils.isEmpty(jo.DependentOrderId) && Job.checkPendingDependentCollections(jo.DependentOrderId).size()>0) {
+            for (Job jo : jobsList) {
+                if (!TextUtils.isEmpty(jo.DependentOrderId) && Job.checkPendingDependentCollections(jo.DependentOrderId).size() > 0) {
                     tmp = 1;
                     break;
-                } else if(!Delivery.hasPendingDeliveryItems(jo.TransportMasterId)){
+                } else if (!Delivery.hasPendingDeliveryItems(jo.TransportMasterId)) {
                     tmp = 2;
                     break;
                 }
             }
 
-            if(tmp ==1){
+            if (tmp == 1) {
                 alert("Can not perform delivery since item(s) are not collected from pick-up location");
-            } else if(tmp == 2) {
+//            } else if(TextUtils.isEmpty(job.DependentOrderId) && !Delivery.hasPendingDeliveryItems(job.TransportMasterId)){
+            } else if (tmp == 2) {
                 alert("No items to deliver");
             } else {
-                Job.updateDeliveryJobsStartTime(GroupKey,CommonMethods.getCurrentDateTime(this));
-                intent = new Intent(GroupJobActivity.this, ConfirmationActivity.class);
-                intent.putExtra("TransportMasterId", j.TransportMasterId);
+                Job.updateDeliveryJobsStartTime(GroupKey, CommonMethods.getCurrentDateTime(this));
+                intent = new Intent(SelectedJobListActivity.this, ConfirmationActivity.class);
+                intent.putExtra("TransportMasterId", TransportMasterId);
                 intent.putExtra("GroupKey", GroupKey);
             }
-
             Preferences.saveString("PROGRESSGROUPKEY", GroupKey, this);
         }
         if (intent != null) {
@@ -192,7 +187,9 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
         onNetworkChanged();
         IntentFilter filter = new IntentFilter(CONNECTIVITY_ACTION);
         filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        this.registerReceiver(offlineupdateReceiver,filter);
+        this.registerReceiver(offlineupdateReceiver, filter);
+//        LocalBroadcastManager.getInstance(this).registerReceiver(offlineupdateReceiver,
+//                new IntentFilter("offlinereciverevent"));
         LocalBroadcastManager.getInstance(this).registerReceiver(syncReceiver,
                 new IntentFilter("syncreciverevent"));
         Preferences.saveInt("PROGRESSPOINTID", -5, this);
@@ -207,13 +204,11 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
     }
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Preferences.saveInt("PROGRESSPOINTID", -5, this);
     }
-
 
     private BroadcastReceiver offlineupdateReceiver = new NetworkChangeReceiver();
 
@@ -237,17 +232,8 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
         }
     };
 
-    private List<Branch> getJobList() {
-        switch (status) {
-            case "PENDING":
-//                return Branch.getBranchesByStatus("PENDING");
-                return Branch.getPendingBranches();
-            case "COMPLETED":
-//                return Branch.getBranchesByStatus("COMPLETED");
-                return Branch.getCompletedBranches();
-            default:
-                return Branch.getAllBranches();
-        }
+    private List<Job> getJobList() {
+        return Job.getJobListByType(isDelivered, isCollection);
     }
 
     private void refresh() {
@@ -256,12 +242,12 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             if (isgridview) {
                 recyclerView.setLayoutManager(new GridLayoutManager(this, 5));
-                gridAdapter = new GroupGridAdapter(jobList, status,this,this);
+                gridAdapter = new SelectedJobGridAdapter(jobList, this, this);
                 recyclerView.setAdapter(gridAdapter);
             } else {
                 RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
                 recyclerView.setLayoutManager(mLayoutManager);
-                listAdapter = new GroupListAdapter(jobList,status, this, this);
+                listAdapter = new SelectedJobListAdapter(jobList, this, this);
                 recyclerView.setAdapter(listAdapter);
             }
         } else {
@@ -289,11 +275,8 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
                 onOptionsItemSelected(refreshItem);
             }
         });
-        print=menu.findItem(R.id.action_print);
-        if (status.equals("COMPLETED"))
+        print = menu.findItem(R.id.action_print);
             print.setVisible(true);
-        else
-            print.setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -317,7 +300,7 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
             }
             isgridview = !isgridview;
             refresh();
-        }else if(item.getItemId() == R.id.action_print){
+        } else if (item.getItemId() == R.id.action_print) {
             printAll();
         }
         return super.onOptionsItemSelected(item);
@@ -341,20 +324,21 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
         }
     }
 
-    private void printAll(){
-       // List<Job> competedJobCount = Job.getCompletedJobsByStatus();
-        List<Branch> completedBranchCount=Branch.getCompletedBranches();
-        if(completedBranchCount.size()==0){
-            Toast.makeText(GroupJobActivity.this,"No completed jobs to print",Toast.LENGTH_LONG).show();
-        }else{
-            Intent intent = new Intent(GroupJobActivity.this,PrintActivity.class);
-          //  intent.putExtra("status"," SINGLE JOBS");
-            intent.putExtra("status","COMPLETED");
-            intent.putExtra("transporterMasterId",123);
+
+    private void printAll() {
+        // List<Job> competedJobCount = Job.getCompletedJobsByStatus();
+        List<Job> completedBranchCount = getJobList();
+        if (completedBranchCount.size() == 0) {
+            Toast.makeText(SelectedJobListActivity.this, "No completed jobs to print", Toast.LENGTH_LONG).show();
+        } else {
+            Intent intent = new Intent(SelectedJobListActivity.this, PrintSelectedJobActivity.class);
+            intent.putExtra("isCollection", isCollection);
+            intent.putExtra("isDelivered", isDelivered);
+            intent.putExtra("status", "COMPLETED");
+            intent.putExtra("transporterMasterId", 123);
             startActivity(intent);
         }
     }
-
 
     @Override
     public void onNetworkChanged() {
@@ -367,7 +351,7 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
     @Override
     public void onOfflineUpdated(int result, String resultdata) {
         hideProgressDialog();
-        Toast.makeText(GroupJobActivity.this, resultdata, Toast.LENGTH_SHORT).show();
+        Toast.makeText(SelectedJobListActivity.this, resultdata, Toast.LENGTH_SHORT).show();
         refresh();
     }
 

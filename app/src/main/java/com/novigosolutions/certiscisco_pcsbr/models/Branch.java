@@ -172,12 +172,6 @@ public class Branch extends Model implements Comparable<Branch> {
 //    }
 
     public static List<Branch> getCompletedBranches() {
-//        return new Select().from(Branch.class)
-//                .where("GroupKey IN (select DISTINCT GroupKey from job where GroupKey NOT IN\n" +
-//                        "       (SELECT GroupKey  \n" +
-//                        "        FROM  job \n" +
-//                        "        WHERE status = 'PENDING') group by GroupKey )")
-//                .execute();
         List<Branch> branches = new Select().from(Branch.class)
                 .where("GroupKey IN (select DISTINCT GroupKey from job where Status = 'COMPLETED' GROUP BY GroupKey)")
                 .execute();
