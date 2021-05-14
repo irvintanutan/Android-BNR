@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.GestureDetector;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,7 +23,9 @@ import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.DataAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.GridAdapter;
 import com.novigosolutions.certiscisco_pcsbr.models.MenuForm;
+import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
+import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,10 +116,28 @@ public class SelectionActivity extends AppCompatActivity {
         });
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            startActivity(new Intent(SelectionActivity.this, HomeActivity.class));
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
     private void setuptoolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setHomeButtonEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("Select Category");
         TextView UserName = (TextView) toolbar.findViewById(R.id.UserName);
