@@ -276,10 +276,7 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
             }
         });
         print = menu.findItem(R.id.action_print);
-        if (status.equals("COMPLETED"))
             print.setVisible(true);
-        else
-            print.setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -330,12 +327,13 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
 
     private void printAll() {
         // List<Job> competedJobCount = Job.getCompletedJobsByStatus();
-        List<Branch> completedBranchCount = Branch.getCompletedBranches();
+        List<Job> completedBranchCount = getJobList();
         if (completedBranchCount.size() == 0) {
             Toast.makeText(SelectedJobListActivity.this, "No completed jobs to print", Toast.LENGTH_LONG).show();
         } else {
-            Intent intent = new Intent(SelectedJobListActivity.this, PrintActivity.class);
-            //  intent.putExtra("status"," SINGLE JOBS");
+            Intent intent = new Intent(SelectedJobListActivity.this, PrintSelectedJobActivity.class);
+            intent.putExtra("isCollection", isCollection);
+            intent.putExtra("isDelivered", isDelivered);
             intent.putExtra("status", "COMPLETED");
             intent.putExtra("transporterMasterId", 123);
             startActivity(intent);

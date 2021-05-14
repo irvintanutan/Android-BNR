@@ -49,7 +49,6 @@
                         android:layout_height="wrap_content"
                         android:hint="User ID"
                         android:inputType="text"
-                        android:text="116503"
                         android:maxLines="1"
                         tools:text="TEST" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -67,7 +66,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Password"
-                        android:text="097T"
                         android:inputType="textPassword"
                         tools:text="TEST" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -127,7 +125,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="12dp"
-            android:text="VERSION 9.2"
+            android:text="VERSION 10"
             android:textColor="@color/colorPrimary"
             android:textSize="12sp" />
     </RelativeLayout>

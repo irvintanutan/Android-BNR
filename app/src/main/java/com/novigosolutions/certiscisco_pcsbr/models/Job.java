@@ -202,6 +202,8 @@ public class Job extends Model implements Comparable<Job> {
     @Column(name = "StaffID")
     public String StaffID;
 
+    private boolean isSelected;
+
 
     public static Job getSingle(int TransportMasterId) {
         return new Select().from(Job.class)
@@ -1128,5 +1130,13 @@ public class Job extends Model implements Comparable<Job> {
 //        }else {
         return this.SequenceNo.compareTo(o.SequenceNo);
 //        }
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

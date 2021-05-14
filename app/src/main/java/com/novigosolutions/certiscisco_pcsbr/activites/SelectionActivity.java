@@ -48,8 +48,8 @@ public class SelectionActivity extends AppCompatActivity {
 
         form = new ArrayList<>();
 
-        form.add(new MenuForm("Delivery", R.drawable.ic_baseline_drive_eta_24, "Delivery"));
-        form.add(new MenuForm("Collection", R.drawable.ic_baseline_soap_24, "Collection"));
+        form.add(new MenuForm("Delivery", R.drawable.ic_delivery2, "Delivery"));
+        form.add(new MenuForm("Collection", R.drawable.ic_collection2, "Collection"));
 
         RecyclerView.Adapter adapter = new DataAdapter(form, this);
         recyclerView.setAdapter(adapter);

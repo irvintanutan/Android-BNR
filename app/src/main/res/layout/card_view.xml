@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:layout_margin="@dimen/_5sdp"
         android:clickable="true"
-        android:elevation="@dimen/_10sdp"
+        android:elevation="@dimen/_30sdp"
         android:foreground="?android:attr/selectableItemBackground">
 
         <RelativeLayout
@@ -36,7 +36,7 @@
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginBottom="@dimen/_10sdp"
                 android:text="SAMPLE TEXT"
-                android:textColor="@color/colorAccent"
+                android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/_15sdp"
                 android:textStyle="bold" />
         </RelativeLayout>
