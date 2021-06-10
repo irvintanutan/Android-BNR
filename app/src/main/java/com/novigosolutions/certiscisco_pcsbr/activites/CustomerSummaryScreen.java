@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -531,6 +532,8 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 finish();
             } else {
                 raiseSnakbar(":" + result_code);
+                Log.e("ERROR ON SYNCING" , result_data);
+                Toast.makeText(getApplicationContext() , result_data , Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
             raiseSnakbar("Error");

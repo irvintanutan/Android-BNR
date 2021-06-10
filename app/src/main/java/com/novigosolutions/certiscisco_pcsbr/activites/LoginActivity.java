@@ -375,6 +375,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     public void onResult(int api_code, int result_code, String result_data) {
         try {
             Log.e("login response code", ":" + result_code);
+            Log.e("login response code", ":" + result_data);
             if (result_code == 200) {
                 JSONObject obj = new JSONObject(result_data);
                 String result = obj.getString("Result");
