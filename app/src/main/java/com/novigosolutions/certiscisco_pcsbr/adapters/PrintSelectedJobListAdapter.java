@@ -52,6 +52,8 @@ public class PrintSelectedJobListAdapter extends RecyclerView.Adapter<PrintSelec
         serverTime = CommonMethods.getServerTimeInms(context);
         this.checkBoxListnerCallBack = checkBoxListnerCallBack;
         this.isDelivered = isDelivered;
+
+        PrintSelectedJobActivity.list.clear();
     }
 
     @NonNull

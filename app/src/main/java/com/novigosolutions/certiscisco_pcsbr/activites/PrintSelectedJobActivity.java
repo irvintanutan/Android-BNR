@@ -42,7 +42,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class PrintSelectedJobActivity extends BaseActivity implements View.OnClickListener, PrintSelectedJobListAdapter.CheckBoxListnerCallBack, NetworkChangekListener, PrintCallBack {
-    Button btnBack,btnPrint,btnPrintAll,btnSelectedPrint,btnCancel;
+    Button btnBack, btnPrint, btnPrintAll, btnSelectedPrint, btnCancel;
     TextView txtPrintCount;
     ImageView imageView;
     int transporterMasterId;
@@ -53,12 +53,12 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
     public static List<Job> list;
     protected MenuItem refreshItem = null;
     RelativeLayout layoutPrintProcess;
-    LinearLayout layoutSelectJobs,layoutToolBar;
+    LinearLayout layoutSelectJobs, layoutToolBar;
     RecyclerView recyclerView;
     List<Job> jobList;
-    List<Print> printDataArray ;
+    List<Print> printDataArray;
     List<String> printTemplateList;
-    List<String> bulktemplateList=new ArrayList<>();
+    List<String> bulktemplateList = new ArrayList<>();
     private PrintSelectedJobListAdapter listAdapter;
     Runnable runnable;
     Handler handler;
@@ -66,52 +66,54 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
     GenerateImage generateImage;
     BulkImageGenerator bulkImageGenerator;
     Thread t;
-    int printCount=0;
-    Boolean alertFlag=true;
+    int printCount = 0;
+    Boolean alertFlag = true;
     private ProgressDialog progressDialog;
     String groupKey;
     int isCollection, isDelivered;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_print);
         initialiser();
         setupToolBar();
+        clearSelectedJob();
     }
 
     private void initialiser() {
-        btnPrint=findViewById(R.id.bt_print);
-        btnPrintAll=findViewById(R.id.bt_printAll);
-        btnBack=findViewById(R.id.bt_back);
-        btnCancel=findViewById(R.id.bt_cancel_print);
-        btnSelectedPrint=findViewById(R.id.bt_print_selected);
-        txtPrintCount=findViewById(R.id.lb_print_count);
-        imageView=findViewById(R.id.img_print);
-        progressView=findViewById(R.id.cv_progress);
-        layoutSelectJobs=(LinearLayout)findViewById(R.id.lc_recycle);
-        layoutPrintProcess=findViewById(R.id.lc_progress);
+        btnPrint = findViewById(R.id.bt_print);
+        btnPrintAll = findViewById(R.id.bt_printAll);
+        btnBack = findViewById(R.id.bt_back);
+        btnCancel = findViewById(R.id.bt_cancel_print);
+        btnSelectedPrint = findViewById(R.id.bt_print_selected);
+        txtPrintCount = findViewById(R.id.lb_print_count);
+        imageView = findViewById(R.id.img_print);
+        progressView = findViewById(R.id.cv_progress);
+        layoutSelectJobs = (LinearLayout) findViewById(R.id.lc_recycle);
+        layoutPrintProcess = findViewById(R.id.lc_progress);
         btnBack.setOnClickListener(this);
-        layoutToolBar=findViewById(R.id.lc_tool_bar);
+        layoutToolBar = findViewById(R.id.lc_tool_bar);
         btnPrintAll.setOnClickListener(this);
         btnPrint.setOnClickListener(this);
         btnSelectedPrint.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
-        recyclerView=findViewById(R.id.recyclerview);
+        recyclerView = findViewById(R.id.recyclerview);
         progressView.setVisibility(View.GONE);
-        printer=new PrinterSelected(PrintSelectedJobActivity.this,this);
-        list=new ArrayList<Job>();
+        printer = new PrinterSelected(PrintSelectedJobActivity.this, this);
+        list = new ArrayList<>();
         list.clear();
-        printDataArray=new ArrayList<>();
-        printTemplateList=new ArrayList<>();
+        printDataArray = new ArrayList<>();
+        printTemplateList = new ArrayList<>();
     }
 
     private void setupToolBar() {
         Bundle extras = getIntent().getExtras();
-        status=extras.getString("status");
+        status = extras.getString("status");
         groupKey = extras.getString("groupKey");
         isDelivered = extras.getInt("isDelivered");
         isCollection = extras.getInt("isCollection");
-        if(status.equals("COMPLETED")){
+        if (status.equals("COMPLETED")) {
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -126,7 +128,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         }
     }
 
-    private void bulkPrintViewInit(){
+    private void bulkPrintViewInit() {
         layoutSelectJobs.setVisibility(View.VISIBLE);
         btnPrintAll.setVisibility(View.VISIBLE);
         btnPrint.setVisibility(View.GONE);
@@ -138,7 +140,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         jobList = getJobList();
-        listAdapter = new PrintSelectedJobListAdapter(jobList,status, this,this, isDelivered);
+        listAdapter = new PrintSelectedJobListAdapter(jobList, status, this, this, isDelivered);
         recyclerView.setAdapter(listAdapter);
     }
 
@@ -148,7 +150,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.bt_print:
             case R.id.bt_print_selected:
                 checkBluetoothConnection();
@@ -158,9 +160,11 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
                 break;
             case R.id.bt_back:
                 if (status.equals("SINGLE")) {
-                    Intent intent=new Intent(PrintSelectedJobActivity.this,HomeActivity.class);
+                    clearSelectedJob();
+                    Intent intent = new Intent(PrintSelectedJobActivity.this, HomeActivity.class);
                     startActivity(intent);
-                }else {
+                } else {
+                    clearSelectedJob();
                     onBackPressed();
                 }
                 break;
@@ -179,19 +183,19 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
     }
 
     // disabling all buttons and enabling print progress ui
-    private void printUIChange(){
+    private void printUIChange() {
         if (status.equals("COMPLETED")) {
             layoutPrintProcess.setVisibility(View.VISIBLE);
             btnPrintAll.setVisibility(View.GONE);
             btnSelectedPrint.setVisibility(View.GONE);
             layoutSelectJobs.setVisibility(View.GONE);
             btnCancel.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             btnPrint.setVisibility(View.GONE);
         }
         txtPrintCount.setVisibility(View.VISIBLE);
         btnBack.setVisibility(View.GONE);
-        txtPrintCount.setText("Printed 0 / "+printDataArray.size());
+        txtPrintCount.setText("Printed 0 / " + printDataArray.size());
         Glide.with(this)
                 .asGif()
                 .load(R.raw.printerr)
@@ -201,8 +205,8 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
 
     }
 
-    private void checkBluetoothConnection(){
-        if (list.size()!=0) {
+    private void checkBluetoothConnection() {
+        if (list.size() != 0) {
             if (printer.checkBluetoothConection()) {
                 if (printer.checkDeviceAvailability()) {
                     try {
@@ -213,47 +217,47 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
                         raiseSnakbar("Print data error");
                         cancelProcess();
                     }
-                }else {
+                } else {
                     Toast.makeText(PrintSelectedJobActivity.this, "Please select the printer", Toast.LENGTH_LONG).show();
                 }
-            }else {
+            } else {
                 Toast.makeText(PrintSelectedJobActivity.this, "Bluetooth not on", Toast.LENGTH_LONG).show();
             }
-        }else {
+        } else {
             raiseSnakbar("No jobs are selected");
         }
     }
 
-    private void sendPrintDataValidation(){
-        try{
-            if(printDataArray.size()==0)
+    private void sendPrintDataValidation() {
+        try {
+            if (printDataArray.size() == 0)
                 raiseSnakbar("No Data to print");
             else
                 printUIChange();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void processPrintData() {
         printDataArray.clear();
-        BulkSelectedPrintData bulkPrintData = new BulkSelectedPrintData(PrintSelectedJobActivity.this,status,list);
+        BulkSelectedPrintData bulkPrintData = new BulkSelectedPrintData(PrintSelectedJobActivity.this, status, list);
         bulkPrintData.execute();
     }
 
-    public void receiptPrint(){
-            if(printer.doConnectionTestForBulk()){
-                bulkImageGenerator=new BulkImageGenerator(PrintSelectedJobActivity.this,printDataArray);
-                bulkImageGenerator.execute();
-            }else {
-                Toast.makeText(PrintSelectedJobActivity.this,"Failed to connect the printer",Toast.LENGTH_LONG).show();
-            }
+    public void receiptPrint() {
+        if (printer.doConnectionTestForBulk()) {
+            bulkImageGenerator = new BulkImageGenerator(PrintSelectedJobActivity.this, printDataArray);
+            bulkImageGenerator.execute();
+        } else {
+            Toast.makeText(PrintSelectedJobActivity.this, "Failed to connect the printer", Toast.LENGTH_LONG).show();
+        }
     }
 
     //click on cancel button
-    public void cancelProcess(){
-        alertFlag=true;
-        printCount=0;
+    public void cancelProcess() {
+        alertFlag = true;
+        printCount = 0;
         printDataArray.clear();
         if (status.equals("COMPLETED")) {
             list.clear();
@@ -262,21 +266,21 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
             btnSelectedPrint.setVisibility(View.GONE);
             layoutPrintProcess.setVisibility(View.GONE);
             printRecyclerViewInit();
-        }else {
+        } else {
             setPrintImage();
             btnPrint.setVisibility(View.VISIBLE);
         }
         btnCancel.setVisibility(View.GONE);
         btnBack.setVisibility(View.VISIBLE);
+        clearSelectedJob();
 
     }
 
-    private void setPrintImage(){
+    private void setPrintImage() {
         Glide.with(this)
                 .load(R.drawable.printerrimg)
                 .into(imageView);
     }
-
 
 
     @Override
@@ -299,10 +303,12 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
     @Override
     public boolean onSupportNavigateUp() {
         if (status.equals("SINGLE")) {
-            Intent intent=new Intent(PrintSelectedJobActivity.this,HomeActivity.class);
+            clearSelectedJob();
+            Intent intent = new Intent(PrintSelectedJobActivity.this, HomeActivity.class);
             startActivity(intent);
-        } else{
+        } else {
             onBackPressed();
+            clearSelectedJob();
         }
         finish();
         return true;
@@ -310,39 +316,42 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
 
     @Override
     public void onChange() {
-        if(list.size()==0)
+        if (list.size() == 0) {
             btnSelectedPrint.setVisibility(View.GONE);
-        else
+            btnPrintAll.setVisibility(View.VISIBLE);
+        } else {
             btnSelectedPrint.setVisibility(View.VISIBLE);
+            btnPrintAll.setVisibility(View.GONE);
+        }
     }
 
-    public void alertView(){
+    public void alertView() {
         printer.cancelBulkPrint();    // cancel the print job
         cancelProcess();
     }
 
-    public List<String> getbulktemplateList(){
+    public List<String> getbulktemplateList() {
         return bulktemplateList;
     }
 
-    public void setprintDataArray(List<Print> printDataArray){
-        this.printDataArray=printDataArray;
+    public void setprintDataArray(List<Print> printDataArray) {
+        this.printDataArray = printDataArray;
         sendPrintDataValidation();
     }
 
-    public void setbulktemplateList(List<String> bulktemplateList){
-        this.bulktemplateList=bulktemplateList; 
+    public void setbulktemplateList(List<String> bulktemplateList) {
+        this.bulktemplateList = bulktemplateList;
         printer.printBulk(PrinterSelected.PRINT, status);
     }
 
     @Override
     public void onPrint(int flag, String message) {
         if (flag == 1) {
-            Toast.makeText(PrintSelectedJobActivity.this,"Printing Completed",Toast.LENGTH_LONG).show();
-            if (status.equals("SINGLE")){
+            Toast.makeText(PrintSelectedJobActivity.this, "Printing Completed", Toast.LENGTH_LONG).show();
+            if (status.equals("SINGLE")) {
                 onBackPressed();
                 finish();
-            }else {
+            } else {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -354,9 +363,15 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
             }
         } else if (flag == 2) {
             printCount++;
-            txtPrintCount.setText("Printed "+ printCount+" / " + printDataArray.size());
+            txtPrintCount.setText("Printed " + printCount + " / " + printDataArray.size());
         } else if (flag == 3) {
 
+        }
+    }
+
+    void clearSelectedJob () {
+        for (Job job : jobList) {
+            job.setSelected(false);
         }
     }
 }
