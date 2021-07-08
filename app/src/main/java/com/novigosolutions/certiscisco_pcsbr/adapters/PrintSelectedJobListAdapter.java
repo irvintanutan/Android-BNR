@@ -77,7 +77,12 @@ public class PrintSelectedJobListAdapter extends RecyclerView.Adapter<PrintSelec
         } 
 
         holder.txt_customer_name.setText(j.CustomerName);
-        holder.txt_functional_code.setText(j.OrderNo);
+
+        if(j.IsFloatDeliveryOrder){
+            holder.txt_functional_code.setText(Job.getAllDeliveryOrderNos(j.GroupKey));
+        } else{
+            holder.txt_functional_code.setText(Job.getSingle(j.TransportMasterId).OrderNo);
+        }
 
         if (singleJob) {
             if (!TextUtils.isEmpty(j.SequenceNo) && !j.SequenceNo.equalsIgnoreCase("null"))

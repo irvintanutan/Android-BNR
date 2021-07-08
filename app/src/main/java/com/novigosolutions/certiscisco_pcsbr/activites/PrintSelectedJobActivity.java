@@ -22,6 +22,7 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.PrintCallBack;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
+import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
@@ -38,6 +39,8 @@ import java.util.List;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,6 +48,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
     Button btnBack, btnPrint, btnPrintAll, btnSelectedPrint, btnCancel;
     TextView txtPrintCount;
     ImageView imageView;
+    ConstraintLayout mainContainer;
     int transporterMasterId;
     String status;
     ImageView imgnetwork;
@@ -79,9 +83,15 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         initialiser();
         setupToolBar();
         clearSelectedJob();
+        if (transporterMasterId != 123) {
+            mainContainer.setVisibility(View.GONE);
+            list = Job.getSpecificJobListByType(isDelivered, isCollection, transporterMasterId);
+            checkBluetoothConnection();
+        }
     }
 
     private void initialiser() {
+        mainContainer = findViewById(R.id.mainContainer);
         btnPrint = findViewById(R.id.bt_print);
         btnPrintAll = findViewById(R.id.bt_printAll);
         btnBack = findViewById(R.id.bt_back);
@@ -113,6 +123,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         groupKey = extras.getString("groupKey");
         isDelivered = extras.getInt("isDelivered");
         isCollection = extras.getInt("isCollection");
+        transporterMasterId = extras.getInt("transporterMasterId");
         if (status.equals("COMPLETED")) {
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
@@ -174,7 +185,6 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         }
     }
 
-
     //click on printAll button
     private void printAll() {
         list.clear();
@@ -219,6 +229,11 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
                     }
                 } else {
                     Toast.makeText(PrintSelectedJobActivity.this, "Please select the printer", Toast.LENGTH_LONG).show();
+                    if (transporterMasterId != 123) {
+                        Intent intent = new Intent(PrintSelectedJobActivity.this, HomeActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
                 }
             } else {
                 Toast.makeText(PrintSelectedJobActivity.this, "Bluetooth not on", Toast.LENGTH_LONG).show();
@@ -241,7 +256,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
 
     private void processPrintData() {
         printDataArray.clear();
-        BulkSelectedPrintData bulkPrintData = new BulkSelectedPrintData(PrintSelectedJobActivity.this, status, list);
+        BulkSelectedPrintData bulkPrintData = new BulkSelectedPrintData(PrintSelectedJobActivity.this, status, list, isDelivered);
         bulkPrintData.execute();
     }
 
@@ -259,6 +274,13 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         alertFlag = true;
         printCount = 0;
         printDataArray.clear();
+
+        if (transporterMasterId != 123) {
+            Intent intent = new Intent(PrintSelectedJobActivity.this, HomeActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         if (status.equals("COMPLETED")) {
             list.clear();
             layoutSelectJobs.setVisibility(View.VISIBLE);
@@ -337,6 +359,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
     public void setprintDataArray(List<Print> printDataArray) {
         this.printDataArray = printDataArray;
         sendPrintDataValidation();
+        mainContainer.setVisibility(View.VISIBLE);
     }
 
     public void setbulktemplateList(List<String> bulktemplateList) {
@@ -369,7 +392,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         }
     }
 
-    void clearSelectedJob () {
+    void clearSelectedJob() {
         for (Job job : jobList) {
             job.setSelected(false);
         }

@@ -193,6 +193,8 @@ public class APICaller {
                             if (api_code == Constants.SYNC) {
                                 JSONObject obj = new JSONObject(result_body);
                                 String result = obj.getString("Result");
+                                Log.e("RESULT" , result_body);
+
                                 if (result.equals("Success")) {
                                     Boolean ischangeindata = false, hasBreak = false;
                                     JSONObject jsonObject = obj.getJSONObject("Data");

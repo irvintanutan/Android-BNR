@@ -20,12 +20,14 @@ public class BulkSelectedPrintData extends AsyncTask<Void,Void, List<Print>> {
     private List<Job> jobs;
     private ProgressDialog dialog;
     private String status;
+    private int isDelivery;
     PrinterSelected printer;
 
-    public BulkSelectedPrintData(Context context, String status, List<Job> list){
+    public BulkSelectedPrintData(Context context, String status, List<Job> list, int isDelivery){
         this.context=context;
         this.jobs=list;
         this.status=status;
+        this.isDelivery = isDelivery;
         dialog = new ProgressDialog(context);
     }
 
@@ -63,7 +65,7 @@ public class BulkSelectedPrintData extends AsyncTask<Void,Void, List<Print>> {
                         print.setServiceEndTime(CommonMethods.getTimeIn12Hour(jobs.get(j).ActualToTime));
                     }
                     //Transaction Details
-                    print.setTransactionId(jobs.get(j).OrderNo);
+                    print.setTransactionId(jobs.get(j).ReceiptNo);
                     print.setFunctionalLocation(jobs.get(j).PDFunctionalCode);
                     print.setDeliveryPoint(jobs.get(j).BranchCode);
 
@@ -128,7 +130,7 @@ public class BulkSelectedPrintData extends AsyncTask<Void,Void, List<Print>> {
                     print.setBranchName(branch.BranchName);
                     print.setCustomerLocation(jobs.get(j).BranchStreetName + " " + jobs.get(j).BranchTower + " " + jobs.get(j).BranchTown + " " + jobs.get(j).BranchPinCode);
 
-                    print.setContentList(Job.getPrintContent(jobs.get(j).TransportMasterId));
+                    print.setContentList(Job.getSelectedPrintContent(jobs.get(j).GroupKey , isDelivery));
 //                    if (status.equals("SINGLE")) {
 //                        print.setCustomerAcknowledgment(printer.getSign());
 //                    } else {

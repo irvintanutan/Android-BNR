@@ -143,6 +143,8 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
             intent.putExtra("TransportMasterId", TransportMasterId);
             intent.putExtra("GroupKey", GroupKey);
             intent.putExtra("summaryType", jobtype);
+            intent.putExtra("isDelivery" , isDelivered);
+            intent.putExtra("isCollection" , isCollection);
             intent.putExtra("isSummary", true);
         } else if (jobtype == 1 || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey).size() == 0 || branch.isDelOffline))) {
             Job.updateJobStartTime(job.TransportMasterId, CommonMethods.getCurrentDateTime(this));

@@ -1,17 +1,12 @@
 package com.novigosolutions.certiscisco_pcsbr.models;
 
 
-import android.content.Context;
-import android.text.TextUtils;
-import android.util.Log;
-
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.activeandroid.query.Update;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Content;
@@ -19,7 +14,6 @@ import com.novigosolutions.certiscisco_pcsbr.zebra.Denomination;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Table(name = "job")
@@ -202,6 +196,9 @@ public class Job extends Model implements Comparable<Job> {
     @Column(name = "StaffID")
     public String StaffID;
 
+    @Column(name = "ReceiptNo")
+    public String ReceiptNo;
+
     private boolean isSelected;
 
 
@@ -262,6 +259,26 @@ public class Job extends Model implements Comparable<Job> {
     public static List<Job> getJobListByType(int isDelivered, int isCollection) {
         List<Job> jl = new Select().from(Job.class)
                 .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=?", "COMPLETED", isCollection, isDelivered)
+                .groupBy("GroupKey")
+                .orderBy("SequenceNo")
+                .execute();
+
+        return jl;
+    }
+
+    public static List<Job> getJobListByTypeByGroupKey(int isDelivered, int isCollection, String groupKey) {
+        List<Job> jl = new Select().from(Job.class)
+                .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=? ", "COMPLETED", isCollection, isDelivered, groupKey)
+                .execute();
+
+        return jl;
+    }
+
+    public static List<Job> getSpecificJobListByType(int isDelivered, int isCollection, int TransportMasterId) {
+        List<Job> jl = new Select().from(Job.class)
+                .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and TransportMasterId=?", "COMPLETED", isCollection, isDelivered, TransportMasterId)
+                .groupBy("GroupKey")
+                .orderBy("SequenceNo")
                 .execute();
 
         return jl;
@@ -742,9 +759,9 @@ public class Job extends Model implements Comparable<Job> {
         return collection_summary;
     }
 
+
     public static List<Content> getPrintContent(int transportMasterId) {
         List<Content> printContent = new ArrayList<>();
-
 
         //adding the box
         List<Box> boxes = Box.getBoxByTransportMasterId(transportMasterId);
@@ -865,6 +882,144 @@ public class Job extends Model implements Comparable<Job> {
 
         }
 
+        return printContent;
+    }
+
+    public static List<Content> getSelectedPrintContent(String groupKey, int isDelivery) {
+        List<Content> printContent = new ArrayList<>();
+        int isCollection = isDelivery == 0 ? 1 : 0;
+        List<Job> list = Job.getJobListByTypeByGroupKey(isDelivery, isCollection, groupKey);
+
+        int bagQty = 0, boxQty = 0, coinBagQty = 0;
+        List<String> boxSealNoList = new ArrayList<>();
+        List<String> boxBagSealNoList = new ArrayList<>();
+        List<String> bagSealNoList = new ArrayList<>();
+
+        for (int a = 0; a < list.size(); a++) {
+            int transportMasterId = list.get(a).TransportMasterId;
+            //adding the box
+            List<Box> boxes = Box.getBoxByTransportMasterId(transportMasterId);
+            if (!boxes.isEmpty()) {
+
+
+                for (int i = 0; i < boxes.size(); i++) {
+                    if (boxes.get(i).CoinSeriesId == 0)
+                        boxSealNoList.add(boxes.get(i).ProductName + "*" + boxes.get(i).count);
+                    else
+                        boxSealNoList.add(boxes.get(i).ProductName + "(" + boxes.get(i).CoinSeries + ")*" + boxes.get(i).count);
+                    boxQty += boxes.get(i).count;
+                }
+            }
+
+
+            //adding coinBag
+            List<BoxBag> boxBags = BoxBag.getByTransportMasterId(transportMasterId);
+            if (!boxBags.isEmpty()) {
+                for (int i = 0; i < boxBags.size(); i++) {
+                    coinBagQty++;
+                    boxBagSealNoList.add(boxBags.get(i).bagcode + ":" + boxBags.get(i).ProductName + "(" + boxBags.get(i).CoinSeries + ")");
+                }
+
+            }
+
+
+            //pallet
+            int palletCount = getSingle(transportMasterId).palletCount;
+            if (palletCount > 0) {
+                Content palletContent = new Content();
+                List<String> palletSealNoList = new ArrayList<>();
+                palletContent.setDescription("Pallet");
+                palletContent.setQty(palletCount);
+                palletContent.setSealNoList(palletSealNoList);
+                printContent.add(palletContent);
+            }
+
+            //bags
+            List<Bags> bags = Bags.getByTransportMasterId(transportMasterId);
+            if (!bags.isEmpty()) {
+                for (int i = 0; i < bags.size(); i++) {
+                    String message = bags.get(i).firstbarcode;
+                    if (!bags.get(i).secondbarcode.isEmpty())
+                        message += ", " + bags.get(i).secondbarcode;
+                    bagQty++;
+                    bagSealNoList.add(message);
+
+                }
+            }
+
+
+            List<EnvelopeBag> envelopeBags = EnvelopeBag.getByTransportMasterId(transportMasterId);
+            if (!envelopeBags.isEmpty()) {
+                Content envelopContent = new Content();
+                Content envelopInBagContent = new Content();
+                List<String> envSealNoList = new ArrayList<>();
+                List<Denomination> envelopDenomination = new ArrayList<>();
+                int envQty = 0;
+                int enveInBagQty = 0;
+
+
+                for (int j = 0; j < envelopeBags.size(); j++) {
+                    EnvelopeBag envelopeBag = envelopeBags.get(j);
+                    List<Envelope> envelopes = Envelope.getByBagId(envelopeBag.getId());
+                    if (envelopeBag.bagcode.equals("none")) {
+                        for (int k = 0; k < envelopes.size(); k++) {
+                            JsonObject Detail = new JsonObject();
+                            Detail.addProperty("ItemType", "Envelopes");
+                            envSealNoList.add(envelopes.get(k).barcode);
+                            envQty++;
+                        }
+                    } else {
+                        List<String> envelopList = new ArrayList<>();
+                        for (int k = 0; k < envelopes.size(); k++) {
+                            envelopList.add(envelopes.get(k).barcode);
+                        }
+                        Denomination envelopDeno = new Denomination();
+                        enveInBagQty++;
+                        envelopDeno.setBagName("Bag " + enveInBagQty);
+                        envelopDeno.setSealNo(envelopeBag.bagcode);
+                        envelopDeno.setEnvelopsList(envelopList);
+                        envelopDenomination.add(envelopDeno);
+
+                    }
+                }
+                if (envQty > 0) {
+                    envelopContent.setDescription("Envelopes");
+                    envelopContent.setQty(envQty);
+                    envelopContent.setSealNoList(envSealNoList);
+                    printContent.add(envelopContent);
+                }
+                if (enveInBagQty > 0) {
+                    envelopInBagContent.setDescription("Envelope In Bag");
+                    envelopInBagContent.setQty(enveInBagQty);
+                    envelopInBagContent.setDenominationList(envelopDenomination);
+                    printContent.add(envelopInBagContent);
+                }
+
+            }
+        }
+        if (!bagSealNoList.isEmpty()) {
+            Content bagContent = new Content();
+            bagContent.setDescription("Bag");
+            bagContent.setQty(bagQty);
+            bagContent.setSealNoList(bagSealNoList);
+            printContent.add(bagContent);
+        }
+
+        if (!boxBagSealNoList.isEmpty()) {
+            Content boxBagContent = new Content();
+            boxBagContent.setDescription("Coin Bag");
+            boxBagContent.setQty(coinBagQty);
+            boxBagContent.setSealNoList(boxBagSealNoList);
+            printContent.add(boxBagContent);
+        }
+
+        if (!boxSealNoList.isEmpty()) {
+            Content boxContent = new Content();
+            boxContent.setDescription("Box");
+            boxContent.setQty(boxQty);
+            boxContent.setSealNoList(boxSealNoList);
+            printContent.add(boxContent);
+        }
         return printContent;
     }
 

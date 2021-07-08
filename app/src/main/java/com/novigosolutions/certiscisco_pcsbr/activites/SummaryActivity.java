@@ -12,11 +12,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.internal.$Gson$Preconditions;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.CollectionSummaryAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.StringAdapter;
-import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
@@ -26,20 +24,10 @@ import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.ui.SignatureView;
-import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
-import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
-import com.novigosolutions.certiscisco_pcsbr.zebra.Content;
-import com.novigosolutions.certiscisco_pcsbr.zebra.Print;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,9 +40,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class SummaryActivity extends BaseActivity implements View.OnClickListener, NetworkChangekListener {
-    TextView txt_customer_name, txt_del_head,txt_del_count, txt_branch_name, txt_functional_code;//, txt_town_pin ,, txt_street_tower
+    TextView txt_customer_name, txt_del_head, txt_del_count, txt_branch_name, txt_functional_code;//, txt_town_pin ,, txt_street_tower
     //    int PointId;
-    TextView txt_sealed_count,txt_unsealed_count;  //nidheesh
+    TextView txt_sealed_count, txt_unsealed_count;  //nidheesh
     String GroupKey;
     int summaryType = 0;
     ImageView img_erase;
@@ -63,8 +51,9 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
     Button button_submit;
     View bll;
     LinearLayout ll_lists, ll_delivery;
-    Button btn_ok,btn_print,btnCancel;
+    Button btn_ok, btn_print, btnCancel;
     int TransportMasterId;
+    int isDelivery = 0, isCollection = 0;
     static int total_item_counter;
     Boolean isSummaryScreen;
 
@@ -78,7 +67,9 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             GroupKey = extras.getString("GroupKey");
             summaryType = extras.getInt("summaryType");
             TransportMasterId = extras.getInt("TransportMasterId");
-            isSummaryScreen = extras.getBoolean("isSummary",false);
+            isSummaryScreen = extras.getBoolean("isSummary", false);
+            isDelivery = extras.getInt("isDelivery");
+            isCollection = extras.getInt("isCollection");
         }
         setuptoolbar();
         ll_lists = findViewById(R.id.ll_lists);
@@ -92,24 +83,24 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
         txt_branch_name = (TextView) findViewById(R.id.txt_txt_branch_name);
 
         //nidheesh ** start
-        txt_sealed_count=(TextView)findViewById(R.id.txt_seal_count);
-        txt_unsealed_count=(TextView)findViewById(R.id.txt_unseal_count);
+        txt_sealed_count = (TextView) findViewById(R.id.txt_seal_count);
+        txt_unsealed_count = (TextView) findViewById(R.id.txt_unseal_count);
         txt_sealed_count.setVisibility(View.GONE);
         txt_unsealed_count.setVisibility(View.GONE);
-        total_item_counter=0;
+        total_item_counter = 0;
 
         //nidheesh ** end
 
 
         Branch branch = Branch.getSingle(GroupKey);
         Job job = Job.getSingle(TransportMasterId);
-        if (isSummary(branch,job)) {
+        if (isSummary(branch, job)) {
             bll = findViewById(R.id.bll);
             bll.setVisibility(View.GONE);
             btn_ok = findViewById(R.id.btn_ok);
             btn_ok.setVisibility(View.VISIBLE);
             btn_ok.setOnClickListener(this);
-            btn_print=findViewById(R.id.btn_print);
+            btn_print = findViewById(R.id.btn_print);
             btn_print.setVisibility(View.VISIBLE);
             btn_print.setOnClickListener(this);
             btnCancel = findViewById(R.id.btn_cancel);
@@ -126,9 +117,9 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             btnCancel.setOnClickListener(this);
         }
         txt_customer_name.setText(branch.CustomerName);
-        if(job.IsFloatDeliveryOrder) {
+        if (job.IsFloatDeliveryOrder) {
             txt_functional_code.setText(Job.getDeliveryOrderNos(branch.GroupKey));
-        }else {
+        } else {
             txt_functional_code.setText(job.OrderNo);
         }
 //        String street_tower = branch.StreetName;
@@ -151,7 +142,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             }
             ll_lists = findViewById(R.id.ll_lists);
             List<Job> jobs = new ArrayList<>();
-            if (isSummary(branch,job))
+            if (isSummary(branch, job))
 //                jobs = Job.getCollectionJobsOfPoint(GroupKey);
                 jobs.add(Job.getSingle(TransportMasterId));
             else
@@ -164,8 +155,8 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                     TextView txt_branch_code = titleList.findViewById(R.id.txt_branch_code);
 
                     //nidheesh ** start
-                    TextView txt_col_box_count=titleList.findViewById(R.id.txt_col_bag_count);  // nidheesh
-                    TextView txt_envs_count=titleList.findViewById(R.id.txt_col_env_count);
+                    TextView txt_col_box_count = titleList.findViewById(R.id.txt_col_bag_count);  // nidheesh
+                    TextView txt_envs_count = titleList.findViewById(R.id.txt_col_env_count);
                     //nidheesh ** end
 
                     txt_branch_code.setText("" + jobs.get(i).BranchCode + " - " + jobs.get(i).OrderNo);
@@ -196,14 +187,13 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                     boxCounter(jobs.get(i).TransportMasterId);
                     //nidheesh ** start
                     txt_col_box_count.setVisibility(View.VISIBLE);
-                    txt_col_box_count.setText("Items Count : "+total_item_counter);
-                    int envCountValue=counter(collectionSummaries);
-                    if(envCountValue==0) {
+                    txt_col_box_count.setText("Items Count : " + total_item_counter);
+                    int envCountValue = counter(collectionSummaries);
+                    if (envCountValue == 0) {
                         txt_envs_count.setVisibility(View.GONE);
-                    }
-                    else {
+                    } else {
                         txt_envs_count.setVisibility(View.VISIBLE);
-                        txt_envs_count.setText("Env-In-Bag : "+ envCountValue);
+                        txt_envs_count.setText("Env-In-Bag : " + envCountValue);
                     }
                     //nidheesh ** end
 
@@ -227,7 +217,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                 dlist.setVisibility(View.GONE);
             } else {
                 List<Delivery> bagList = null;
-                if (isSummary(branch,job)) bagList = Delivery.getSealedByPointId(GroupKey);
+                if (isSummary(branch, job)) bagList = Delivery.getSealedByPointId(GroupKey);
                 else bagList = Delivery.getPendingSealedByPointId(GroupKey);
                 if (bagList.size() > 0) {
                     List<String> baglist = new ArrayList<>();
@@ -236,10 +226,10 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                     baglistView.setLayoutManager(mLayoutManager);
                     baglistView.setItemAnimator(new DefaultItemAnimator());
                     for (int i = 0; i < bagList.size(); i++) {
-                        if(bagList.get(i).ItemType.equals("Coin Box") || bagList.get(i).ItemType.equals("BOX")) {
-                            if(bagList.get(i).CoinSeriesId==0){
+                        if (bagList.get(i).ItemType.equals("Coin Box") || bagList.get(i).ItemType.equals("BOX")) {
+                            if (bagList.get(i).CoinSeriesId == 0) {
                                 baglist.add(bagList.get(i).ItemType + "(" + bagList.get(i).SealNo + ")");
-                            }else{
+                            } else {
                                 baglist.add(bagList.get(i).ItemType + "(" + bagList.get(i).SealNo + ")(" + bagList.get(i).CoinSeries + ")");
                             }
                         } else
@@ -253,11 +243,11 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
 
                 //nidheesh ** start
                 txt_sealed_count.setVisibility(View.VISIBLE);
-                txt_sealed_count.setText("Item count : "+bagList.size());
+                txt_sealed_count.setText("Item count : " + bagList.size());
                 //nidheesh ** end
 
                 List<Delivery> boxList = null;
-                if (isSummary(branch,job)) boxList = Delivery.getUnSealedByPointId(GroupKey);
+                if (isSummary(branch, job)) boxList = Delivery.getUnSealedByPointId(GroupKey);
                 else boxList = Delivery.getPendingUnSealedByPointId(GroupKey);
                 if (boxList.size() > 0) {
                     RecyclerView boxlistView = findViewById(R.id.boxlistview);
@@ -266,20 +256,19 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                     boxlistView.setItemAnimator(new DefaultItemAnimator());
                     List<String> boxlist = new ArrayList<>();
                     //nidheesh ** start
-                    int unsealed=0;
+                    int unsealed = 0;
                     //nidheesh ** end
 
                     for (int i = 0; i < boxList.size(); i++) {
                         //nidheesh ** start
-                        unsealed+= boxList.get(i).Qty;
+                        unsealed += boxList.get(i).Qty;
                         //nidheesh ** end
-                        if (boxList.get(i).ItemType.equals("BOX") || boxList.get(i).ItemType.equals("Coin Box")){
-                            if(boxList.get(i).CoinSeriesId==0)
+                        if (boxList.get(i).ItemType.equals("BOX") || boxList.get(i).ItemType.equals("Coin Box")) {
+                            if (boxList.get(i).CoinSeriesId == 0)
                                 boxlist.add(boxList.get(i).ItemType + "(" + boxList.get(i).Denomination + " * " + boxList.get(i).Qty + ")");
                             else
-                                boxlist.add(boxList.get(i).ItemType + "(" + boxList.get(i).Denomination + " * " + boxList.get(i).Qty + ")("+boxList.get(i).CoinSeries+")");
-                        }
-                        else {
+                                boxlist.add(boxList.get(i).ItemType + "(" + boxList.get(i).Denomination + " * " + boxList.get(i).Qty + ")(" + boxList.get(i).CoinSeries + ")");
+                        } else {
                             boxlist.add(boxList.get(i).ItemType + "(" + boxList.get(i).Qty + ")");
                         }
 //                        if (boxList.get(i).ItemType.equals("BOX"))
@@ -291,7 +280,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                     boxlistView.setAdapter(boxAdapter);
                     //nidheesh ** start
                     txt_unsealed_count.setVisibility(View.VISIBLE);
-                    txt_unsealed_count.setText("Item count : "+unsealed);
+                    txt_unsealed_count.setText("Item count : " + unsealed);
                     //nidheesh ** end
                 } else {
                     findViewById(R.id.no_box_list).setVisibility(View.VISIBLE);
@@ -301,7 +290,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
         }
     }
 
-    private boolean isSummary(Branch branch,Job job) {
+    private boolean isSummary(Branch branch, Job job) {
         if (job.Status.equals("COMPLETED")
                 || (summaryType == Constants.COLLECTION && job.isOfflineSaved)
                 || (summaryType == Constants.DELIVERY &&
@@ -315,57 +304,57 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
     }
 
     //nidheesh ** start
-    public  int counter(List<Summary> collectionSummaries) {
-        int envolops_count=0;
-        List<Summary> summary=collectionSummaries ;
-        for(int i=0;i<summary.size();i++) {
-            if(summary.get(i).Collection_type.equals("EnvelopeBag")) {
-                String msg=summary.get(i).Message;
+    public int counter(List<Summary> collectionSummaries) {
+        int envolops_count = 0;
+        List<Summary> summary = collectionSummaries;
+        for (int i = 0; i < summary.size(); i++) {
+            if (summary.get(i).Collection_type.equals("EnvelopeBag")) {
+                String msg = summary.get(i).Message;
                 String[] elements = msg.split(",");
                 List<String> fixedLenghtList = Arrays.asList(elements);
                 ArrayList<String> listOfString = new ArrayList<String>(fixedLenghtList);
-                envolops_count+=listOfString.size();
+                envolops_count += listOfString.size();
             }
         }
         return envolops_count;
     }
 
-    public void itemCounter(List<Summary> collectionSummaries){
-        int item_count=0;
-        List<Summary> summary=collectionSummaries ;
-        for(int i=0;i<summary.size();i++) {
-            if(summary.get(i).Collection_type.equals("Box")) {
+    public void itemCounter(List<Summary> collectionSummaries) {
+        int item_count = 0;
+        List<Summary> summary = collectionSummaries;
+        for (int i = 0; i < summary.size(); i++) {
+            if (summary.get(i).Collection_type.equals("Box")) {
 //                int count=0;
 //                count=boxCount(summary.get(i).Message);
 //                if(count>0){
 //                    item_count+=count;
 //                }
-            }else if(summary.get(i).Collection_type.equals("Pallet")){
-                item_count+=Integer.parseInt(summary.get(i).Message);
-            }else{
+            } else if (summary.get(i).Collection_type.equals("Pallet")) {
+                item_count += Integer.parseInt(summary.get(i).Message);
+            } else {
                 item_count++;
             }
 
         }
-        total_item_counter+=item_count;
+        total_item_counter += item_count;
         // return item_count;
     }
 
-    public int boxCount(String message){
-        String str=message;
-        int count=Integer.parseInt(str.substring(str.indexOf('(')+1,str.indexOf(')')));
+    public int boxCount(String message) {
+        String str = message;
+        int count = Integer.parseInt(str.substring(str.indexOf('(') + 1, str.indexOf(')')));
         return count;
     }
 
     private void boxCounter(int transportMasterId) {
-        int count=0;
-        List<Box> box=Box.getBoxByTransportMasterId(transportMasterId);
-        if(box.size()>0){
-            for(int i=0;i<box.size();i++){
-                count+=box.get(i).count;
+        int count = 0;
+        List<Box> box = Box.getBoxByTransportMasterId(transportMasterId);
+        if (box.size() > 0) {
+            for (int i = 0; i < box.size(); i++) {
+                count += box.get(i).count;
             }
         }
-        total_item_counter+=count;
+        total_item_counter += count;
     }
     //nidheesh ** end
 
@@ -376,9 +365,9 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
         getSupportActionBar().setHomeButtonEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
-        if (isSummaryScreen){
+        if (isSummaryScreen) {
             mTitle.setText("SUMMARY");
-        }else {
+        } else {
             mTitle.setText("TRANSACTION OFFICER \nSUMMARY");
         }
         TextView UserName = (TextView) toolbar.findViewById(R.id.UserName);
@@ -425,13 +414,13 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                 Toast.makeText(this, "Signature is empty", Toast.LENGTH_SHORT).show();
             } else {
                 //saving signature in preference using shared preferences
-                Preferences.saveString("signature",sign,SummaryActivity.this);
+                Preferences.saveString("signature", sign, SummaryActivity.this);
                 if (summaryType == Constants.COLLECTION) {
                     Branch.updatecolSignature(GroupKey, sign);
-                    Job.UpdateSignature(TransportMasterId,sign);
+                    Job.UpdateSignature(TransportMasterId, sign);
                 } else if (summaryType == Constants.DELIVERY) {
                     Branch.updatedelSignature(GroupKey, sign);
-                    Job.UpdateSignature(TransportMasterId,sign);
+                    Job.UpdateSignature(TransportMasterId, sign);
                 }
                 button_submit.setEnabled(true);
                 Intent intent = new Intent(SummaryActivity.this, CustomerSummaryScreen.class);
@@ -443,13 +432,15 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
 
         } else if (id == R.id.btn_ok) {
             onBackPressed();
-        }else if(id==R.id.btn_print){
-            Intent intent = new Intent(SummaryActivity.this,PrintActivity.class);
-            intent.putExtra("status","PRINT");
-          //  intent.putExtra("transporterMasterId",TransportMasterId);
-            intent.putExtra("groupKey",GroupKey);
+        } else if (id == R.id.btn_print) {
+            Intent intent = new Intent(SummaryActivity.this, PrintSelectedJobActivity.class);
+            intent.putExtra("isCollection", isCollection);
+            intent.putExtra("isDelivered", isDelivery);
+            intent.putExtra("status", "COMPLETED");
+            intent.putExtra("transporterMasterId", TransportMasterId);
             startActivity(intent);
-        }else if (id == R.id.btn_cancel){
+
+        } else if (id == R.id.btn_cancel) {
             alert();
         }
     }

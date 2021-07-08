@@ -66,7 +66,7 @@ public class BulkPrintData extends AsyncTask<Void,Void, List<Print>> {
                         print.setServiceEndTime(CommonMethods.getTimeIn12Hour(jobs.get(j).ActualToTime));
                     }
                     //Transaction Details
-                    print.setTransactionId(jobs.get(j).OrderNo);
+                    print.setTransactionId(jobs.get(j).ReceiptNo);
                     print.setFunctionalLocation(jobs.get(j).PDFunctionalCode);
                     print.setDeliveryPoint(jobs.get(j).BranchCode);
 
