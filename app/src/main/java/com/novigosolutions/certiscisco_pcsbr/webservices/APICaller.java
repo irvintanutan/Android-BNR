@@ -202,6 +202,7 @@ public class APICaller {
                                     SyncDatabase.instance().saveCoinSeries(obj,context);
                                     for (int i = 0; i < jsonArray.length(); i++) {
                                         JSONObject orderJSONObject = jsonArray.getJSONObject(i);
+                                        Job.UpdateReceiptNo(orderJSONObject.getInt("TransportId"), orderJSONObject.getString("ReceiptNo"));
                                         if (orderJSONObject.getString("Status").equalsIgnoreCase("Updated") || orderJSONObject.getString("Status").equalsIgnoreCase("Deleted") || orderJSONObject.getString("Status").equalsIgnoreCase("New")) {
                                             ischangeindata = true;
                                             break;

@@ -66,6 +66,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
     static int total_item_counter;
     EditText txt_staff_name,txt_staff_id;
     LinearLayout linearLayout_staff_details;
+    int isDelivery = 0, isCollection = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +128,8 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
         }
         txt_customer_name.setText(branch.CustomerName);
         if(job.IsFloatDeliveryOrder) {
+            isDelivery = 1;
+            isCollection = 0;
             txt_functional_code.setText(Job.getDeliveryOrderNos(branch.GroupKey));
         }else {
             txt_functional_code.setText(job.OrderNo);
@@ -498,7 +501,6 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
     public void onResult(int api_code, int result_code, String result_data) {
         try {
             button_submit.setEnabled(true);
-            hideProgressDialog();
             if (result_code == 200) {
                 JSONObject obj = new JSONObject(result_data);
                 if (obj.getString("Result").equals("Success")) {
@@ -521,21 +523,24 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        hideProgressDialog();
+                        Intent intent = new Intent(CustomerSummaryScreen.this, PrintSelectedJobActivity.class);
+                        intent.putExtra("isCollection", isCollection);
+                        intent.putExtra("isDelivered", isDelivery);
+                        intent.putExtra("status", "SINGLE");
+                        intent.putExtra("transporterMasterId", TransportMasterId);
+                        startActivity(intent);
                     }
-                }, 5000);
-                Intent intent = new Intent(CustomerSummaryScreen.this,PrintActivity.class);
-                //  intent.putExtra("status"," SINGLE JOBS");
-                intent.putExtra("status","SINGLE");
-               // intent.putExtra("transporterMasterId",TransportMasterId);
-                intent.putExtra("groupKey",GroupKey);
-                startActivity(intent);
-                finish();
+                }, 10000);
+
             } else {
+                hideProgressDialog();
                 raiseSnakbar(":" + result_code);
                 Log.e("ERROR ON SYNCING" , result_data);
                 Toast.makeText(getApplicationContext() , result_data , Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
+            hideProgressDialog();
             raiseSnakbar("Error");
             e.printStackTrace();
         }

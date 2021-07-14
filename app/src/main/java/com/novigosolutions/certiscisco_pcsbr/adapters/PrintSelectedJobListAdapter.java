@@ -69,6 +69,7 @@ public class PrintSelectedJobListAdapter extends RecyclerView.Adapter<PrintSelec
 
         boolean singleJob = true;
         Job j = branches.get(position);
+        Branch branch = Branch.getSingle(j.GroupKey);
         int jobtype;
         if (this.isDelivered == 1) {
             jobtype = 2;
@@ -91,9 +92,9 @@ public class PrintSelectedJobListAdapter extends RecyclerView.Adapter<PrintSelec
                 holder.txt_pos.setText("");
             holder.txt_break_time.setText(j.ClientBreak);
             if (jobtype == 1) {
-                holder.txt_branch_name.setText("Pick Up : " + j.BranchCode);// + " (" + j.FunctionalCode + ")");
+                holder.txt_branch_name.setText("Pick Up : " + branch.BranchCode);// + " (" + j.FunctionalCode + ")");
             } else if (jobtype == 2) {
-                holder.txt_branch_name.setText("Drop Off : " + j.BranchCode);
+                holder.txt_branch_name.setText("Drop Off : " + branch.BranchCode);
             }
         }
 

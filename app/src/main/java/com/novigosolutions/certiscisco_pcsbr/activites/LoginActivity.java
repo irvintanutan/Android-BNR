@@ -2,6 +2,7 @@ package com.novigosolutions.certiscisco_pcsbr.activites;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.JsonObject;
+import com.novigosolutions.certiscisco_pcsbr.BuildConfig;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.applications.CertisCISCO;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
@@ -77,6 +79,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     TextInputLayout mtxtinUserid, mtxtinPassword;
     ImageView imgnetwork;
     Spinner mspindate;
+    TextView version;
     CoordinatorLayout clv;
     SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy", Locale.US);
     SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
@@ -104,6 +107,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     }
 
     private void initializeviews() {
+        version = findViewById(R.id.version);
+        version.setText(BuildConfig.VERSION_NAME);
         edtteamid = (EditText) findViewById(R.id.edtTeamid);
         edtpassword = (EditText) findViewById(R.id.edtPassword);
         mtxtinUserid = (TextInputLayout) findViewById(R.id.txtinputuserid);

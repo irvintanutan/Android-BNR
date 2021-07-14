@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -82,12 +83,6 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         setContentView(R.layout.activity_print);
         initialiser();
         setupToolBar();
-        clearSelectedJob();
-        if (transporterMasterId != 123) {
-            mainContainer.setVisibility(View.GONE);
-            list = Job.getSpecificJobListByType(isDelivered, isCollection, transporterMasterId);
-            checkBluetoothConnection();
-        }
     }
 
     private void initialiser() {
@@ -124,6 +119,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         isDelivered = extras.getInt("isDelivered");
         isCollection = extras.getInt("isCollection");
         transporterMasterId = extras.getInt("transporterMasterId");
+        Log.e("TRANSPORT ID ", Integer.toString(transporterMasterId));
         if (status.equals("COMPLETED")) {
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
@@ -136,8 +132,34 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
             UserName.setText(Preferences.getString("UserName", this));
             imgnetwork = (ImageView) toolbar.findViewById(R.id.imgnetwork);
             bulkPrintViewInit();
+            clearSelectedJob();
+            if (transporterMasterId != 123) {
+                list = Job.getSpecificJobListByType(isDelivered, isCollection, transporterMasterId);
+                mainContainer.setVisibility(View.GONE);
+                checkBluetoothConnection();
+            }
+        } else {
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().hide();
+            }
+            list = Job.getSpecificJobListByType(isDelivered, isCollection, transporterMasterId);
+            singlePrintViewInit();
         }
     }
+
+    private void singlePrintViewInit() {
+        layoutToolBar.setVisibility(View.GONE);
+        setPrintImage();
+        if (status.equals("SINGLE")) {
+            btnBack.setText("HOME");
+        } else if (status.equals("PRINT")) {
+            btnPrint.setVisibility(View.GONE);
+            btnBack.setVisibility(View.GONE);
+            btnCancel.setVisibility(View.GONE);
+            checkBluetoothConnection();
+        }
+    }
+
 
     private void bulkPrintViewInit() {
         layoutSelectJobs.setVisibility(View.VISIBLE);
@@ -261,6 +283,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
     }
 
     public void receiptPrint() {
+        hideProgressDialog();
         if (printer.doConnectionTestForBulk()) {
             bulkImageGenerator = new BulkImageGenerator(PrintSelectedJobActivity.this, printDataArray);
             bulkImageGenerator.execute();
@@ -288,13 +311,14 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
             btnSelectedPrint.setVisibility(View.GONE);
             layoutPrintProcess.setVisibility(View.GONE);
             printRecyclerViewInit();
+            clearSelectedJob();
         } else {
             setPrintImage();
             btnPrint.setVisibility(View.VISIBLE);
         }
         btnCancel.setVisibility(View.GONE);
         btnBack.setVisibility(View.VISIBLE);
-        clearSelectedJob();
+
 
     }
 
@@ -372,7 +396,8 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         if (flag == 1) {
             Toast.makeText(PrintSelectedJobActivity.this, "Printing Completed", Toast.LENGTH_LONG).show();
             if (status.equals("SINGLE")) {
-                onBackPressed();
+                Intent intent = new Intent(PrintSelectedJobActivity.this, HomeActivity.class);
+                startActivity(intent);
                 finish();
             } else {
                 new Handler().postDelayed(new Runnable() {
@@ -393,8 +418,9 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
     }
 
     void clearSelectedJob() {
-        for (Job job : jobList) {
-            job.setSelected(false);
-        }
+        if (status.equals("COMPLETED"))
+            for (Job job : jobList) {
+                job.setSelected(false);
+            }
     }
 }

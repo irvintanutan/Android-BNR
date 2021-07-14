@@ -32,6 +32,7 @@ import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.zebra.BulkImageGenerator;
 import com.novigosolutions.certiscisco_pcsbr.zebra.BulkPrintData;
+import com.novigosolutions.certiscisco_pcsbr.zebra.BulkSelectedPrintData;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Content;
 import com.novigosolutions.certiscisco_pcsbr.zebra.GenerateImage;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Print;
@@ -73,12 +74,14 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener,
     Handler handler;
     Printer printer;
     GenerateImage generateImage;
+    public static List<Job> finalList;
     BulkImageGenerator bulkImageGenerator;
     Thread t;
     int printCount=0;
     Boolean alertFlag=true;
     private ProgressDialog progressDialog;
     String groupKey;
+    int isDelivered = 0, isCollection = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,6 +119,9 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener,
         Bundle extras = getIntent().getExtras();
         status=extras.getString("status");
         groupKey = extras.getString("groupKey");
+        isDelivered = extras.getInt("isDelivery");
+        transporterMasterId = extras.getInt("transporterMasterId");
+        isCollection = extras.getInt("isCollection");
         if(status.equals("COMPLETED")){
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
@@ -264,121 +270,19 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener,
         }
     }
 
+    private List<Job> getAllJobList() {
+        return Job.getSpecificJobListByType(isDelivered, isCollection, transporterMasterId);
+    }
+
     private void processPrintData() {
+
         printDataArray.clear();
-        BulkPrintData bulkPrintData = new BulkPrintData(PrintActivity.this,status,list);
+        BulkSelectedPrintData bulkPrintData = new BulkSelectedPrintData(PrintActivity.this, status, getAllJobList(), isDelivered);
         bulkPrintData.execute();
 
-//        bulktemplateList.clear();
 //        printDataArray.clear();
-//        for(int i=0;i<list.size();i++){
-//            Branch branch=Branch.getSingle(String.valueOf(list.get(i)));
-//            List<Job> jobs= Job.hasCompletedJob(String.valueOf(branch.GroupKey));
-//            for(int j=0;j<jobs.size();j++){
-//                ArrayList<String> collectionModeArray=new ArrayList<>();
-//                String collectionMode="";
-//                Print print=new Print();
-//                print.setLogo( printer.getLogo());
-//                print.setCertisAddress(Preferences.getPrintHeader(PrintActivity.this));
-//                //Service details
-//                print.setDate(CommonMethods.getDateForPrint(branch.StartTime));
-//
-//                if(TextUtils.isEmpty(jobs.get(j).ActualFromTime)) {
-//                    print.setServiceStartTime("");
-//                }else{
-//                    print.setServiceStartTime(CommonMethods.getTimeIn12Hour(jobs.get(j).ActualFromTime));
-//                }
-//                if(TextUtils.isEmpty(jobs.get(j).ActualToTime)) {
-//                    print.setServiceEndTime("");
-//                }
-//                else {
-//                    print.setServiceEndTime(CommonMethods.getTimeIn12Hour(jobs.get(j).ActualToTime));
-//                }
-//                //Transaction Details
-//                print.setTransactionId(jobs.get(j).OrderNo);
-//                print.setFunctionalLocation(jobs.get(j).PDFunctionalCode);
-//                print.setDeliveryPoint(jobs.get(j).BranchCode);
-//
-//                if(jobs.get(j).IsFloatDeliveryOrder && !jobs.get(j).IsCollectionOrder){
-//                    print.setCollection(false);
-//                }
-//                if(!jobs.get(j).IsFloatDeliveryOrder && jobs.get(j).IsCollectionOrder){
-//                    print.setCollection(true);
-//                }
-//                if (jobs.get(j).CanCollectedBag) {
-////                    List<Bags> bags = Bags.getByTransportMasterId(jobs.get(j).TransportMasterId);
-////                    if(!bags.isEmpty())
-//                        collectionModeArray.add("Sealed Duffel Bag");
-//                }
-//                if(jobs.get(j).CanCollectCoinBox) {
-////                    List<BoxBag> boxBags = BoxBag.getByTransportMasterId(jobs.get(j).TransportMasterId);
-////                    if (!boxBags.isEmpty()) {
-//                        collectionModeArray.add("Coin Bag");
-//                  //  }
-//                }
-//                if (jobs.get(j).CanCollectedBox) {
-////                    List<Box> boxes = Box.getBoxByTransportMasterId(jobs.get(j).TransportMasterId);
-////                    if(!boxes.isEmpty()) {
-//                        collectionModeArray.add("Box");
-//                   // }
-//                }
-//                if (jobs.get(j).CanCollectedEnvelop) {
-////                    List<EnvelopeBag> envelopeBags = EnvelopeBag.getEnvelopesByTransportMasterId(jobs.get(j).TransportMasterId);
-////                    if (!envelopeBags.isEmpty()) {
-//                        collectionModeArray.add("Envelopes");
-//                //    }
-//                }
-//                if (jobs.get(j).CanCollectedEnvelopInBag) {
-////                    List<EnvelopeBag> envelopeBags = EnvelopeBag.getEnvelopesInBagByTransportMasterId(jobs.get(j).TransportMasterId);
-////                    if (!envelopeBags.isEmpty()) {
-//                        collectionModeArray.add("Envelopes In Bag");
-//                   // }
-//                }
-//                if (jobs.get(j).CanCollectPallet) {
-////                    int palletCount = Job.getSingle(jobs.get(j).TransportMasterId).palletCount;
-////                    if (palletCount > 0) {
-//                        collectionModeArray.add("Pallet");
-//                  //  }
-//                }
-//
-//                if(collectionModeArray.size()==0 || collectionModeArray==null){
-//                    collectionMode="No Collection";
-//                }else {
-//                    collectionMode = TextUtils.join(", ",collectionModeArray);
-//                }
-//
-//                print.setCollectionMode(collectionMode);
-//               // print.setBank(jobs.get(j).CreditTo);
-//                if(TextUtils.isEmpty(jobs.get(j).CreditTo)){
-//                    print.setBank("");
-//                }else {
-//                    print.setBank(jobs.get(j).CreditTo);
-//                }
-//
-//                //Customer Details
-//                print.setCustomerName(jobs.get(j).CustomerName);
-//                print.setBranchName(branch.BranchName);
-//                print.setCustomerLocation(jobs.get(j).BranchStreetName+" "+jobs.get(j).BranchTower+" "+jobs.get(j).BranchTown+" "+jobs.get(j).BranchPinCode);
-//
-//                print.setContentList(Job.getPrintContent(jobs.get(j).TransportMasterId));
-//                if (status.equals("SINGLE")) {
-//                    print.setCustomerAcknowledgment(printer.getSign());
-//                }
-//                else {
-//                    if(TextUtils.isEmpty(jobs.get(j).CustomerSign)) {
-//                        print.setCustomerAcknowledgment("");
-//                    }else {
-//                        print.setCustomerAcknowledgment(printer.getSign(jobs.get(j).CustomerSign));
-//                    }
-//                }
-//                //Handed/received
-//                print.setCertisTransactionOfficer(Preferences.getString("TrasactionOfficerName",PrintActivity.this));
-//                print.setTransactionOfficerId(Preferences.getString("UserCode",PrintActivity.this));
-//                print.setFooter(Preferences.getPrintFooter(PrintActivity.this));
-//                printDataArray.add(print);
-//
-//            }
-//        }
+//        BulkPrintData bulkPrintData = new BulkPrintData(PrintActivity.this,status,list);
+//        bulkPrintData.execute();
 //
     }
 

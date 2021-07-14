@@ -1,6 +1,8 @@
 package com.novigosolutions.certiscisco_pcsbr.models;
 
 
+import android.util.Log;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -207,6 +209,12 @@ public class Job extends Model implements Comparable<Job> {
                 .where("TransportMasterId=?", TransportMasterId)
                 .executeSingle();
 
+    }
+
+    public static Job getSingleByReceiptNo(String receiptNo) {
+        return new Select().from(Job.class)
+                .where("ReceiptNo=?", receiptNo)
+                .executeSingle();
     }
 
     public static Job getSingleByOrderNo(String OrderNo) {
@@ -569,6 +577,16 @@ public class Job extends Model implements Comparable<Job> {
     public static void UpdateStatus(int TransportMasterId) {
         new Update(Job.class)
                 .set("Status=?", "COMPLETED")
+                .where("TransportMasterId=?", TransportMasterId)
+                .execute();
+    }
+
+    public static void UpdateReceiptNo(int TransportMasterId, String receiptNo) {
+
+        Log.e("FOR TESTING " , TransportMasterId + " " + receiptNo);
+
+        new Update(Job.class)
+                .set("ReceiptNo=?", receiptNo)
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();
     }
