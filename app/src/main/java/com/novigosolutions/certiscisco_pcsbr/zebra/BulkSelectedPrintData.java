@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.novigosolutions.certiscisco_pcsbr.activites.PrintActivity;
 import com.novigosolutions.certiscisco_pcsbr.activites.PrintSelectedJobActivity;
@@ -65,7 +66,8 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
                     print.setServiceEndTime(CommonMethods.getTimeIn12Hour(jobs.get(j).ActualToTime));
                 }
                 //Transaction Details
-                print.setTransactionId(jobs.get(j).ReceiptNo);
+                String receiptNo = Job.getSingle(jobs.get(j).TransportMasterId).ReceiptNo;
+                print.setTransactionId(receiptNo);
                 print.setFunctionalLocation(jobs.get(j).PDFunctionalCode);
                 print.setDeliveryPoint(jobs.get(j).BranchCode);
 
@@ -131,13 +133,9 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
                 print.setCustomerLocation(jobs.get(j).BranchStreetName + " " + jobs.get(j).BranchTower + " " + jobs.get(j).BranchTown + " " + jobs.get(j).BranchPinCode);
 
                 print.setContentList(Job.getSelectedPrintContent(jobs.get(j).GroupKey, isDelivery));
-//                    if (status.equals("SINGLE")) {
-//                        print.setCustomerAcknowledgment(printer.getSign());
-//                    } else {
-
-                String ackSign = Job.getSingleByReceiptNo(jobs.get(j).ReceiptNo).CustomerSign;
-                String customerSign = Job.getSingleByReceiptNo(jobs.get(j).ReceiptNo).CustomerSignature;
-
+ 
+                String ackSign = Job.getSingleByReceiptNo(receiptNo).CustomerSign;
+                String customerSign = Job.getSingleByReceiptNo(receiptNo).CustomerSignature;
 
                 if (TextUtils.isEmpty(ackSign)) {
                     print.setCustomerAcknowledgment("");

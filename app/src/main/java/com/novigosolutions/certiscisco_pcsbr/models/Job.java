@@ -11,6 +11,7 @@ import com.activeandroid.query.Select;
 import com.activeandroid.query.Update;
 import com.google.gson.JsonObject;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Content;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Denomination;
 
@@ -285,8 +286,6 @@ public class Job extends Model implements Comparable<Job> {
     public static List<Job> getSpecificJobListByType(int isDelivered, int isCollection, int TransportMasterId) {
         List<Job> jl = new Select().from(Job.class)
                 .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and TransportMasterId=?", "COMPLETED", isCollection, isDelivered, TransportMasterId)
-                .groupBy("GroupKey")
-                .orderBy("SequenceNo")
                 .execute();
 
         return jl;
@@ -583,7 +582,7 @@ public class Job extends Model implements Comparable<Job> {
 
     public static void UpdateReceiptNo(int TransportMasterId, String receiptNo) {
 
-        Log.e("FOR TESTING " , TransportMasterId + " " + receiptNo);
+        Log.e("FOR TESTING ", TransportMasterId + " " + receiptNo);
 
         new Update(Job.class)
                 .set("ReceiptNo=?", receiptNo)
@@ -904,6 +903,7 @@ public class Job extends Model implements Comparable<Job> {
     }
 
     public static List<Content> getSelectedPrintContent(String groupKey, int isDelivery) {
+        Constants.BOX_QUANTITY = 0;
         List<Content> printContent = new ArrayList<>();
         int isCollection = isDelivery == 0 ? 1 : 0;
         List<Job> list = Job.getJobListByTypeByGroupKey(isDelivery, isCollection, groupKey);
@@ -948,6 +948,7 @@ public class Job extends Model implements Comparable<Job> {
                 List<String> palletSealNoList = new ArrayList<>();
                 palletContent.setDescription("Pallet");
                 palletContent.setQty(palletCount);
+                Constants.BOX_QUANTITY += palletCount;
                 palletContent.setSealNoList(palletSealNoList);
                 printContent.add(palletContent);
             }
@@ -1003,12 +1004,14 @@ public class Job extends Model implements Comparable<Job> {
                 if (envQty > 0) {
                     envelopContent.setDescription("Envelopes");
                     envelopContent.setQty(envQty);
+                    Constants.BOX_QUANTITY += envQty;
                     envelopContent.setSealNoList(envSealNoList);
                     printContent.add(envelopContent);
                 }
                 if (enveInBagQty > 0) {
                     envelopInBagContent.setDescription("Envelope In Bag");
                     envelopInBagContent.setQty(enveInBagQty);
+                    Constants.BOX_QUANTITY += enveInBagQty;
                     envelopInBagContent.setDenominationList(envelopDenomination);
                     printContent.add(envelopInBagContent);
                 }
@@ -1038,6 +1041,10 @@ public class Job extends Model implements Comparable<Job> {
             boxContent.setSealNoList(boxSealNoList);
             printContent.add(boxContent);
         }
+
+        Constants.BOX_QUANTITY += boxQty;
+        Constants.BOX_QUANTITY += coinBagQty;
+        Constants.BOX_QUANTITY += bagQty;
         return printContent;
     }
 

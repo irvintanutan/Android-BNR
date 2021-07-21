@@ -7,6 +7,7 @@ package com.novigosolutions.certiscisco_pcsbr.utils;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.SystemClock;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.Format;
@@ -129,17 +130,29 @@ public class CommonMethods {
 
     public static String getTimeIn12Hour(String dateAndTime){
         String date=dateAndTime;
-        String time="";
-        // This is the format date we want
-        DateFormat mSDF = new SimpleDateFormat("hh:mm a");
-        // This format date is actually present
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-        try {
-            time= mSDF.format(formatter.parse(date));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        String time=""; 
+        String [] dateArr = dateAndTime.split(" ");
+
+        int hour = Integer.parseInt(dateArr[1].substring(0,2));
+        int minutes = Integer.parseInt(dateArr[1].substring(3,5));
+
+        time = format(hour , minutes);
+
         return time;
+    }
+
+    /*
+     * hour in 24Format -> AM/PM Format
+     */
+    public static String format(int hour, int minutes ){
+
+        String meridiem = hour > 11 ? "PM" : "AM";
+
+        // trim "0-23 hour" to "0-11 hour", then replace "0" with "12"
+        hour = (hour %= 12) == 0 ? 12 : hour;
+
+        // Apply desired format "HH:MM AM/PM"
+        return String.format("%02d:%02d %s", hour, minutes, meridiem );
     }
 
     public static String getTimeIn12Hour1(String dateAndTime){

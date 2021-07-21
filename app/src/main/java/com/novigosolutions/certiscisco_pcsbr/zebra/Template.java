@@ -1,5 +1,7 @@
 package com.novigosolutions.certiscisco_pcsbr.zebra;
 
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
+
 import java.util.List;
 
 public class Template {
@@ -62,15 +64,10 @@ public class Template {
                 "\n" +
                 "        <br><br>\n" +
                 "        <b><u>Transactional Details</u></b> \n" +
-                "        <br><label>Transaction ID : " + print.getTransactionId() + " </label>\n" +
+                "        <br><label>RECEIPT NO : " + print.getTransactionId() + " </label>\n" +
                 "        <br><label>Functional Location : " + print.getFunctionalLocation() + " </label>\n" +
                 "        <br><label>Delivery Point : " + print.getDeliveryPoint() + "</label>\n" +
                 "        <br><label>Nature of Transaction : " + print.getNatureOfTransaction() + " </label>\n" ;
-
-        if(print.isCollection()){
-            html+= "        <br><label>collection Mode : " + print.getCollectionMode() + " </label>\n";
-        }
-
               html+=  "        <br><label>Bank : " + print.getBank() + "</label>\n" +
                 "     \n" +
                 "        <br><br>\n" +
@@ -143,6 +140,8 @@ public class Template {
         }
 
         html += "</table>";
+
+        html += "        <br><label><b>Total Quantity : " + Constants.BOX_QUANTITY + "</b></label><br>";
 
         html += "        <br><label><b>" + getLabel1(print.isCollection()) + "</b></label>\n" +
                 "        <br><label>Certis Transaction Officer (TO) : " + print.getCertisTransactionOfficer() + " </label>\n" +

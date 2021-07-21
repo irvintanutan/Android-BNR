@@ -47,11 +47,11 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class CustomerSummaryScreen extends BaseActivity implements View.OnClickListener, ApiCallback, NetworkChangekListener  {
+public class CustomerSummaryScreen extends BaseActivity implements View.OnClickListener, ApiCallback, NetworkChangekListener {
 
-    TextView txt_customer_name, txt_del_head,txt_del_count, txt_branch_name, txt_functional_code;//, txt_town_pin ,, txt_street_tower
+    TextView txt_customer_name, txt_del_head, txt_del_count, txt_branch_name, txt_functional_code;//, txt_town_pin ,, txt_street_tower
     //    int PointId;
-    TextView txt_sealed_count,txt_unsealed_count;  //nidheesh
+    TextView txt_sealed_count, txt_unsealed_count;  //nidheesh
     String GroupKey;
     int summaryType = 0;
     ImageView img_erase;
@@ -60,11 +60,11 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
     Button button_submit;
     View bll;
     LinearLayout ll_lists, ll_delivery;
-    Button btn_ok,btn_print;
+    Button btn_ok, btn_print;
     Button btnCancel;
     int TransportMasterId;
     static int total_item_counter;
-    EditText txt_staff_name,txt_staff_id;
+    EditText txt_staff_name, txt_staff_id;
     LinearLayout linearLayout_staff_details;
     int isDelivery = 0, isCollection = 1;
 
@@ -92,21 +92,21 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
         txt_branch_name = (TextView) findViewById(R.id.txt_txt_branch_name);
 
         //nidheesh ** start
-        txt_sealed_count=(TextView)findViewById(R.id.txt_seal_count);
-        txt_unsealed_count=(TextView)findViewById(R.id.txt_unseal_count);
+        txt_sealed_count = (TextView) findViewById(R.id.txt_seal_count);
+        txt_unsealed_count = (TextView) findViewById(R.id.txt_unseal_count);
         txt_sealed_count.setVisibility(View.GONE);
         txt_unsealed_count.setVisibility(View.GONE);
-        total_item_counter=0;
+        total_item_counter = 0;
         txt_staff_name = findViewById(R.id.txt_staff_name);
         txt_staff_id = findViewById(R.id.txt_staff_id);
-        linearLayout_staff_details=findViewById(R.id.lyt_staff_details);
+        linearLayout_staff_details = findViewById(R.id.lyt_staff_details);
 
         //nidheesh ** end
 
 
         Branch branch = Branch.getSingle(GroupKey);
         Job job = Job.getSingle(TransportMasterId);
-        if (isSummary(branch,job)) {
+        if (isSummary(branch, job)) {
             bll = findViewById(R.id.bll);
             bll.setVisibility(View.GONE);
 //            btn_ok = findViewById(R.id.btn_ok);
@@ -127,11 +127,11 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
             btnCancel.setOnClickListener(this);
         }
         txt_customer_name.setText(branch.CustomerName);
-        if(job.IsFloatDeliveryOrder) {
+        if (job.IsFloatDeliveryOrder) {
             isDelivery = 1;
             isCollection = 0;
             txt_functional_code.setText(Job.getDeliveryOrderNos(branch.GroupKey));
-        }else {
+        } else {
             txt_functional_code.setText(job.OrderNo);
         }
 //        String street_tower = branch.StreetName;
@@ -154,7 +154,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
             }
             ll_lists = findViewById(R.id.ll_lists);
             List<Job> jobs = new ArrayList<>();
-            if (isSummary(branch,job))
+            if (isSummary(branch, job))
 //                jobs = Job.getCollectionJobsOfPoint(GroupKey);
                 jobs.add(Job.getSingle(TransportMasterId));
             else
@@ -167,8 +167,8 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                     TextView txt_branch_code = titleList.findViewById(R.id.txt_branch_code);
 
                     //nidheesh ** start
-                    TextView txt_col_box_count=titleList.findViewById(R.id.txt_col_bag_count);  // nidheesh
-                    TextView txt_envs_count=titleList.findViewById(R.id.txt_col_env_count);
+                    TextView txt_col_box_count = titleList.findViewById(R.id.txt_col_bag_count);  // nidheesh
+                    TextView txt_envs_count = titleList.findViewById(R.id.txt_col_env_count);
                     //nidheesh ** end
 
                     txt_branch_code.setText("" + jobs.get(i).BranchCode + " - " + jobs.get(i).OrderNo);
@@ -199,14 +199,13 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                     boxCounter(jobs.get(i).TransportMasterId);
                     //nidheesh ** start
                     txt_col_box_count.setVisibility(View.VISIBLE);
-                    txt_col_box_count.setText("Items Count : "+total_item_counter);
-                    int envCountValue=counter(collectionSummaries);
-                    if(envCountValue==0) {
+                    txt_col_box_count.setText("Items Count : " + total_item_counter);
+                    int envCountValue = counter(collectionSummaries);
+                    if (envCountValue == 0) {
                         txt_envs_count.setVisibility(View.GONE);
-                    }
-                    else {
+                    } else {
                         txt_envs_count.setVisibility(View.VISIBLE);
-                        txt_envs_count.setText("Env-In-Bag : "+ envCountValue);
+                        txt_envs_count.setText("Env-In-Bag : " + envCountValue);
                     }
                     //nidheesh ** end
 
@@ -230,7 +229,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 dlist.setVisibility(View.GONE);
             } else {
                 List<Delivery> bagList = null;
-                if (isSummary(branch,job)) bagList = Delivery.getSealedByPointId(GroupKey);
+                if (isSummary(branch, job)) bagList = Delivery.getSealedByPointId(GroupKey);
                 else bagList = Delivery.getPendingSealedByPointId(GroupKey);
                 if (bagList.size() > 0) {
                     List<String> baglist = new ArrayList<>();
@@ -239,10 +238,10 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                     baglistView.setLayoutManager(mLayoutManager);
                     baglistView.setItemAnimator(new DefaultItemAnimator());
                     for (int i = 0; i < bagList.size(); i++) {
-                        if(bagList.get(i).ItemType.equals("Coin Box") || bagList.get(i).ItemType.equals("BOX")) {
-                            if(bagList.get(i).CoinSeriesId==0){
+                        if (bagList.get(i).ItemType.equals("Coin Box") || bagList.get(i).ItemType.equals("BOX")) {
+                            if (bagList.get(i).CoinSeriesId == 0) {
                                 baglist.add(bagList.get(i).ItemType + "(" + bagList.get(i).SealNo + ")");
-                            }else{
+                            } else {
                                 baglist.add(bagList.get(i).ItemType + "(" + bagList.get(i).SealNo + ")(" + bagList.get(i).CoinSeries + ")");
                             }
                         } else
@@ -256,11 +255,11 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
 
                 //nidheesh ** start
                 txt_sealed_count.setVisibility(View.VISIBLE);
-                txt_sealed_count.setText("Item count : "+bagList.size());
+                txt_sealed_count.setText("Item count : " + bagList.size());
                 //nidheesh ** end
 
                 List<Delivery> boxList = null;
-                if (isSummary(branch,job)) boxList = Delivery.getUnSealedByPointId(GroupKey);
+                if (isSummary(branch, job)) boxList = Delivery.getUnSealedByPointId(GroupKey);
                 else boxList = Delivery.getPendingUnSealedByPointId(GroupKey);
                 if (boxList.size() > 0) {
                     RecyclerView boxlistView = findViewById(R.id.boxlistview);
@@ -269,20 +268,19 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                     boxlistView.setItemAnimator(new DefaultItemAnimator());
                     List<String> boxlist = new ArrayList<>();
                     //nidheesh ** start
-                    int unsealed=0;
+                    int unsealed = 0;
                     //nidheesh ** end
 
                     for (int i = 0; i < boxList.size(); i++) {
                         //nidheesh ** start
-                        unsealed+= boxList.get(i).Qty;
+                        unsealed += boxList.get(i).Qty;
                         //nidheesh ** end
-                        if (boxList.get(i).ItemType.equals("BOX") || boxList.get(i).ItemType.equals("Coin Box")){
-                            if(boxList.get(i).CoinSeriesId==0)
+                        if (boxList.get(i).ItemType.equals("BOX") || boxList.get(i).ItemType.equals("Coin Box")) {
+                            if (boxList.get(i).CoinSeriesId == 0)
                                 boxlist.add(boxList.get(i).ItemType + "(" + boxList.get(i).Denomination + " * " + boxList.get(i).Qty + ")");
                             else
-                                boxlist.add(boxList.get(i).ItemType + "(" + boxList.get(i).Denomination + " * " + boxList.get(i).Qty + ")("+boxList.get(i).CoinSeries+")");
-                        }
-                        else {
+                                boxlist.add(boxList.get(i).ItemType + "(" + boxList.get(i).Denomination + " * " + boxList.get(i).Qty + ")(" + boxList.get(i).CoinSeries + ")");
+                        } else {
                             boxlist.add(boxList.get(i).ItemType + "(" + boxList.get(i).Qty + ")");
                         }
 //                        if (boxList.get(i).ItemType.equals("BOX"))
@@ -294,7 +292,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                     boxlistView.setAdapter(boxAdapter);
                     //nidheesh ** start
                     txt_unsealed_count.setVisibility(View.VISIBLE);
-                    txt_unsealed_count.setText("Item count : "+unsealed);
+                    txt_unsealed_count.setText("Item count : " + unsealed);
                     //nidheesh ** end
                 } else {
                     findViewById(R.id.no_box_list).setVisibility(View.VISIBLE);
@@ -304,10 +302,9 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
         }
 
 
-
     }
 
-    private boolean isSummary(Branch branch,Job job) {
+    private boolean isSummary(Branch branch, Job job) {
         if (job.Status.equals("COMPLETED")
                 || (summaryType == Constants.COLLECTION && job.isOfflineSaved)
                 || (summaryType == Constants.DELIVERY &&
@@ -321,57 +318,57 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
     }
 
     //nidheesh ** start
-    public  int counter(List<Summary> collectionSummaries) {
-        int envolops_count=0;
-        List<Summary> summary=collectionSummaries ;
-        for(int i=0;i<summary.size();i++) {
-            if(summary.get(i).Collection_type.equals("EnvelopeBag")) {
-                String msg=summary.get(i).Message;
+    public int counter(List<Summary> collectionSummaries) {
+        int envolops_count = 0;
+        List<Summary> summary = collectionSummaries;
+        for (int i = 0; i < summary.size(); i++) {
+            if (summary.get(i).Collection_type.equals("EnvelopeBag")) {
+                String msg = summary.get(i).Message;
                 String[] elements = msg.split(",");
                 List<String> fixedLenghtList = Arrays.asList(elements);
                 ArrayList<String> listOfString = new ArrayList<String>(fixedLenghtList);
-                envolops_count+=listOfString.size();
+                envolops_count += listOfString.size();
             }
         }
         return envolops_count;
     }
 
-    public void itemCounter(List<Summary> collectionSummaries){
-        int item_count=0;
-        List<Summary> summary=collectionSummaries ;
-        for(int i=0;i<summary.size();i++) {
-            if(summary.get(i).Collection_type.equals("Box")) {
+    public void itemCounter(List<Summary> collectionSummaries) {
+        int item_count = 0;
+        List<Summary> summary = collectionSummaries;
+        for (int i = 0; i < summary.size(); i++) {
+            if (summary.get(i).Collection_type.equals("Box")) {
 //                int count=0;
 //                count=boxCount(summary.get(i).Message);
 //                if(count>0){
 //                    item_count+=count;
 //                }
-            }else if(summary.get(i).Collection_type.equals("Pallet")){
-                item_count+=Integer.parseInt(summary.get(i).Message);
-            }else{
+            } else if (summary.get(i).Collection_type.equals("Pallet")) {
+                item_count += Integer.parseInt(summary.get(i).Message);
+            } else {
                 item_count++;
             }
 
         }
-        total_item_counter+=item_count;
+        total_item_counter += item_count;
         // return item_count;
     }
 
-    public int boxCount(String message){
-        String str=message;
-        int count=Integer.parseInt(str.substring(str.indexOf('(')+1,str.indexOf(')')));
+    public int boxCount(String message) {
+        String str = message;
+        int count = Integer.parseInt(str.substring(str.indexOf('(') + 1, str.indexOf(')')));
         return count;
     }
 
     private void boxCounter(int transportMasterId) {
-        int count=0;
-        List<Box> box=Box.getBoxByTransportMasterId(transportMasterId);
-        if(box.size()>0){
-            for(int i=0;i<box.size();i++){
-                count+=box.get(i).count;
+        int count = 0;
+        List<Box> box = Box.getBoxByTransportMasterId(transportMasterId);
+        if (box.size() > 0) {
+            for (int i = 0; i < box.size(); i++) {
+                count += box.get(i).count;
             }
         }
-        total_item_counter+=count;
+        total_item_counter += count;
     }
     //nidheesh ** end
 
@@ -421,8 +418,8 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                     hideProgressDialog();
                     Toast.makeText(this, "Signature is empty", Toast.LENGTH_SHORT).show();
                 } else {
-                    String name = (TextUtils.isEmpty(txt_staff_name.toString().trim()))? "" : txt_staff_name.getText().toString().trim();
-                    String staffID = (TextUtils.isEmpty(txt_staff_id.toString().trim()))? "" : txt_staff_id.getText().toString().trim();
+                    String name = (TextUtils.isEmpty(txt_staff_name.toString().trim())) ? "" : txt_staff_name.getText().toString().trim();
+                    String staffID = (TextUtils.isEmpty(txt_staff_id.toString().trim())) ? "" : txt_staff_id.getText().toString().trim();
 
                     Job job = Job.getSingle(TransportMasterId);
                     Branch.updateJobEndTime(GroupKey, CommonMethods.getCurrentDateTime(this));
@@ -436,10 +433,10 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
 
                     if (summaryType == Constants.COLLECTION) {
 
-                        Branch.updateColCustomerSignature(GroupKey,sign);
-                        Job.UpdateCustomerSignature(TransportMasterId,sign);
-                        Branch.UpdateNameandStaffIdD(GroupKey,name,staffID);
-                        Job.UpdateNameAndStaffID(TransportMasterId,name,staffID);
+                        Branch.updateColCustomerSignature(GroupKey, sign);
+                        Job.UpdateCustomerSignature(TransportMasterId, sign);
+                        Branch.UpdateNameandStaffIdD(GroupKey, name, staffID);
+                        Job.UpdateNameAndStaffID(TransportMasterId, name, staffID);
 
                         if (NetworkUtil.getConnectivityStatusString(this)) {
 //                        showProgressDialog("Loading...");
@@ -455,10 +452,10 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                         }
                     } else if (summaryType == Constants.DELIVERY) {
 
-                        Branch.updateDelCustomerSignature(GroupKey,sign);
-                        Job.UpdateCustomerSignature(TransportMasterId,sign);
-                        Branch.UpdateNameandStaffIdD(GroupKey,name,staffID);
-                        Job.UpdateNameAndStaffID(TransportMasterId,name,staffID);
+                        Branch.updateDelCustomerSignature(GroupKey, sign);
+                        Job.UpdateCustomerSignature(TransportMasterId, sign);
+                        Branch.UpdateNameandStaffIdD(GroupKey, name, staffID);
+                        Job.UpdateNameAndStaffID(TransportMasterId, name, staffID);
 
                         if (NetworkUtil.getConnectivityStatusString(this)) {
 //                        showProgressDialog("Loading...");
@@ -481,7 +478,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                     }
                 }
             }
-        }else if (id == R.id.btn_cancel){
+        } else if (id == R.id.btn_cancel) {
             alert();
         }
 //        else if (id == R.id.btn_ok) {
@@ -515,29 +512,37 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
 //                            startActivity(intent);
 //                        }
                     }
-                    APICaller.instance().sync(null,getApplicationContext());
+                    APICaller.instance().sync(null, getApplicationContext());
                     setResult(Constants.FINISHONRESULT);
                     //   finish();
                 }
                 raiseSnakbar("Success");
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideProgressDialog();
-                        Intent intent = new Intent(CustomerSummaryScreen.this, PrintSelectedJobActivity.class);
-                        intent.putExtra("isCollection", isCollection);
-                        intent.putExtra("isDelivered", isDelivery);
-                        intent.putExtra("status", "SINGLE");
-                        intent.putExtra("transporterMasterId", TransportMasterId);
-                        startActivity(intent);
+
+                int retries = 0;
+                boolean hasReceipt = false;
+                while (retries <= 40 && hasReceipt == false) {
+                    try {
+                        hasReceipt = hasReceiptNo(TransportMasterId);
+                        retries++;
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                }, 10000);
+                }
+
+                hideProgressDialog();
+                Intent intent = new Intent(CustomerSummaryScreen.this, PrintSelectedJobActivity.class);
+                intent.putExtra("isCollection", isCollection);
+                intent.putExtra("isDelivered", isDelivery);
+                intent.putExtra("status", "SINGLE");
+                intent.putExtra("transporterMasterId", TransportMasterId);
+                startActivity(intent);
 
             } else {
                 hideProgressDialog();
                 raiseSnakbar(":" + result_code);
-                Log.e("ERROR ON SYNCING" , result_data);
-                Toast.makeText(getApplicationContext() , result_data , Toast.LENGTH_LONG).show();
+                Log.e("ERROR ON SYNCING", result_data);
+                Toast.makeText(getApplicationContext(), result_data, Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
             hideProgressDialog();
@@ -566,4 +571,17 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
         alertDialog.show();
     }
 
+
+    private boolean hasReceiptNo(int transportMasterId) {
+      boolean result = false;
+      Job j = Job.getSingle(transportMasterId);
+      Log.e("JOB" , j.toString());
+      if (!j.ReceiptNo.equals("null") && j.ReceiptNo != null)
+      {
+          result = true;
+          Log.e("RETRIES" , result + " " + transportMasterId + " " + j.ReceiptNo);
+      }
+      Log.e("RETRIES" , result + " " + transportMasterId);
+      return  result;
+    }
 }

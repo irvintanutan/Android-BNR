@@ -27,4 +27,6 @@ public class Constants {
     public final static int COLLECTION = 1;
     public final static int DELIVERY = 2;
     public final static int COLLECTIONDELIVERY = 3;
+
+    public static int BOX_QUANTITY = 0;
 }
