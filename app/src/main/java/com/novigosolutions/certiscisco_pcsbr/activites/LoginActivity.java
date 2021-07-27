@@ -344,6 +344,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             JSONObject jp = loginJsonArray.getJSONObject(0);
             Preferences.clearAll(LoginActivity.this);
             JSONArray dataArray = jsonArray.getJSONArray(1);
+            Log.e("TOKEN" , jp.getString("Token") + " " + Integer.parseInt(jp.getString("LoggedInUser")));
             Preferences.saveString("AuthToken", jp.getString("Token"), LoginActivity.this);
             Preferences.saveString("LoggedOn", jp.getString("LoginTime"), LoginActivity.this);
             Preferences.saveString("LoggedInDate", sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())), LoginActivity.this);
@@ -406,6 +407,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                             } else {
                                 Preferences.clearAll(LoginActivity.this);
                                 JSONArray dataArray = jsonArray.getJSONArray(1);
+
+                                Log.e("TOKEN" , jp.getString("Token") + " " + Integer.parseInt(jp.getString("LoggedInUser")));
                                 Preferences.saveString("AuthToken", jp.getString("Token"), LoginActivity.this);
                                 Preferences.saveString("LoggedOn", jp.getString("LoginTime"), LoginActivity.this);
                                 Preferences.saveString("LoggedInDate", sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())), LoginActivity.this);

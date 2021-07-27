@@ -38,6 +38,10 @@ public interface CertisCISCOServices {
     Call<ResponseBody> SubmitBulkCollection(@Header("AuthToken") String AuthToken, @Header("UserId") int UserId, @Body JsonObject object);
 
     @Headers("Content-Type: application/json")
+    @POST("GetReceiptNo")
+    Call<ResponseBody> GetReceiptNumber(@Query("jobId") int jobId);
+
+    @Headers("Content-Type: application/json")
     @POST("RequestForEditForMC45")
     Call<ResponseBody> requestForEdit(@Header("AuthToken") String AuthToken, @Body JsonObject object);
 

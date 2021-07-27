@@ -46,7 +46,8 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
         List<Print> printList = new ArrayList<>();
         try {
             for (int j = 0; j < jobs.size(); j++) {
-                Branch branch = Branch.getSingle(String.valueOf(jobs.get(j).GroupKey));
+                Job job = jobs.get(j);
+                Branch branch = Branch.getSingle(String.valueOf(job.GroupKey));
                 ArrayList<String> collectionModeArray = new ArrayList<>();
                 String collectionMode = "";
                 Print print = new Print();
@@ -55,58 +56,58 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
                 //Service details
                 print.setDate(CommonMethods.getDateForPrint(branch.StartTime));
 
-                if (TextUtils.isEmpty(jobs.get(j).ActualFromTime)) {
+                if (TextUtils.isEmpty(job.ActualFromTime)) {
                     print.setServiceStartTime("");
                 } else {
-                    print.setServiceStartTime(CommonMethods.getTimeIn12Hour(jobs.get(j).ActualFromTime));
+                    print.setServiceStartTime(CommonMethods.getTimeIn12Hour(job.ActualFromTime));
                 }
-                if (TextUtils.isEmpty(jobs.get(j).ActualToTime)) {
+                if (TextUtils.isEmpty(job.ActualToTime)) {
                     print.setServiceEndTime("");
                 } else {
-                    print.setServiceEndTime(CommonMethods.getTimeIn12Hour(jobs.get(j).ActualToTime));
+                    print.setServiceEndTime(CommonMethods.getTimeIn12Hour(job.ActualToTime));
                 }
                 //Transaction Details
-                String receiptNo = Job.getSingle(jobs.get(j).TransportMasterId).ReceiptNo;
+                String receiptNo = Job.getSingle(job.TransportMasterId).ReceiptNo;
                 print.setTransactionId(receiptNo);
-                print.setFunctionalLocation(jobs.get(j).PDFunctionalCode);
-                print.setDeliveryPoint(jobs.get(j).BranchCode);
+                print.setFunctionalLocation(job.PDFunctionalCode);
+                print.setDeliveryPoint(job.BranchCode);
 
-                if (jobs.get(j).IsFloatDeliveryOrder && !jobs.get(j).IsCollectionOrder) {
+                if (job.IsFloatDeliveryOrder && !job.IsCollectionOrder) {
                     print.setCollection(false);
                 }
-                if (!jobs.get(j).IsFloatDeliveryOrder && jobs.get(j).IsCollectionOrder) {
+                if (!job.IsFloatDeliveryOrder && job.IsCollectionOrder) {
                     print.setCollection(true);
                 }
-                if (jobs.get(j).CanCollectedBag) {
+                if (job.CanCollectedBag) {
 //                    List<Bags> bags = Bags.getByTransportMasterId(jobs.get(j).TransportMasterId);
 //                    if(!bags.isEmpty())
                     collectionModeArray.add("Sealed Duffel Bag");
                 }
-                if (jobs.get(j).CanCollectCoinBox) {
+                if (job.CanCollectCoinBox) {
 //                    List<BoxBag> boxBags = BoxBag.getByTransportMasterId(jobs.get(j).TransportMasterId);
 //                    if (!boxBags.isEmpty()) {
                     collectionModeArray.add("Coin Bag");
                     //  }
                 }
-                if (jobs.get(j).CanCollectedBox) {
+                if (job.CanCollectedBox) {
 //                    List<Box> boxes = Box.getBoxByTransportMasterId(jobs.get(j).TransportMasterId);
 //                    if(!boxes.isEmpty()) {
                     collectionModeArray.add("Box");
                     // }
                 }
-                if (jobs.get(j).CanCollectedEnvelop) {
+                if (job.CanCollectedEnvelop) {
 //                    List<EnvelopeBag> envelopeBags = EnvelopeBag.getEnvelopesByTransportMasterId(jobs.get(j).TransportMasterId);
 //                    if (!envelopeBags.isEmpty()) {
                     collectionModeArray.add("Envelopes");
                     //    }
                 }
-                if (jobs.get(j).CanCollectedEnvelopInBag) {
+                if (job.CanCollectedEnvelopInBag) {
 //                    List<EnvelopeBag> envelopeBags = EnvelopeBag.getEnvelopesInBagByTransportMasterId(jobs.get(j).TransportMasterId);
 //                    if (!envelopeBags.isEmpty()) {
                     collectionModeArray.add("Envelopes In Bag");
                     // }
                 }
-                if (jobs.get(j).CanCollectPallet) {
+                if (job.CanCollectPallet) {
 //                    int palletCount = Job.getSingle(jobs.get(j).TransportMasterId).palletCount;
 //                    if (palletCount > 0) {
                     collectionModeArray.add("Pallet");
@@ -121,21 +122,25 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
 
                 print.setCollectionMode(collectionMode);
                 // print.setBank(jobs.get(j).CreditTo);
-                if (TextUtils.isEmpty(jobs.get(j).CreditTo)) {
+                if (TextUtils.isEmpty(job.CreditTo)) {
                     print.setBank("");
                 } else {
-                    print.setBank(jobs.get(j).CreditTo);
+                    print.setBank(job.CreditTo);
                 }
 
                 //Customer Details
-                print.setCustomerName(jobs.get(j).CustomerName);
+                print.setCustomerName(job.CustomerName);
                 print.setBranchName(branch.BranchName);
-                print.setCustomerLocation(jobs.get(j).BranchStreetName + " " + jobs.get(j).BranchTower + " " + jobs.get(j).BranchTown + " " + jobs.get(j).BranchPinCode);
 
-                print.setContentList(Job.getSelectedPrintContent(jobs.get(j).GroupKey, isDelivery));
- 
-                String ackSign = Job.getSingleByReceiptNo(receiptNo).CustomerSign;
-                String customerSign = Job.getSingleByReceiptNo(receiptNo).CustomerSignature;
+                if (job.IsCollectionOrder)
+                    print.setCustomerLocation(job.BranchStreetName + " " + job.BranchTower + " " + job.BranchTown + " " + job.BranchPinCode);
+                else
+                    print.setCustomerLocation(job.StreetName + " " + job.Tower + " " + job.Town + " " + job.PinCode);
+
+                print.setContentList(Job.getSelectedPrintContent(job.GroupKey, isDelivery));
+
+                String ackSign = job.CustomerSign;
+                String customerSign = job.CustomerSignature;
 
                 if (TextUtils.isEmpty(ackSign)) {
                     print.setCustomerAcknowledgment("");
@@ -150,16 +155,16 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
                     print.setCustomerSignature(printer.getSign(customerSign));
                 }
 
-                if (TextUtils.isEmpty(jobs.get(j).CName)) {
+                if (TextUtils.isEmpty(job.CName)) {
                     print.setCName("");
                 } else {
-                    print.setCName(jobs.get(j).CName);
+                    print.setCName(job.CName);
                 }
 
-                if (TextUtils.isEmpty(jobs.get(j).StaffID)) {
+                if (TextUtils.isEmpty(job.StaffID)) {
                     print.setStaffId("");
                 } else {
-                    print.setStaffId(jobs.get(j).StaffID);
+                    print.setStaffId(job.StaffID);
                 }
 
                 //Handed/received

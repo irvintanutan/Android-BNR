@@ -124,6 +124,12 @@ public class APICaller {
         process(Constants.SUBMITBULKCOLLECTION, call, callback);
     }
 
+    public void getReceiptNo(ApiCallback callback, Context context, int jobId) {
+        this.context = context;
+        Call<ResponseBody> call = getService().GetReceiptNumber(jobId);
+        process(Constants.GETRECEIPTNUMBER, call, callback);
+    }
+
     public void requestForEdit(ApiCallback callback, Context context, String type, String GroupKey) {
         this.context = context;
         Call<ResponseBody> call = getService().requestForEdit(Preferences.getString("AuthToken", context), getRequestType(type, GroupKey));
@@ -187,22 +193,26 @@ public class APICaller {
                     if (response.code() == 409) {
                         //authalert(this);
                     } else if (response.code() == 200) {
-
                         try {
                             String result_body = response.body().string();
+
+                            if (api_code == Constants.GETRECEIPTNUMBER) {
+                                Log.e("RECEIPT NUMBER", result_body);
+                                Job.UpdateReceiptNo(Constants.TRANSPORT_MASTER_ID, result_body.replace("\"" , ""));
+                            }
                             if (api_code == Constants.SYNC) {
                                 JSONObject obj = new JSONObject(result_body);
                                 String result = obj.getString("Result");
-                                Log.e("RESULT" , result_body);
+                                Log.e("RESULT", result_body);
 
                                 if (result.equals("Success")) {
                                     Boolean ischangeindata = false, hasBreak = false;
                                     JSONObject jsonObject = obj.getJSONObject("Data");
                                     JSONArray jsonArray = jsonObject.getJSONArray("Orders");
-                                    SyncDatabase.instance().saveCoinSeries(obj,context);
+
+                                    SyncDatabase.instance().saveCoinSeries(obj, context);
                                     for (int i = 0; i < jsonArray.length(); i++) {
                                         JSONObject orderJSONObject = jsonArray.getJSONObject(i);
-                                        Job.UpdateReceiptNo(orderJSONObject.getInt("TransportId"), orderJSONObject.getString("ReceiptNo"));
                                         if (orderJSONObject.getString("Status").equalsIgnoreCase("Updated") || orderJSONObject.getString("Status").equalsIgnoreCase("Deleted") || orderJSONObject.getString("Status").equalsIgnoreCase("New")) {
                                             ischangeindata = true;
                                             break;

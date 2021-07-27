@@ -19,6 +19,8 @@ public class Constants {
     public final static int SENDMESSAGE = 11;
     public final static int GETALLMESSAGE = 12;
     public final static int MarkMessageAsRead = 13;
+    public final static int GETRECEIPTNUMBER = 14;
+
 
 
     public final static int FINISHONRESULT = 20;
@@ -29,4 +31,5 @@ public class Constants {
     public final static int COLLECTIONDELIVERY = 3;
 
     public static int BOX_QUANTITY = 0;
+    public static int TRANSPORT_MASTER_ID = 0;
 }

@@ -37,6 +37,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
@@ -135,6 +136,8 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
         } else if (job.IsCollectionOrder) {
             jobtype = 1;
         }
+
+        Constants.TRANSPORT_MASTER_ID = TransportMasterId;
 
         List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey);
         branch.updateJobStartTime(CommonMethods.getCurrentDateTime(this));

@@ -81,6 +81,9 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
             summaryType = extras.getInt("summaryType");
             TransportMasterId = extras.getInt("TransportMasterId");
         }
+
+        Constants.TRANSPORT_MASTER_ID = TransportMasterId;
+
         ll_lists = findViewById(R.id.ll_lists);
         ll_delivery = findViewById(R.id.ll_delivery);
         txt_customer_name = (TextView) findViewById(R.id.txt_customer_name);
@@ -505,30 +508,14 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                         Job.setCollected(TransportMasterId);
                     } else if (summaryType == Constants.DELIVERY) {
                         Job.setDelivered(GroupKey);
-//                        if (Job.getIncompleteCollectionJobsOfPoint(GroupKey).size() > 0) {
-//                            Intent intent = new Intent(this, CollectionDetailActivity.class);
-////                            intent.putExtra("PointId", PointId);
-//                            intent.putExtra("GroupKey", GroupKey);
-//                            startActivity(intent);
-//                        }
                     }
+
+                    APICaller.instance().getReceiptNo(null, getApplicationContext(), Constants.TRANSPORT_MASTER_ID);
                     APICaller.instance().sync(null, getApplicationContext());
                     setResult(Constants.FINISHONRESULT);
                     //   finish();
                 }
                 raiseSnakbar("Success");
-
-                int retries = 0;
-                boolean hasReceipt = false;
-                while (retries <= 40 && hasReceipt == false) {
-                    try {
-                        hasReceipt = hasReceiptNo(TransportMasterId);
-                        retries++;
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
 
                 hideProgressDialog();
                 Intent intent = new Intent(CustomerSummaryScreen.this, PrintSelectedJobActivity.class);
@@ -573,15 +560,15 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
 
 
     private boolean hasReceiptNo(int transportMasterId) {
-      boolean result = false;
-      Job j = Job.getSingle(transportMasterId);
-      Log.e("JOB" , j.toString());
-      if (!j.ReceiptNo.equals("null") && j.ReceiptNo != null)
-      {
-          result = true;
-          Log.e("RETRIES" , result + " " + transportMasterId + " " + j.ReceiptNo);
-      }
-      Log.e("RETRIES" , result + " " + transportMasterId);
-      return  result;
+        boolean result = false;
+        try {
+            Job j = Job.getSingle(transportMasterId);
+            if (!j.ReceiptNo.equals("null") && j.ReceiptNo != null) {
+                result = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }
