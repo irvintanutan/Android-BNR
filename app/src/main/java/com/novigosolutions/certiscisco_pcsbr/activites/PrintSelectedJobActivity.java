@@ -1,6 +1,7 @@
 package com.novigosolutions.certiscisco_pcsbr.activites;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -76,6 +77,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
     private ProgressDialog progressDialog;
     String groupKey;
     int isCollection, isDelivered;
+    boolean isOffline = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +121,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         isDelivered = extras.getInt("isDelivered");
         isCollection = extras.getInt("isCollection");
         transporterMasterId = extras.getInt("transporterMasterId");
+        isOffline = extras.getBoolean("isOffline");
         Log.e("TRANSPORT ID ", Integer.toString(transporterMasterId));
         if (status.equals("COMPLETED")) {
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -134,7 +137,12 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
             bulkPrintViewInit();
             clearSelectedJob();
             if (transporterMasterId != 123) {
-                list = Job.getSpecificJobListByType(isDelivered, isCollection, transporterMasterId);
+                if (isOffline) {
+                    list = Job.getSpecificJobListByType(transporterMasterId);
+                } else {
+                    list = Job.getSpecificJobListByType(isDelivered, isCollection, transporterMasterId);
+
+                }
                 mainContainer.setVisibility(View.GONE);
                 checkBluetoothConnection();
             }
@@ -422,5 +430,11 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
             for (Job job : jobList) {
                 job.setSelected(false);
             }
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(PrintSelectedJobActivity.this, GroupJobActivity.class));
+        finish();
     }
 }

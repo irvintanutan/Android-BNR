@@ -1,6 +1,7 @@
 package com.novigosolutions.certiscisco_pcsbr.models;
 
 
+import android.content.Context;
 import android.util.Log;
 
 import com.activeandroid.Model;
@@ -12,12 +13,19 @@ import com.activeandroid.query.Update;
 import com.google.gson.JsonObject;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
+import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Content;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Denomination;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @Table(name = "job")
 public class Job extends Model implements Comparable<Job> {
@@ -288,6 +296,13 @@ public class Job extends Model implements Comparable<Job> {
                 .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and TransportMasterId=?", "COMPLETED", isCollection, isDelivered, TransportMasterId)
                 .execute();
 
+        return jl;
+    }
+
+    public static List<Job> getSpecificJobListByType(int TransportMasterId) {
+        List<Job> jl = new Select().from(Job.class)
+                .where("TransportMasterId=?",  TransportMasterId)
+                .execute();
         return jl;
     }
 
@@ -620,6 +635,18 @@ public class Job extends Model implements Comparable<Job> {
                 .execute();
     }
 
+
+    public static void UpdateReceiptNo(String groupKey, Context context) {
+        int userId = Preferences.getInt("UserId", context);
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
+        String formattedDate = df.format(c);
+
+        new Update(Job.class)
+                .set("ReceiptNo=?", "RN" + formattedDate + userId)
+                .where("GroupKey=?", groupKey)
+                .execute();
+    }
 
     public static void UpdateNameAndStaffID(int TransportMasterId, String name, String id) {
         new Update(Job.class)

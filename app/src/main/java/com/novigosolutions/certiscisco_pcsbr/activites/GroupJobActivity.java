@@ -147,6 +147,8 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
             intent.putExtra("TransportMasterId", j.TransportMasterId);
             intent.putExtra("GroupKey", GroupKey);
             intent.putExtra("summaryType", jobtype);
+            intent.putExtra("isDelivery",  j.IsFloatDeliveryOrder ? 1:0);
+            intent.putExtra("isCollection", j.IsCollectionOrder ? 1:0);
             intent.putExtra("isSummary",true);
         } else if (jobtype == 1 ) {
 //            || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey).size() == 0 || branch.isDelOffline))

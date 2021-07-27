@@ -56,6 +56,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
     int isDelivery = 0, isCollection = 0;
     static int total_item_counter;
     Boolean isSummaryScreen;
+    Boolean isOffline = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +95,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
 
         Branch branch = Branch.getSingle(GroupKey);
         Job job = Job.getSingle(TransportMasterId);
+        isOffline = job.isOfflineSaved;
         if (isSummary(branch, job)) {
             bll = findViewById(R.id.bll);
             bll.setVisibility(View.GONE);
@@ -438,6 +440,8 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             intent.putExtra("isDelivered", isDelivery);
             intent.putExtra("status", "COMPLETED");
             intent.putExtra("transporterMasterId", TransportMasterId);
+            intent.putExtra("isOffline", isOffline);
+
             startActivity(intent);
 
         } else if (id == R.id.btn_cancel) {

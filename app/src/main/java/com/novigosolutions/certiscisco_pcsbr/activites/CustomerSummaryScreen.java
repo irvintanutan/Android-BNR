@@ -435,7 +435,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                     }
 
                     if (summaryType == Constants.COLLECTION) {
-
+                        Job.UpdateReceiptNo(GroupKey , this);
                         Branch.updateColCustomerSignature(GroupKey, sign);
                         Job.UpdateCustomerSignature(TransportMasterId, sign);
                         Branch.UpdateNameandStaffIdD(GroupKey, name, staffID);
@@ -455,6 +455,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                         }
                     } else if (summaryType == Constants.DELIVERY) {
 
+                        Job.UpdateReceiptNo(GroupKey , this);
                         Branch.updateDelCustomerSignature(GroupKey, sign);
                         Job.UpdateCustomerSignature(TransportMasterId, sign);
                         Branch.UpdateNameandStaffIdD(GroupKey, name, staffID);
@@ -509,8 +510,6 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                     } else if (summaryType == Constants.DELIVERY) {
                         Job.setDelivered(GroupKey);
                     }
-
-                    APICaller.instance().getReceiptNo(null, getApplicationContext(), Constants.TRANSPORT_MASTER_ID);
                     APICaller.instance().sync(null, getApplicationContext());
                     setResult(Constants.FINISHONRESULT);
                     //   finish();

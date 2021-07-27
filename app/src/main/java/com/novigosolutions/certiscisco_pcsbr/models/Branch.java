@@ -533,6 +533,7 @@ public class Branch extends Model implements Comparable<Branch> {
 
     public static JsonObject getCollection(String GroupKey, Context context) {
         List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey);
+        String receiptNo = "";
         //List<Job> jobs = Job.getCollectionJobsOfPoint(PointId);
         JsonObject jsonObject = new JsonObject();
         JsonArray CollectionHeaderList = new JsonArray();
@@ -540,8 +541,11 @@ public class Branch extends Model implements Comparable<Branch> {
             Job job = jobs.get(i);
             int TransportMasterId = job.TransportMasterId;
             JsonObject jobjson = new JsonObject();
+            receiptNo = job.ReceiptNo;
             jobjson.addProperty("TransportId", TransportMasterId);
             jobjson.addProperty("CollectionId", job.CollectionOrderId);
+            jobjson.addProperty("ReceiptNo",  receiptNo);
+
             JsonArray Details = new JsonArray();
 
             List<Bags> bags = Bags.getByTransportMasterId(TransportMasterId);
@@ -634,6 +638,7 @@ public class Branch extends Model implements Comparable<Branch> {
             CollectionHeaderList.add(jobjson);
         }
         jsonObject.add("CollectionHeaderList", CollectionHeaderList);
+        jsonObject.addProperty("ReceiptNo", receiptNo);
         jsonObject.addProperty("Sign", Branch.getSingle(GroupKey).colSignature);
         jsonObject.addProperty("JobStartTime", Branch.getSingle(GroupKey).JobStartTime);
         jsonObject.addProperty("JobEndTime",  Branch.getSingle(GroupKey).JobEndTime);
@@ -655,15 +660,18 @@ public class Branch extends Model implements Comparable<Branch> {
     public static JsonObject getDelivery(String GroupKey, Context context) {
         JsonObject jsonObject = new JsonObject();
         JsonArray DeliveryList = new JsonArray();
+        String receiptNo = "";
         List<Job> deliveryjobs = Job.getFinishedPendingDeliveryJobsOfPoint(GroupKey);
         for (int i = 0; i < deliveryjobs.size(); i++) {
             JsonObject Delivery = new JsonObject();
+            receiptNo = deliveryjobs.get(i).ReceiptNo;
             Delivery.addProperty("TransportMasterId", deliveryjobs.get(i).TransportMasterId);
             Delivery.addProperty("FloatDeliveryOrderId", deliveryjobs.get(i).FloatDeliveryOrderId);
             DeliveryList.add(Delivery);
             Job.UpdateTime(deliveryjobs.get(i).TransportMasterId,Branch.getSingle(GroupKey).JobStartTime,Branch.getSingle(GroupKey).JobEndTime);
         }
         jsonObject.add("DeliveryList", DeliveryList);
+        jsonObject.addProperty("ReceiptNo", receiptNo);
         jsonObject.addProperty("Sign", Branch.getSingle(GroupKey).delSignature);
         jsonObject.addProperty("JobStartTime", Branch.getSingle(GroupKey).JobStartTime);
         jsonObject.addProperty("JobEndTime",Branch.getSingle(GroupKey).JobEndTime);

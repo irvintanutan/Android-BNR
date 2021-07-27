@@ -130,14 +130,19 @@ public class CommonMethods {
 
     public static String getTimeIn12Hour(String dateAndTime){
         String date=dateAndTime;
-        String time=""; 
-        String [] dateArr = dateAndTime.split(" ");
+        Log.e("DATETIME" , dateAndTime);
+        String time="00:00";
 
-        int hour = Integer.parseInt(dateArr[1].substring(0,2));
-        int minutes = Integer.parseInt(dateArr[1].substring(3,5));
+        try {
+            String[] dateArr = dateAndTime.split(" ");
+            Log.e("DATETIME" , dateArr[1]);
+            int hour = Integer.parseInt(dateArr[1].substring(0, 2));
+            int minutes = Integer.parseInt(dateArr[1].substring(3, 5));
 
-        time = format(hour , minutes);
-
+            time = format(hour, minutes);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
         return time;
     }
 
