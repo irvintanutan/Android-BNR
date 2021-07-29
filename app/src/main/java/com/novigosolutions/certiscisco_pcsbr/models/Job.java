@@ -1,6 +1,7 @@
 package com.novigosolutions.certiscisco_pcsbr.models;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
@@ -26,6 +27,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Table(name = "job")
 public class Job extends Model implements Comparable<Job> {
@@ -929,6 +935,15 @@ public class Job extends Model implements Comparable<Job> {
         return printContent;
     }
 
+
+    @SuppressLint("NewApi")
+    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor)
+    {
+        Map<Object, Boolean> map = new ConcurrentHashMap<>();
+        return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
+
+    @SuppressLint("NewApi")
     public static List<Content> getSelectedPrintContent(String groupKey, int isDelivery) {
         Constants.BOX_QUANTITY = 0;
         List<Content> printContent = new ArrayList<>();
@@ -939,6 +954,7 @@ public class Job extends Model implements Comparable<Job> {
         List<String> boxSealNoList = new ArrayList<>();
         List<String> boxBagSealNoList = new ArrayList<>();
         List<String> bagSealNoList = new ArrayList<>();
+        List<String> checker = new ArrayList<>();
 
         for (int a = 0; a < list.size(); a++) {
             int transportMasterId = list.get(a).TransportMasterId;
@@ -987,6 +1003,12 @@ public class Job extends Model implements Comparable<Job> {
                     String message = bags.get(i).firstbarcode;
                     if (!bags.get(i).secondbarcode.isEmpty())
                         message += ", " + bags.get(i).secondbarcode;
+
+                    if (checker.size() > 0) {
+                        if (checker.contains(message))
+                             break;
+                    }
+                    checker.add(message);
                     bagQty++;
                     bagSealNoList.add(message);
 

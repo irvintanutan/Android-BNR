@@ -184,6 +184,7 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
         }
         if (intent != null) {
             startActivity(intent);
+            finish();
         }
     }
 

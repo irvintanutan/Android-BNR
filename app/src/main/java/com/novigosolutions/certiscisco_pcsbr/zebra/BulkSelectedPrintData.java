@@ -1,5 +1,6 @@
 package com.novigosolutions.certiscisco_pcsbr.zebra;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -15,6 +16,10 @@ import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
     private Context context;
@@ -182,6 +187,7 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
         }
         return printList;
     }
+
 
     @Override
     protected void onPostExecute(List<Print> bulkPrintData) {

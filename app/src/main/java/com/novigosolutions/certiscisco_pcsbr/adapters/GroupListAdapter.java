@@ -92,144 +92,146 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        boolean singleJob = false;
-        Job j = null;
-        int jobtype = 0;
-        List<Job> js = Job.getByGroupKey(branches.get(position).GroupKey);
-        if(js.size()==1){
-            singleJob = true;
-            j = js.get(0);
-            if(j.IsCollectionOrder && j.IsFloatDeliveryOrder ) {
-                jobtype = 3;
-            } else if (j.IsFloatDeliveryOrder) {
-                jobtype = 2;
-                Log.e("DELIVERY" , Integer.toString(position));
-            } else if (j.IsCollectionOrder){
-                jobtype = 1;
+        try {
+            boolean singleJob = false;
+            Job j = null;
+            int jobtype = 0;
+            List<Job> js = Job.getByGroupKey(branches.get(position).GroupKey);
+            if (js.size() == 1) {
+                singleJob = true;
+                j = js.get(0);
+                if (j.IsCollectionOrder && j.IsFloatDeliveryOrder) {
+                    jobtype = 3;
+                } else if (j.IsFloatDeliveryOrder) {
+                    jobtype = 2;
+                    Log.e("DELIVERY", Integer.toString(position));
+                } else if (j.IsCollectionOrder) {
+                    jobtype = 1;
+                }
             }
-        }
 
 
-        holder.txt_customer_name.setText(branches.get(position).CustomerName);
-        holder.txt_functional_code.setText(Job.getAllOrderNos(branches.get(position).GroupKey,status));
-        holder.txt_start_time.setText(CommonMethods.getStartTime(branches.get(position).StartTime) + " - " + CommonMethods.getStartTime(branches.get(position).EndTime));
+            holder.txt_customer_name.setText(branches.get(position).CustomerName);
+            holder.txt_functional_code.setText(Job.getAllOrderNos(branches.get(position).GroupKey, status));
+            holder.txt_start_time.setText(CommonMethods.getStartTime(branches.get(position).StartTime) + " - " + CommonMethods.getStartTime(branches.get(position).EndTime));
 
 
-        if(singleJob) {
-            if(!TextUtils.isEmpty(j.SequenceNo) && !j.SequenceNo.equalsIgnoreCase("null"))
-                holder.txt_pos.setText(j.SequenceNo);
-            else
-                holder.txt_pos.setText("");
-            holder.txt_break_time.setText(j.ClientBreak);
-            if(jobtype==1) {
-                holder.txt_branch_name.setText("Pick Up : " + branches.get(position).BranchCode);// + " (" + j.FunctionalCode + ")");
-            }else  if(jobtype==2){
-                holder.txt_branch_name.setText("Drop Off : " + branches.get(position).BranchCode);
-            }
-        }
-        else {
-
-            holder.txt_pos.setText(Job.getMinimumSequenceNo(branches.get(position).GroupKey,status));
-            if(jobtype==1) {
-                holder.txt_branch_name.setText("Pick Up : " + branches.get(position).BranchCode);// + " (" + j.FunctionalCode + ")");
-            }else  if(jobtype==2){
-                holder.txt_branch_name.setText("Drop Off : " + branches.get(position).BranchCode);
-            }else {
-                holder.txt_branch_name.setText(branches.get(position).BranchCode);
-            }
-        }
-
-        if(singleJob && !TextUtils.isEmpty(j.OrderRemarks)){
-            holder.txt_remarks.setVisibility(View.VISIBLE);
-            holder.txt_remarks.setText("Remarks: "+j.OrderRemarks);
-        }else{
-            holder.txt_remarks.setVisibility(View.GONE);
-        }
-
-        if(!singleJob) {
-            if ("ALL".equals(status)) {
-                jobtype = branches.get(position).getBranchJobType();
+            if (singleJob) {
+                if (!TextUtils.isEmpty(j.SequenceNo) && !j.SequenceNo.equalsIgnoreCase("null"))
+                    holder.txt_pos.setText(j.SequenceNo);
+                else
+                    holder.txt_pos.setText("");
+                holder.txt_break_time.setText(j.ClientBreak);
+                if (jobtype == 1) {
+                    holder.txt_branch_name.setText("Pick Up : " + branches.get(position).BranchCode);// + " (" + j.FunctionalCode + ")");
+                } else if (jobtype == 2) {
+                    holder.txt_branch_name.setText("Drop Off : " + branches.get(position).BranchCode);
+                }
             } else {
-                jobtype = branches.get(position).getBranchJobTypeByStatus(status);
-            }
-        }
 
-        switch (jobtype) {
-            case 1:
-                holder.img_type.setImageResource(R.drawable.ic_collection);
-                break;
-            case 2:
-                holder.img_type.setImageResource(R.drawable.ic_delivery);
-                break;
-            case 3:
-                holder.img_type.setImageResource(R.drawable.ic_collection_delivery);
-                break;
-        }
-        boolean yellow = false;
-        if(!singleJob && (jobtype == 2 || jobtype == 3)){
-            Log.d("TAG", "onBindViewHolder: ");
-            List<Job> jl = Job.getDeliveryJobsOfPoint(branches.get(position).GroupKey);
-            for(Job jb:jl){
-                if(TextUtils.isEmpty(jb.DependentOrderId)
-                        && Job.checkPendingDependentCollections(jb.DependentOrderId).size()>0) {
-                    yellow = true;
-                    break;
-                } else if(!Delivery.hasPendingDeliveryItems(jb.TransportMasterId)){
-                    yellow = true;
-                    break;
+                holder.txt_pos.setText(Job.getMinimumSequenceNo(branches.get(position).GroupKey, status));
+                if (jobtype == 1) {
+                    holder.txt_branch_name.setText("Pick Up : " + branches.get(position).BranchCode);// + " (" + j.FunctionalCode + ")");
+                } else if (jobtype == 2) {
+                    holder.txt_branch_name.setText("Drop Off : " + branches.get(position).BranchCode);
+                } else {
+                    holder.txt_branch_name.setText(branches.get(position).BranchCode);
                 }
             }
-        }
 
-        if(singleJob){
-            if(jobtype==1){
-                if(!TextUtils.isEmpty(j.BranchCode)) {
-                    holder.txt_drop_off_branch.setVisibility(View.VISIBLE);
-                    holder.txt_drop_off_branch.setText("Drop Off : "+j.BranchCode.toUpperCase());
+            if (singleJob && !TextUtils.isEmpty(j.OrderRemarks)) {
+                holder.txt_remarks.setVisibility(View.VISIBLE);
+                holder.txt_remarks.setText("Remarks: " + j.OrderRemarks);
+            } else {
+                holder.txt_remarks.setVisibility(View.GONE);
+            }
+
+            if (!singleJob) {
+                if ("ALL".equals(status)) {
+                    jobtype = branches.get(position).getBranchJobType();
+                } else {
+                    jobtype = branches.get(position).getBranchJobTypeByStatus(status);
                 }
-            }else {
+            }
+
+            switch (jobtype) {
+                case 1:
+                    holder.img_type.setImageResource(R.drawable.ic_collection);
+                    break;
+                case 2:
+                    holder.img_type.setImageResource(R.drawable.ic_delivery);
+                    break;
+                case 3:
+                    holder.img_type.setImageResource(R.drawable.ic_collection_delivery);
+                    break;
+            }
+            boolean yellow = false;
+            if (!singleJob && (jobtype == 2 || jobtype == 3)) {
+                Log.d("TAG", "onBindViewHolder: ");
+                List<Job> jl = Job.getDeliveryJobsOfPoint(branches.get(position).GroupKey);
+                for (Job jb : jl) {
+                    if (TextUtils.isEmpty(jb.DependentOrderId)
+                            && Job.checkPendingDependentCollections(jb.DependentOrderId).size() > 0) {
+                        yellow = true;
+                        break;
+                    } else if (!Delivery.hasPendingDeliveryItems(jb.TransportMasterId)) {
+                        yellow = true;
+                        break;
+                    }
+                }
+            }
+
+            if (singleJob) {
+                if (jobtype == 1) {
+                    if (!TextUtils.isEmpty(j.BranchCode)) {
+                        holder.txt_drop_off_branch.setVisibility(View.VISIBLE);
+                        holder.txt_drop_off_branch.setText("Drop Off : " + j.BranchCode.toUpperCase());
+                    }
+                } else {
+                    holder.txt_drop_off_branch.setVisibility(View.GONE);
+                }
+            } else {
                 holder.txt_drop_off_branch.setVisibility(View.GONE);
             }
-        }else {
-            holder.txt_drop_off_branch.setVisibility(View.GONE);
-        }
 
-        if (!"COMPLETED".equals(status)) {
-            if (j!=null && j.isOfflineSaved) {
-                holder.llmain.setBackgroundColor(Color.parseColor(colorBrown));
-                holder.llsub.setBackgroundColor(Color.parseColor(colorLightBrown));
-            } else if (Job.getPendingJobsOfPoint(branches.get(position).GroupKey).size() == 0) {
+            if (!"COMPLETED".equals(status)) {
+                if (j != null && j.isOfflineSaved) {
+                    holder.llmain.setBackgroundColor(Color.parseColor(colorBrown));
+                    holder.llsub.setBackgroundColor(Color.parseColor(colorLightBrown));
+                } else if (Job.getPendingJobsOfPoint(branches.get(position).GroupKey).size() == 0) {
+                    holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
+                    holder.llsub.setBackgroundColor(Color.parseColor(colorLightGreen));
+                } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey).size() > 0 && !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey)) {
+                    holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
+                    holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
+                } else if (singleJob && jobtype == 2 && TextUtils.isEmpty(j.DependentOrderId) && Job.checkPendingDependentCollections(j.DependentOrderId).size() > 0) {
+                    holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
+                    holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
+                } else if (singleJob && jobtype == 2 && !Delivery.hasPendingDeliveryItems(j.TransportMasterId)) {
+                    holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
+                    holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
+                } else if (yellow) {
+                    holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
+                    holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
+                } else {
+                    Date endTime = CommonMethods.getBreakTime(branches.get(position).EndTime);
+                    if (endTime != null && endTime.getTime() < serverTime) {
+                        holder.llmain.setBackgroundColor(Color.parseColor(colorRed));
+                        holder.llsub.setBackgroundColor(Color.parseColor(colorLightRed));
+                    } else if (endTime != null && endTime.getTime() - (60 * 60 * 1000) < serverTime) {
+                        holder.llmain.setBackgroundColor(Color.parseColor(colorOrange));
+                        holder.llsub.setBackgroundColor(Color.parseColor(colorLightOrange));
+                    } else {
+                        holder.llmain.setBackgroundColor(Color.parseColor(colorBlue));
+                        holder.llsub.setBackgroundColor(Color.parseColor(colorWhite));
+                    }
+                }
+            } else {
                 holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
                 holder.llsub.setBackgroundColor(Color.parseColor(colorLightGreen));
-            } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey).size() > 0 && !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey)) {
-                holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
-                holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
-            } else if (singleJob && jobtype == 2 && TextUtils.isEmpty(j.DependentOrderId) && Job.checkPendingDependentCollections(j.DependentOrderId).size()>0) {
-                holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
-                holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
-            } else if (singleJob && jobtype == 2 && !Delivery.hasPendingDeliveryItems(j.TransportMasterId)){
-                holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
-                holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
-            } else if(yellow){
-                holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
-                holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
             }
-            else {
-                Date endTime = CommonMethods.getBreakTime(branches.get(position).EndTime);
-                if (endTime != null && endTime.getTime() < serverTime) {
-                    holder.llmain.setBackgroundColor(Color.parseColor(colorRed));
-                    holder.llsub.setBackgroundColor(Color.parseColor(colorLightRed));
-                } else if (endTime != null && endTime.getTime() - (60 * 60 * 1000) < serverTime) {
-                    holder.llmain.setBackgroundColor(Color.parseColor(colorOrange));
-                    holder.llsub.setBackgroundColor(Color.parseColor(colorLightOrange));
-                } else {
-                    holder.llmain.setBackgroundColor(Color.parseColor(colorBlue));
-                    holder.llsub.setBackgroundColor(Color.parseColor(colorWhite));
-                }
-            }
-        }else {
-            holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
-            holder.llsub.setBackgroundColor(Color.parseColor(colorLightGreen));
+        }catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

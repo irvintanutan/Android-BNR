@@ -123,11 +123,28 @@ public class Delivery extends Model {
         return deliveries;
     }
 
+    public static List<Delivery> distinct(List<Delivery> deliveries) {
+        List<Delivery> result = new ArrayList<>();
+        List<String> checker = new ArrayList<>();
+
+        for (int a = 0; a < deliveries.size(); a++) {
+            Delivery delivery = deliveries.get(a);
+            if (a == 0) {
+                checker.add(deliveries.get(a).SealNo);
+                result.add(delivery);
+            } else {
+            }
+        }
+
+
+        return result;
+    }
+
     public static List<Delivery> getPendingSealedByTransportId(int TransportMasterId) {
 //        List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey);
         List<Delivery> deliveries = new ArrayList<>();
 //        for (int i = 0; i < jobs.size(); i++) {
-            deliveries.addAll(getSealedByByTransportMasterId(TransportMasterId));
+        deliveries.addAll(getSealedByByTransportMasterId(TransportMasterId));
 //        }
         return deliveries;
     }
@@ -154,7 +171,7 @@ public class Delivery extends Model {
 //        List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey);
         List<Delivery> deliveries = new ArrayList<>();
 //        for (int i = 0; i < jobs.size(); i++) {
-            deliveries.addAll(getUnSealedByTransportMasterId(TransportMasterId));
+        deliveries.addAll(getUnSealedByTransportMasterId(TransportMasterId));
 //        }
         return deliveries;
     }
@@ -199,7 +216,7 @@ public class Delivery extends Model {
             if (deliveries.get(i).SealNo.equals(seal)) {
                 new Update(Delivery.class)
                         .set("IsScanned=?", 1)
-                        .where("id=?", deliveries.get(i).getId())
+                        .where("id=? or SealNo=?", deliveries.get(i).getId(), seal)
                         .execute();
                 return true;
             }

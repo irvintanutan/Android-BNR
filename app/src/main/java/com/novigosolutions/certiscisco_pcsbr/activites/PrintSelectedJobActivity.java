@@ -434,7 +434,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(PrintSelectedJobActivity.this, GroupJobActivity.class));
+        startActivity(new Intent(PrintSelectedJobActivity.this, GroupJobActivity.class).putExtra("status", "PENDING"));
         finish();
     }
 }

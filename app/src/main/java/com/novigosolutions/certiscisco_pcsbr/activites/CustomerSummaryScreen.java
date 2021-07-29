@@ -523,6 +523,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 intent.putExtra("status", "SINGLE");
                 intent.putExtra("transporterMasterId", TransportMasterId);
                 startActivity(intent);
+                finish();
 
             } else {
                 hideProgressDialog();

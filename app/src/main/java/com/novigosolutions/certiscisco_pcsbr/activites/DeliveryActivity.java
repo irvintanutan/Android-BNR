@@ -1,5 +1,6 @@
 package com.novigosolutions.certiscisco_pcsbr.activites;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -35,6 +36,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -60,6 +66,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
     View l_manual_entry;
 
     // private EMDKWrapper emdkWrapper = null;
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,7 +111,10 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
 //            bagList = Delivery.getPendingSealedByTransportId(Job.getSingleByOrderNo(j.DependentOrderId).TransportMasterId);
 //            boxList = Delivery.getPendingUnSealedByTransportId(Job.getSingleByOrderNo(j.DependentOrderId).TransportMasterId);
 //        }
-        bagList = Delivery.getPendingSealedByPointId(GroupKey);
+        List<Delivery> list = Delivery.getPendingSealedByPointId(GroupKey);
+        bagList = list.stream().filter( distinctByKey(p -> p.SealNo) )
+                .collect( Collectors.toList() );
+
         setSealedScannedCount();
         boxList = Delivery.getPendingUnSealedByPointId(GroupKey);
         recyclerViewbag.setLayoutManager(mLayoutManager);
@@ -203,6 +213,13 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         if (Preferences.getBoolean("EnableManualEntry", this) || Branch.getSingle(GroupKey).EnableManualEntry) {
             enableManualEntry();
         }
+    }
+
+    @SuppressLint("NewApi")
+    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor)
+    {
+        Map<Object, Boolean> map = new ConcurrentHashMap<>();
+        return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     private void setSealedScannedCount() {
