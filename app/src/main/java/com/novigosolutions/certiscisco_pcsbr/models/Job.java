@@ -289,9 +289,9 @@ public class Job extends Model implements Comparable<Job> {
         return jl;
     }
 
-    public static List<Job> getJobListByTypeByGroupKey(int isDelivered, int isCollection, String groupKey) {
+    public static List<Job> getJobListByTypeByGroupKey(int isDelivered, int isCollection, String groupKey, String branchCode) {
         List<Job> jl = new Select().from(Job.class)
-                .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=? ", "COMPLETED", isCollection, isDelivered, groupKey)
+                .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=? and BranchCode=?", "COMPLETED", isCollection, isDelivered, groupKey, branchCode)
                 .execute();
 
         return jl;
@@ -300,6 +300,15 @@ public class Job extends Model implements Comparable<Job> {
     public static List<Job> getSpecificJobListByType(int isDelivered, int isCollection, int TransportMasterId) {
         List<Job> jl = new Select().from(Job.class)
                 .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and TransportMasterId=?", "COMPLETED", isCollection, isDelivered, TransportMasterId)
+                .execute();
+
+        return jl;
+    }
+
+    public static List<Job> getSpecificJobListByType(int isDelivered, int isCollection, String  GroupKey) {
+        List<Job> jl = new Select().from(Job.class)
+                .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=?", "COMPLETED", isCollection, isDelivered, GroupKey)
+                .groupBy("BranchCode")
                 .execute();
 
         return jl;
@@ -331,6 +340,11 @@ public class Job extends Model implements Comparable<Job> {
                 .execute();
     }
 
+    public static List<Job> getCollectionJobsOfPoint(String GroupKey, String status) {
+        return new Select().from(Job.class)
+                .where("IsCollectionOrder=? AND GroupKey=? AND Status=?", 1, GroupKey, status)
+                .execute();
+    }
 
 //    public static List<Job> getIncompleteCollectionJobsOfPoint(int PointId) {
 //        return new Select().from(Job.class)
@@ -642,16 +656,22 @@ public class Job extends Model implements Comparable<Job> {
     }
 
 
-    public static void UpdateReceiptNo(String groupKey, Context context) {
+    public static void UpdateReceiptNo(String groupKey, String branchCode, Context context) {
         int userId = Preferences.getInt("UserId", context);
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
         String formattedDate = df.format(c);
 
-        new Update(Job.class)
-                .set("ReceiptNo=?", "RN" + formattedDate + userId)
-                .where("GroupKey=?", groupKey)
-                .execute();
+        Job job = new Select().from(Job.class)
+                .where("GroupKey=? and BranchCode=?", groupKey , branchCode)
+                .executeSingle();
+
+        if (job.ReceiptNo == null) {
+            new Update(Job.class)
+                    .set("ReceiptNo=?", "RN" + formattedDate + userId)
+                    .where("GroupKey=? and BranchCode=?", groupKey, branchCode)
+                    .execute();
+        }
     }
 
     public static void UpdateNameAndStaffID(int TransportMasterId, String name, String id) {
@@ -944,11 +964,11 @@ public class Job extends Model implements Comparable<Job> {
     }
 
     @SuppressLint("NewApi")
-    public static List<Content> getSelectedPrintContent(String groupKey, int isDelivery) {
+    public static List<Content> getSelectedPrintContent(String groupKey, int isDelivery, String branchCode) {
         Constants.BOX_QUANTITY = 0;
         List<Content> printContent = new ArrayList<>();
         int isCollection = isDelivery == 0 ? 1 : 0;
-        List<Job> list = Job.getJobListByTypeByGroupKey(isDelivery, isCollection, groupKey);
+        List<Job> list = Job.getJobListByTypeByGroupKey(isDelivery, isCollection, groupKey, branchCode);
 
         int bagQty = 0, boxQty = 0, coinBagQty = 0;
         List<String> boxSealNoList = new ArrayList<>();

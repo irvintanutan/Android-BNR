@@ -271,7 +271,7 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener,
     }
 
     private List<Job> getAllJobList() {
-        return Job.getSpecificJobListByType(isDelivered, isCollection, transporterMasterId);
+        return Job.getSpecificJobListByType(isDelivered, isCollection, groupKey);
     }
 
     private void processPrintData() {

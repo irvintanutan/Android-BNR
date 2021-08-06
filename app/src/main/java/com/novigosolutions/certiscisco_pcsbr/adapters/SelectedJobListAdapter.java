@@ -125,11 +125,14 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
         }else{
             holder.txt_remarks.setVisibility(View.GONE);
         }
-        if(job.IsFloatDeliveryOrder){
-            holder.txt_functional_code.setText(Job.getAllDeliveryOrderNos(job.GroupKey));
-        } else{
-            holder.txt_functional_code.setText(Job.getSingle(job.TransportMasterId).OrderNo);
-        }
+//        if(job.IsFloatDeliveryOrder){
+//            holder.txt_functional_code.setText(Job.getAllDeliveryOrderNos(job.GroupKey));
+//        } else{
+//            holder.txt_functional_code.setText(Job.getSingle(job.TransportMasterId).OrderNo);
+//        }
+
+        holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, "COMPLETED"));
+
         holder.txt_start_time.setText(CommonMethods.getStartTime(b.StartTime) + " - " + CommonMethods.getStartTime(b.EndTime));
         holder.txt_break_time.setText(job.ClientBreak);
 

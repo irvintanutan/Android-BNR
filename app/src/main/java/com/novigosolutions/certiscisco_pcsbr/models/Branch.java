@@ -613,7 +613,7 @@ public class Branch extends Model implements Comparable<Branch> {
             for (int j = 0; j < boxBags.size(); j++) {
                 BoxBag boxBag = boxBags.get(j);
                 JsonObject Detail = new JsonObject();
-                Detail.addProperty("ItemType", "Coin Box");
+                Detail.addProperty("ItemType", "Coin Bag");
                 Detail.addProperty("DenoId", boxBag.ProductId);
                 Detail.addProperty("SealNo1", boxBag.bagcode);
                 Detail.addProperty("SealNo2", "");

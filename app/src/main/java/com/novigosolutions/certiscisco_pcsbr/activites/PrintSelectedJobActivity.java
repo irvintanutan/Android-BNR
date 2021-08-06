@@ -140,7 +140,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
                 if (isOffline) {
                     list = Job.getSpecificJobListByType(transporterMasterId);
                 } else {
-                    list = Job.getSpecificJobListByType(isDelivered, isCollection, transporterMasterId);
+                    list = Job.getSpecificJobListByType(isDelivered, isCollection, groupKey);
 
                 }
                 mainContainer.setVisibility(View.GONE);

@@ -1,5 +1,6 @@
 package com.novigosolutions.certiscisco_pcsbr.activites;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -40,12 +41,15 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import static com.novigosolutions.certiscisco_pcsbr.activites.DeliveryActivity.distinctByKey;
 
 public class CustomerSummaryScreen extends BaseActivity implements View.OnClickListener, ApiCallback, NetworkChangekListener {
 
@@ -68,6 +72,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
     LinearLayout linearLayout_staff_details;
     int isDelivery = 0, isCollection = 1;
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -235,6 +240,9 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 if (isSummary(branch, job)) bagList = Delivery.getSealedByPointId(GroupKey);
                 else bagList = Delivery.getPendingSealedByPointId(GroupKey);
                 if (bagList.size() > 0) {
+
+                    bagList = bagList.stream().filter( distinctByKey(p -> p.SealNo) )
+                            .collect( Collectors.toList() );
                     List<String> baglist = new ArrayList<>();
                     RecyclerView baglistView = findViewById(R.id.baglistview);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -435,7 +443,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                     }
 
                     if (summaryType == Constants.COLLECTION) {
-                        Job.UpdateReceiptNo(GroupKey , this);
+                        Job.UpdateReceiptNo(GroupKey , job.BranchCode , this);
                         Branch.updateColCustomerSignature(GroupKey, sign);
                         Job.UpdateCustomerSignature(TransportMasterId, sign);
                         Branch.UpdateNameandStaffIdD(GroupKey, name, staffID);
@@ -455,7 +463,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                         }
                     } else if (summaryType == Constants.DELIVERY) {
 
-                        Job.UpdateReceiptNo(GroupKey , this);
+                        Job.UpdateReceiptNo(GroupKey , job.BranchCode, this);
                         Branch.updateDelCustomerSignature(GroupKey, sign);
                         Job.UpdateCustomerSignature(TransportMasterId, sign);
                         Branch.UpdateNameandStaffIdD(GroupKey, name, staffID);

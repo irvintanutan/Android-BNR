@@ -97,7 +97,7 @@ public class ConfirmationActivity extends AppCompatActivity implements NetworkCh
             txtAddress.setText("Address: "+address);
 
         }else if (jobType == 2){
-            txtJobId.setText("Job ID: "+Job.getDeliveryOrderNos(GroupKey));
+            txtJobId.setText("Job ID: "+Job.getAllOrderNos(GroupKey, "PENDING"));
             txtBranchName.setVisibility(View.GONE);
             txtAddress.setVisibility(View.GONE);
         }

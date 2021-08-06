@@ -342,6 +342,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
     }
 
 
+    @SuppressLint("NewApi")
     @Override
     public void onDataScanned(String data) {
         if (data.isEmpty()) {
@@ -349,6 +350,8 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         } else {
             if (Delivery.setScanned(GroupKey, data)) {
                 List<Delivery> templist = Delivery.getPendingSealedByPointId(GroupKey);
+                templist = templist.stream().filter( distinctByKey(p -> p.SealNo) )
+                        .collect( Collectors.toList() );
                 bagList.clear();
                 bagList.addAll(templist);
                 sealedListAdapter.notifyDataSetChanged();

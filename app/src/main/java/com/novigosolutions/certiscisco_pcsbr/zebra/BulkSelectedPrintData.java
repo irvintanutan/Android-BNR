@@ -142,7 +142,7 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
                 else
                     print.setCustomerLocation(job.StreetName + " " + job.Tower + " " + job.Town + " " + job.PinCode);
 
-                print.setContentList(Job.getSelectedPrintContent(job.GroupKey, isDelivery));
+                print.setContentList(Job.getSelectedPrintContent(job.GroupKey, isDelivery, job.BranchCode));
 
                 String ackSign = job.CustomerSign;
                 String customerSign = job.CustomerSignature;
