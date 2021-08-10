@@ -142,7 +142,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         txt_branch_address = (TextView) findViewById(R.id.txt_txt_branch_address);
         Branch branch = Branch.getSingle(GroupKey);
         txt_customer_name.setText(branch.CustomerName);
-        txt_functional_code.setText(Job.getDeliveryOrderNos(GroupKey));
+        txt_functional_code.setText(Job.getAllOrderNos(GroupKey, "PENDING"));
         txt_branch_name.setText(branch.BranchCode);
         String address = "Address: ";
         if(!TextUtils.isEmpty(j.StreetName)){

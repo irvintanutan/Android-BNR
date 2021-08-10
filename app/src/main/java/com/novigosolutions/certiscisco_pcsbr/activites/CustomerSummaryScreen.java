@@ -138,7 +138,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
         if (job.IsFloatDeliveryOrder) {
             isDelivery = 1;
             isCollection = 0;
-            txt_functional_code.setText(Job.getDeliveryOrderNos(branch.GroupKey));
+            txt_functional_code.setText(Job.getAllOrderNos(GroupKey, "PENDING"));
         } else {
             txt_functional_code.setText(job.OrderNo);
         }

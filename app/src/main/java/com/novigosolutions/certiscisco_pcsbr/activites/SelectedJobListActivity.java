@@ -108,6 +108,10 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
             } else {
                 status = "Delivery List";
             }
+
+            if (Constants.isAll) {
+                status = "ALL JOBS";
+            }
         }
         isgridview = Preferences.getBoolean("isgridview", this);
     }
@@ -137,19 +141,22 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
             jobtype = 1;
         }
 
+        isCollection = job.IsCollectionOrder ? 1 : 0;
+        isDelivered = job.IsFloatDeliveryOrder ? 1 : 0;
+
         Constants.TRANSPORT_MASTER_ID = TransportMasterId;
 
         List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey);
         branch.updateJobStartTime(CommonMethods.getCurrentDateTime(this));
         Intent intent = null;
         if (job.Status.equals("COMPLETED") || (jobtype == 1 && job.isOfflineSaved) || (jobtype == 2 && (job.isOfflineSaved || Reschedule.isOfflineRescheduled(GroupKey))) || (jobtype == 3 && job.isOfflineSaved && Reschedule.isOfflineRescheduled(GroupKey))) {
-            Log.e("TRANSPORTMASTERID" , Integer.toString(TransportMasterId));
+            Log.e("TRANSPORTMASTERID", Integer.toString(TransportMasterId));
             intent = new Intent(SelectedJobListActivity.this, SummaryActivity.class);
             intent.putExtra("TransportMasterId", TransportMasterId);
             intent.putExtra("GroupKey", GroupKey);
             intent.putExtra("summaryType", jobtype);
-            intent.putExtra("isDelivery" , isDelivered);
-            intent.putExtra("isCollection" , isCollection);
+            intent.putExtra("isDelivery", isDelivered);
+            intent.putExtra("isCollection", isCollection);
             intent.putExtra("isSummary", true);
         } else if (jobtype == 1 || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey).size() == 0 || branch.isDelOffline))) {
             Job.updateJobStartTime(job.TransportMasterId, CommonMethods.getCurrentDateTime(this));
@@ -240,6 +247,9 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
     };
 
     private List<Job> getJobList() {
+        if (Constants.isAll) {
+            return Job.getAllJobListByType();
+        }
         return Job.getJobListByType(isDelivered, isCollection);
     }
 
@@ -283,7 +293,7 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
             }
         });
         print = menu.findItem(R.id.action_print);
-            print.setVisible(true);
+        print.setVisible(true);
         return super.onCreateOptionsMenu(menu);
     }
 

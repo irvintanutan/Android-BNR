@@ -32,4 +32,5 @@ public class Constants {
 
     public static int BOX_QUANTITY = 0;
     public static int TRANSPORT_MASTER_ID = 0;
+    public static boolean isAll = false;
 }

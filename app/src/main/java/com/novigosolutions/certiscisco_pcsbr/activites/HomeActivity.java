@@ -39,6 +39,7 @@ import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.service.BreakService;
 import com.novigosolutions.certiscisco_pcsbr.service.SignalRService;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
@@ -130,16 +131,21 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
                 Intent intent = null;
                 switch (position) {
                     case 0:
-                        intent = new Intent(HomeActivity.this, GroupJobActivity.class);
+                        intent = new Intent(HomeActivity.this, SelectedJobListActivity.class);
+                        intent.putExtra("isCollection", 1);
+                        intent.putExtra("isDelivered", 0);
                         intent.putExtra("status", "ALL");
+                        Constants.isAll = true;
                         break;
                     case 1:
                         intent = new Intent(HomeActivity.this, GroupJobActivity.class);
                         intent.putExtra("status", "PENDING");
+                        Constants.isAll = false;
                         break;
                     case 2:
                         intent = new Intent(HomeActivity.this, SelectionActivity.class);
                         intent.putExtra("status", "COMPLETED");
+                        Constants.isAll = false;
                         break;
                     case 3:
                         intent = new Intent(HomeActivity.this, ChatActivity.class);

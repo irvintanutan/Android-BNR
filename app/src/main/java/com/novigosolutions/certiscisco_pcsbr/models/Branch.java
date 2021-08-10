@@ -124,14 +124,6 @@ public class Branch extends Model implements Comparable<Branch> {
     public String StaffID;
 
 
-
-//    public static Branch getSingle(int PointId) {
-//        return new Select().from(Branch.class)
-//                .where("PointId=?", PointId)
-//                .executeSingle();
-//
-//    }
-
     public static Branch getSingle(String GroupKey) {
         return new Select().from(Branch.class)
                 .where("GroupKey=?", GroupKey)
@@ -151,9 +143,8 @@ public class Branch extends Model implements Comparable<Branch> {
     }
 
     public static List<Branch> getAllBranches() {
-        List<Branch> branches = new Select().from(Branch.class)
-//                .orderBy("length(SequenceNo),SequenceNo asc")
-//                .orderBy("GroupKey")
+        List<Branch> branches = new Select().from(Branch.class).innerJoin(Job.class)
+                .on("Job.GroupKey=Branch.GroupKey")
                 .execute();
         for(Branch b: branches){
             String minseq = Job.getMinimumSequenceNo(b.GroupKey,"ALL");

@@ -289,6 +289,15 @@ public class Job extends Model implements Comparable<Job> {
         return jl;
     }
 
+    public static List<Job> getAllJobListByType() {
+        List<Job> jl = new Select().from(Job.class)
+                .groupBy("GroupKey, Status")
+                .execute();
+
+        return jl;
+    }
+
+
     public static List<Job> getJobListByTypeByGroupKey(int isDelivered, int isCollection, String groupKey, String branchCode) {
         List<Job> jl = new Select().from(Job.class)
                 .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=? and BranchCode=?", "COMPLETED", isCollection, isDelivered, groupKey, branchCode)
