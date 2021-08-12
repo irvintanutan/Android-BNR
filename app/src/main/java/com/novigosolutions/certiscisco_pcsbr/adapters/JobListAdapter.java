@@ -93,7 +93,7 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.MyViewHo
         holder.txt_pos.setText(job.SequenceNo);
         holder.txt_customer_name.setText(job.CustomerName);
         if(job.IsFloatDeliveryOrder){
-            List<Job> jjl = Job.getDeliveryJobsOfPoint(job.GroupKey);
+            List<Job> jjl = Job.getDeliveryJobsOfPoint(job.GroupKey, job.BranchCode , job.PFunctionalCode);
             if(jjl.size()>1) {
                 String rem = null;
                 for (Job jj : jjl) {
@@ -125,11 +125,17 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.MyViewHo
         }else{
             holder.txt_remarks.setVisibility(View.GONE);
         }
-        if(job.IsFloatDeliveryOrder){
-            holder.txt_functional_code.setText(Job.getAllDeliveryOrderNos(job.GroupKey));
-        } else{
-            holder.txt_functional_code.setText(Job.getSingle(job.TransportMasterId).OrderNo);
-        }
+//        if(job.IsFloatDeliveryOrder){
+//            holder.txt_functional_code.setText(Job.getAllDeliveryOrderNos(job.GroupKey));
+//        } else{
+//            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.Status));
+//        }
+
+        if (job.Status.equals("COMPLETED"))
+            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode , "COMPLETED", job.PDFunctionalCode));
+        else
+            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode ,"PENDING", job.PDFunctionalCode));
+
         holder.txt_start_time.setText(CommonMethods.getStartTime(b.StartTime) + " - " + CommonMethods.getStartTime(b.EndTime));
         holder.txt_break_time.setText(job.ClientBreak);
 
@@ -175,7 +181,7 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.MyViewHo
         }
         boolean yellow = false;
         if(jobtype == 2) {
-            List<Job> js = Job.getDeliveryJobsOfPoint(job.GroupKey);
+            List<Job> js = Job.getDeliveryJobsOfPoint(job.GroupKey, job.BranchCode , job.PFunctionalCode);
             for (Job jb : js) {
                 if (TextUtils.isEmpty(jb.DependentOrderId)
                         && Job.checkPendingDependentCollections(jb.DependentOrderId).size() > 0) {

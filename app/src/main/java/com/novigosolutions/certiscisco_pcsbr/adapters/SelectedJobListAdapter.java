@@ -3,6 +3,7 @@ package com.novigosolutions.certiscisco_pcsbr.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,8 +42,8 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
     long serverTime;
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView txt_customer_name, txt_functional_code,  txt_pos, txt_start_time,txt_break_time,
-                txt_branch_name,txt_remarks,txt_drop_off_branch; //txt_street_tower, txt_town_pin,
+        TextView txt_customer_name, txt_functional_code, txt_pos, txt_start_time, txt_break_time,
+                txt_branch_name, txt_remarks, txt_drop_off_branch; //txt_street_tower, txt_town_pin,
         ImageView img_type;
         View llmain, llsub;
 
@@ -57,7 +58,7 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
             txt_pos = (TextView) view.findViewById(R.id.txt_pos);
             txt_start_time = (TextView) view.findViewById(R.id.txt_start_time);
             txt_break_time = (TextView) view.findViewById(R.id.txt_break_time);
-            txt_drop_off_branch=(TextView)view.findViewById(R.id.drop_off_branch);
+            txt_drop_off_branch = (TextView) view.findViewById(R.id.drop_off_branch);
             img_type = view.findViewById(R.id.img_type);
             llmain = view.findViewById(R.id.llmain);
             llsub = view.findViewById(R.id.llsub);
@@ -89,20 +90,21 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Job job = jobs.get(position);
         Branch b = Branch.getSingle(job.GroupKey);
-        if(!TextUtils.isEmpty(job.SequenceNo) && !job.SequenceNo.equalsIgnoreCase("null"))
-        holder.txt_pos.setText(job.SequenceNo);
+        if (!TextUtils.isEmpty(job.SequenceNo) && !job.SequenceNo.equalsIgnoreCase("null"))
+            holder.txt_pos.setText(job.SequenceNo);
         holder.txt_customer_name.setText(job.CustomerName);
-        if(job.IsFloatDeliveryOrder){
-            List<Job> jjl = Job.getDeliveryJobsOfPoint(job.GroupKey);
-            if(jjl.size()>1) {
+        if (job.IsFloatDeliveryOrder) {
+
+            List<Job> jjl = Job.getDeliveryJobsOfPoint(job.GroupKey, job.BranchCode , job.PFunctionalCode);
+            if (jjl.size() > 1) {
                 String rem = null;
                 for (Job jj : jjl) {
-    //                if(!TextUtils.isEmpty(jj.OrderRemarks)){
-                    if(rem == null){
-                        if(!TextUtils.isEmpty(jj.OrderRemarks))
+                    //                if(!TextUtils.isEmpty(jj.OrderRemarks)){
+                    if (rem == null) {
+                        if (!TextUtils.isEmpty(jj.OrderRemarks))
                             rem = jj.OrderRemarks;
-                    }else{
-                        if(!TextUtils.isEmpty(jj.OrderRemarks)) {
+                    } else {
+                        if (!TextUtils.isEmpty(jj.OrderRemarks)) {
                             if (rem.equals(jj.OrderRemarks)) {
                                 rem = jj.OrderRemarks;
                             } else {
@@ -110,19 +112,19 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
                             }
                         }
                     }
-    //                }
+                    //                }
                 }
                 if (!TextUtils.isEmpty(rem)) {
                     holder.txt_remarks.setVisibility(View.VISIBLE);
-                    holder.txt_remarks.setText("Remarks: "+rem);
+                    holder.txt_remarks.setText("Remarks: " + rem);
                 } else {
                     holder.txt_remarks.setVisibility(View.GONE);
                 }
             }
-        }else if(!TextUtils.isEmpty(job.OrderRemarks)){
+        } else if (!TextUtils.isEmpty(job.OrderRemarks)) {
             holder.txt_remarks.setVisibility(View.VISIBLE);
-            holder.txt_remarks.setText("Remarks: "+job.OrderRemarks);
-        }else{
+            holder.txt_remarks.setText("Remarks: " + job.OrderRemarks);
+        } else {
             holder.txt_remarks.setVisibility(View.GONE);
         }
 //        if(job.IsFloatDeliveryOrder){
@@ -131,14 +133,17 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
 //            holder.txt_functional_code.setText(Job.getSingle(job.TransportMasterId).OrderNo);
 //        }
 
-        holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, "COMPLETED"));
+        if (job.Status.equals("COMPLETED"))
+            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode , "COMPLETED", job.PDFunctionalCode));
+        else
+            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode ,"PENDING", job.PDFunctionalCode));
 
         holder.txt_start_time.setText(CommonMethods.getStartTime(b.StartTime) + " - " + CommonMethods.getStartTime(b.EndTime));
         holder.txt_break_time.setText(job.ClientBreak);
 
-        if(job.IsCollectionOrder) {
-            holder.txt_branch_name.setText("Pick Up : " + b.BranchCode);//+" ("+job.FunctionalCode+")");
-        }else if(job.IsFloatDeliveryOrder) {
+        if (job.IsCollectionOrder) {
+            holder.txt_branch_name.setText("Pick Up : " + job.PFunctionalCode);//+" ("+job.FunctionalCode+")");
+        } else if (job.IsFloatDeliveryOrder) {
             holder.txt_branch_name.setText("Drop Off : " + b.BranchCode);
         }
 
@@ -157,11 +162,11 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
 //        holder.txt_town_pin.setText(town_pin);
 
         int jobtype = 0;
-        if(job.IsCollectionOrder && job.IsFloatDeliveryOrder ) {
+        if (job.IsCollectionOrder && job.IsFloatDeliveryOrder) {
             jobtype = 3;
         } else if (job.IsFloatDeliveryOrder) {
             jobtype = 2;
-        } else if (job.IsCollectionOrder){
+        } else if (job.IsCollectionOrder) {
             jobtype = 1;
         }
 
@@ -177,8 +182,8 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
                 break;
         }
         boolean yellow = false;
-        if(jobtype == 2) {
-            List<Job> js = Job.getDeliveryJobsOfPoint(job.GroupKey);
+        if (jobtype == 2) {
+            List<Job> js = Job.getDeliveryJobsOfPoint(job.GroupKey, job.BranchCode , job.PFunctionalCode);
             for (Job jb : js) {
                 if (TextUtils.isEmpty(jb.DependentOrderId)
                         && Job.checkPendingDependentCollections(jb.DependentOrderId).size() > 0) {
@@ -192,13 +197,12 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
         }
 
 
-
-        if(jobtype==1){
-            if(!TextUtils.isEmpty(job.BranchCode)) {
+        if (jobtype == 1) {
+            if (!TextUtils.isEmpty(job.BranchCode)) {
                 holder.txt_drop_off_branch.setVisibility(View.VISIBLE);
-                holder.txt_drop_off_branch.setText("Drop Off : "+job.BranchCode.toUpperCase());
+                holder.txt_drop_off_branch.setText("Drop Off : " + job.BranchCode.toUpperCase());
             }
-        }else {
+        } else {
             holder.txt_drop_off_branch.setVisibility(View.GONE);
         }
 
@@ -225,7 +229,7 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
             if (EndTime != null && EndTime.getTime() < serverTime) {
                 holder.llmain.setBackgroundColor(Color.parseColor(colorRed));
                 holder.llsub.setBackgroundColor(Color.parseColor(colorLightRed));
-            } else if (EndTime != null && EndTime.getTime()-(60*60*1000) < serverTime) {
+            } else if (EndTime != null && EndTime.getTime() - (60 * 60 * 1000) < serverTime) {
                 holder.llmain.setBackgroundColor(Color.parseColor(colorOrange));
                 holder.llsub.setBackgroundColor(Color.parseColor(colorLightOrange));
             } else {

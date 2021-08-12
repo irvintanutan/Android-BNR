@@ -76,6 +76,7 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener,
     GenerateImage generateImage;
     public static List<Job> finalList;
     BulkImageGenerator bulkImageGenerator;
+    String BranchCode , PFunctionalCode;
     Thread t;
     int printCount=0;
     Boolean alertFlag=true;
@@ -121,6 +122,12 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener,
         groupKey = extras.getString("groupKey");
         isDelivered = extras.getInt("isDelivery");
         transporterMasterId = extras.getInt("transporterMasterId");
+
+        Job job = Job.getSingle(transporterMasterId);
+
+        BranchCode = job.BranchCode;
+        PFunctionalCode = job.PFunctionalCode;
+
         isCollection = extras.getInt("isCollection");
         if(status.equals("COMPLETED")){
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

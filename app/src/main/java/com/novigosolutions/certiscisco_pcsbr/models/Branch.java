@@ -124,14 +124,6 @@ public class Branch extends Model implements Comparable<Branch> {
     public String StaffID;
 
 
-
-//    public static Branch getSingle(int PointId) {
-//        return new Select().from(Branch.class)
-//                .where("PointId=?", PointId)
-//                .executeSingle();
-//
-//    }
-
     public static Branch getSingle(String GroupKey) {
         return new Select().from(Branch.class)
                 .where("GroupKey=?", GroupKey)
@@ -151,9 +143,8 @@ public class Branch extends Model implements Comparable<Branch> {
     }
 
     public static List<Branch> getAllBranches() {
-        List<Branch> branches = new Select().from(Branch.class)
-//                .orderBy("length(SequenceNo),SequenceNo asc")
-//                .orderBy("GroupKey")
+        List<Branch> branches = new Select().from(Branch.class).innerJoin(Job.class)
+                .on("Job.GroupKey=Branch.GroupKey")
                 .execute();
         for(Branch b: branches){
             String minseq = Job.getMinimumSequenceNo(b.GroupKey,"ALL");
@@ -531,8 +522,8 @@ public class Branch extends Model implements Comparable<Branch> {
 //        return false;
 //    }
 
-    public static JsonObject getCollection(String GroupKey, Context context) {
-        List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey);
+    public static JsonObject getCollection(String GroupKey, Context context, String BranchCode, String PFunctionalCode) {
+        List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
         String receiptNo = "";
         //List<Job> jobs = Job.getCollectionJobsOfPoint(PointId);
         JsonObject jsonObject = new JsonObject();
@@ -657,11 +648,11 @@ public class Branch extends Model implements Comparable<Branch> {
         return jsonObject;
     }
 
-    public static JsonObject getDelivery(String GroupKey, Context context) {
+    public static JsonObject getDelivery(String GroupKey, Context context, String BranchCode, String PFunctionalCode) {
         JsonObject jsonObject = new JsonObject();
         JsonArray DeliveryList = new JsonArray();
         String receiptNo = "";
-        List<Job> deliveryjobs = Job.getFinishedPendingDeliveryJobsOfPoint(GroupKey);
+        List<Job> deliveryjobs = Job.getFinishedPendingDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
         for (int i = 0; i < deliveryjobs.size(); i++) {
             JsonObject Delivery = new JsonObject();
             receiptNo = deliveryjobs.get(i).ReceiptNo;

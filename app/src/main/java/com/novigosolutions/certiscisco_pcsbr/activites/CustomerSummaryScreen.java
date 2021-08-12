@@ -66,6 +66,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
     LinearLayout ll_lists, ll_delivery;
     Button btn_ok, btn_print;
     Button btnCancel;
+    String BranchCode, PFunctionalCode;
     int TransportMasterId;
     static int total_item_counter;
     EditText txt_staff_name, txt_staff_id;
@@ -114,6 +115,8 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
 
         Branch branch = Branch.getSingle(GroupKey);
         Job job = Job.getSingle(TransportMasterId);
+        BranchCode = job.BranchCode;
+        PFunctionalCode = job.PFunctionalCode;
         if (isSummary(branch, job)) {
             bll = findViewById(R.id.bll);
             bll.setVisibility(View.GONE);
@@ -138,7 +141,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
         if (job.IsFloatDeliveryOrder) {
             isDelivery = 1;
             isCollection = 0;
-            txt_functional_code.setText(Job.getDeliveryOrderNos(branch.GroupKey));
+            txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode , "PENDING", job.PDFunctionalCode));
         } else {
             txt_functional_code.setText(job.OrderNo);
         }
@@ -164,7 +167,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
             List<Job> jobs = new ArrayList<>();
             if (isSummary(branch, job))
 //                jobs = Job.getCollectionJobsOfPoint(GroupKey);
-                jobs.add(Job.getSingle(TransportMasterId));
+                jobs = Job.getCollectionJobsOfPoint(GroupKey, BranchCode , PFunctionalCode, "COMPLETED");
             else
 //                jobs = Job.getIncompleteCollectionJobsOfPoint(GroupKey);
                 jobs.add(Job.getSingle(TransportMasterId));
@@ -237,8 +240,8 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 dlist.setVisibility(View.GONE);
             } else {
                 List<Delivery> bagList = null;
-                if (isSummary(branch, job)) bagList = Delivery.getSealedByPointId(GroupKey);
-                else bagList = Delivery.getPendingSealedByPointId(GroupKey);
+                if (isSummary(branch, job)) bagList = Delivery.getSealedByPointId(GroupKey, BranchCode, PFunctionalCode);
+                else bagList = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode);
                 if (bagList.size() > 0) {
 
                     bagList = bagList.stream().filter( distinctByKey(p -> p.SealNo) )
@@ -270,8 +273,8 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 //nidheesh ** end
 
                 List<Delivery> boxList = null;
-                if (isSummary(branch, job)) boxList = Delivery.getUnSealedByPointId(GroupKey);
-                else boxList = Delivery.getPendingUnSealedByPointId(GroupKey);
+                if (isSummary(branch, job)) boxList = Delivery.getUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode);
+                else boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode);
                 if (boxList.size() > 0) {
                     RecyclerView boxlistView = findViewById(R.id.boxlistview);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -438,12 +441,12 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                         Job.updateDeliveryJobsEndTime(GroupKey, CommonMethods.getCurrentDateTime(this));
                         Job.setDeliveryJobsFinished(GroupKey);
                     } else {
-                        Job.updateJobEndTime(TransportMasterId, CommonMethods.getCurrentDateTime(this));
-                        Job.setFinished(TransportMasterId);
+                        Job.updateJobEndTime(GroupKey, job.BranchCode , job.PDFunctionalCode, CommonMethods.getCurrentDateTime(this));
+                        Job.setFinished(GroupKey, job.BranchCode , job.PDFunctionalCode);
                     }
 
                     if (summaryType == Constants.COLLECTION) {
-                        Job.UpdateReceiptNo(GroupKey , job.BranchCode , this);
+                        Job.UpdateReceiptNo(GroupKey , job.BranchCode , job.PDFunctionalCode, this);
                         Branch.updateColCustomerSignature(GroupKey, sign);
                         Job.UpdateCustomerSignature(TransportMasterId, sign);
                         Branch.UpdateNameandStaffIdD(GroupKey, name, staffID);
@@ -451,7 +454,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
 
                         if (NetworkUtil.getConnectivityStatusString(this)) {
 //                        showProgressDialog("Loading...");
-                            APICaller.instance().SubmitBulkCollection(this, this, GroupKey);
+                            APICaller.instance().SubmitBulkCollection(this, this, GroupKey, BranchCode , PFunctionalCode);
                         } else {
 //                        Branch.setColOfflineStatus(GroupKey, 1);
                             Job.setOfflineSaved(TransportMasterId, 1);
@@ -463,7 +466,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                         }
                     } else if (summaryType == Constants.DELIVERY) {
 
-                        Job.UpdateReceiptNo(GroupKey , job.BranchCode, this);
+                        Job.UpdateReceiptNo(GroupKey , job.BranchCode , job.PDFunctionalCode, this);
                         Branch.updateDelCustomerSignature(GroupKey, sign);
                         Job.UpdateCustomerSignature(TransportMasterId, sign);
                         Branch.UpdateNameandStaffIdD(GroupKey, name, staffID);
@@ -471,7 +474,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
 
                         if (NetworkUtil.getConnectivityStatusString(this)) {
 //                        showProgressDialog("Loading...");
-                            APICaller.instance().SubmitDeliveryList(this, this, GroupKey);
+                            APICaller.instance().SubmitDeliveryList(this, this, GroupKey, BranchCode , PFunctionalCode);
                         } else {
 //                        Branch.setDelOfflineStatus(GroupKey, 1);
                             Job.setOfflineSaved(TransportMasterId, 1);
@@ -514,9 +517,9 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 JSONObject obj = new JSONObject(result_data);
                 if (obj.getString("Result").equals("Success")) {
                     if (summaryType == Constants.COLLECTION) {
-                        Job.setCollected(TransportMasterId);
+                        Job.setCollected(GroupKey , BranchCode , PFunctionalCode);
                     } else if (summaryType == Constants.DELIVERY) {
-                        Job.setDelivered(GroupKey);
+                        Job.setDelivered(GroupKey, BranchCode , PFunctionalCode);
                     }
                     APICaller.instance().sync(null, getApplicationContext());
                     setResult(Constants.FINISHONRESULT);

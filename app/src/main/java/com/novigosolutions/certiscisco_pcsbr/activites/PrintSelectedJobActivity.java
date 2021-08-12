@@ -27,6 +27,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.zebra.BulkImageGenerator;
@@ -140,8 +141,8 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
                 if (isOffline) {
                     list = Job.getSpecificJobListByType(transporterMasterId);
                 } else {
-                    list = Job.getSpecificJobListByType(isDelivered, isCollection, groupKey);
-
+                    Job job = Job.getSingle(transporterMasterId);
+                    list = Job.getJobListByType(isDelivered, isCollection, job.GroupKey , job.BranchCode , job.PFunctionalCode);
                 }
                 mainContainer.setVisibility(View.GONE);
                 checkBluetoothConnection();
@@ -434,7 +435,10 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(PrintSelectedJobActivity.this, GroupJobActivity.class).putExtra("status", "PENDING"));
+        Intent intent = new Intent(PrintSelectedJobActivity.this, SelectedJobListActivity.class);
+        intent.putExtra("isCollection", Constants.isCollection ? 1:0);
+        intent.putExtra("isDelivered", Constants.isCollection ? 0:1);
+        startActivity(intent);
         finish();
     }
 }

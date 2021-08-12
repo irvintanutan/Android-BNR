@@ -97,6 +97,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
             Job j = null;
             int jobtype = 0;
             List<Job> js = Job.getByGroupKey(branches.get(position).GroupKey);
+
             if (js.size() == 1) {
                 singleJob = true;
                 j = js.get(0);
@@ -110,6 +111,9 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
                 }
             }
 
+            String BranchCode = js.get(0).BranchCode;
+            String PFunctionalCode = js.get(0).PFunctionalCode;
+            String PickUpPoint = js.get(0).PFunctionalCode;
 
             holder.txt_customer_name.setText(branches.get(position).CustomerName);
             holder.txt_functional_code.setText(Job.getAllOrderNos(branches.get(position).GroupKey, status));
@@ -123,7 +127,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
                     holder.txt_pos.setText("");
                 holder.txt_break_time.setText(j.ClientBreak);
                 if (jobtype == 1) {
-                    holder.txt_branch_name.setText("Pick Up : " + branches.get(position).BranchCode);// + " (" + j.FunctionalCode + ")");
+                    holder.txt_branch_name.setText("Pick Up : " + PickUpPoint);// + " (" + j.FunctionalCode + ")");
                 } else if (jobtype == 2) {
                     holder.txt_branch_name.setText("Drop Off : " + branches.get(position).BranchCode);
                 }
@@ -131,7 +135,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
 
                 holder.txt_pos.setText(Job.getMinimumSequenceNo(branches.get(position).GroupKey, status));
                 if (jobtype == 1) {
-                    holder.txt_branch_name.setText("Pick Up : " + branches.get(position).BranchCode);// + " (" + j.FunctionalCode + ")");
+                    holder.txt_branch_name.setText("Pick Up : " + PickUpPoint);// + " (" + j.FunctionalCode + ")");
                 } else if (jobtype == 2) {
                     holder.txt_branch_name.setText("Drop Off : " + branches.get(position).BranchCode);
                 } else {
@@ -168,7 +172,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
             boolean yellow = false;
             if (!singleJob && (jobtype == 2 || jobtype == 3)) {
                 Log.d("TAG", "onBindViewHolder: ");
-                List<Job> jl = Job.getDeliveryJobsOfPoint(branches.get(position).GroupKey);
+                List<Job> jl = Job.getDeliveryJobsOfPoint(branches.get(position).GroupKey, BranchCode , PFunctionalCode);
                 for (Job jb : jl) {
                     if (TextUtils.isEmpty(jb.DependentOrderId)
                             && Job.checkPendingDependentCollections(jb.DependentOrderId).size() > 0) {
@@ -201,7 +205,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
                 } else if (Job.getPendingJobsOfPoint(branches.get(position).GroupKey).size() == 0) {
                     holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
                     holder.llsub.setBackgroundColor(Color.parseColor(colorLightGreen));
-                } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey).size() > 0 && !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey)) {
+                } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey, BranchCode, PFunctionalCode).size() > 0 && !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey, BranchCode, PFunctionalCode)) {
                     holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
                     holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
                 } else if (singleJob && jobtype == 2 && TextUtils.isEmpty(j.DependentOrderId) && Job.checkPendingDependentCollections(j.DependentOrderId).size() > 0) {

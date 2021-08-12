@@ -23,6 +23,7 @@ import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.DataAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.GridAdapter;
 import com.novigosolutions.certiscisco_pcsbr.models.MenuForm;
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
@@ -91,6 +92,7 @@ public class SelectionActivity extends AppCompatActivity {
             }
 
             private void collection() {
+                Constants.isCollection = true;
                 Intent intent = new Intent(SelectionActivity.this, SelectedJobListActivity.class);
                 intent.putExtra("isCollection", 1);
                 intent.putExtra("isDelivered", 0);
@@ -98,6 +100,7 @@ public class SelectionActivity extends AppCompatActivity {
             }
 
             private void delivery() {
+                Constants.isCollection = false;
                 Intent intent = new Intent(SelectionActivity.this, SelectedJobListActivity.class);
                 intent.putExtra("isCollection", 0);
                 intent.putExtra("isDelivered", 1);

@@ -34,8 +34,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class CollectionDetailActivity extends BaseActivity implements RecyclerViewClickListener, NetworkChangekListener {
-    TextView txt_customer_name,txt_functional_code,txt_branch_name,txt_order_remarks; // txt_street_tower, txt_town_pin;
-//    int PointId;
+    TextView txt_customer_name, txt_functional_code, txt_branch_name, txt_order_remarks; // txt_street_tower, txt_town_pin;
+    //    int PointId;
     String GroupKey;
     int TransportMasterId;
     private RecyclerView recyclerView;
@@ -64,14 +64,15 @@ public class CollectionDetailActivity extends BaseActivity implements RecyclerVi
             TransportMasterId = extras.getInt("TransportMasterId");
         }
         Branch branch = Branch.getSingle(GroupKey);
+        Job job = Job.getSingle(TransportMasterId);
         txt_customer_name.setText(branch.CustomerName);
 //        txt_functional_code.setText(Job.getAllOrderNos(branch.PointId));
-        txt_functional_code.setText(Job.getSingle(TransportMasterId).OrderNo);
+        txt_functional_code.setText(Job.getAllOrderNos(GroupKey, job.BranchCode , job.PFunctionalCode , "PENDING", job.PDFunctionalCode));
         txt_branch_name.setText(branch.BranchCode);
-        if(!TextUtils.isEmpty(Job.getSingle(TransportMasterId).OrderRemarks)){
+        if (!TextUtils.isEmpty(Job.getSingle(TransportMasterId).OrderRemarks)) {
             txt_order_remarks.setVisibility(View.VISIBLE);
-            txt_order_remarks.setText("Remarks: "+Job.getSingle(TransportMasterId).OrderRemarks);
-        }else{
+            txt_order_remarks.setText("Remarks: " + Job.getSingle(TransportMasterId).OrderRemarks);
+        } else {
             txt_order_remarks.setVisibility(View.GONE);
         }
 //        String street_tower = branch.StreetName;
@@ -101,12 +102,12 @@ public class CollectionDetailActivity extends BaseActivity implements RecyclerVi
             public void onClick(View v) {
 //                List<Job> tempjobs = Job.getCollectionJobsOfPoint(GroupKey);
                 Boolean iscomplete = true;
-                Job j =Job.getSingle(TransportMasterId);
+                Job j = Job.getSingle(TransportMasterId);
 //                for (int i = 0; i < tempjobs.size(); i++) {
-                    if (!j.isNoCollection && !Job.isCollected(j.TransportMasterId) && !j.Status.equals("COMPLETED")) {
-                        iscomplete = false;
+                if (!j.isNoCollection && !Job.isCollected(j.TransportMasterId) && !j.Status.equals("COMPLETED")) {
+                    iscomplete = false;
 //                        break;
-                    }
+                }
 //                }
                 if (iscomplete) {
                     Intent intent = new Intent(CollectionDetailActivity.this, SummaryActivity.class);
@@ -114,7 +115,7 @@ public class CollectionDetailActivity extends BaseActivity implements RecyclerVi
                     intent.putExtra("TransportMasterId", TransportMasterId);
                     intent.putExtra("GroupKey", GroupKey);
                     intent.putExtra("summaryType", Constants.COLLECTION);
-                    intent.putExtra("isSummary",false);
+                    intent.putExtra("isSummary", false);
                     startActivityForResult(intent, 000);
                 } else {
                     Toast.makeText(CollectionDetailActivity.this, "Job is incomplete", Toast.LENGTH_SHORT).show();

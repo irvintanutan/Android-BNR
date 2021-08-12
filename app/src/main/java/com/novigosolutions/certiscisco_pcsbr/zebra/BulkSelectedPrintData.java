@@ -74,7 +74,7 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
                 //Transaction Details
                 String receiptNo = Job.getSingle(job.TransportMasterId).ReceiptNo;
                 print.setTransactionId(receiptNo);
-                print.setFunctionalLocation(job.PDFunctionalCode);
+                print.setFunctionalLocation(job.FunctionalCode);
                 print.setDeliveryPoint(job.BranchCode);
 
                 if (job.IsFloatDeliveryOrder && !job.IsCollectionOrder) {
@@ -135,13 +135,14 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
 
                 //Customer Details
                 print.setCustomerName(job.CustomerName);
-                print.setBranchName(branch.BranchName);
 
-                if (job.IsCollectionOrder)
-                    print.setCustomerLocation(job.BranchStreetName + " " + job.BranchTower + " " + job.BranchTown + " " + job.BranchPinCode);
-                else
+                if (job.IsCollectionOrder) {
+                    print.setBranchName(job.PFunctionalCode);
+                    print.setCustomerLocation(job.PStreetName + " " + job.PTower + " " + job.PTown + " " + job.PPinCode);
+                } else {
                     print.setCustomerLocation(job.StreetName + " " + job.Tower + " " + job.Town + " " + job.PinCode);
-
+                    print.setBranchName(branch.BranchName);
+                }
                 print.setContentList(Job.getSelectedPrintContent(job.GroupKey, isDelivery, job.BranchCode));
 
                 String ackSign = job.CustomerSign;
