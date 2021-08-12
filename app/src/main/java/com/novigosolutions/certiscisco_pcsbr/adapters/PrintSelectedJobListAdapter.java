@@ -80,9 +80,9 @@ public class PrintSelectedJobListAdapter extends RecyclerView.Adapter<PrintSelec
         holder.txt_customer_name.setText(j.CustomerName);
 
         if(j.IsFloatDeliveryOrder){
-            holder.txt_functional_code.setText(Job.getAllDeliveryOrderNos(j.GroupKey));
+            holder.txt_functional_code.setText(Job.getAllDeliveryOrderNos(j.GroupKey, j.BranchCode , j.PFunctionalCode));
         } else{
-            holder.txt_functional_code.setText(Job.getSingle(j.TransportMasterId).OrderNo);
+            holder.txt_functional_code.setText(Job.getAllOrderNos(j.GroupKey , j.BranchCode, j.PFunctionalCode, "COMPLETED", j.PDFunctionalCode));
         }
 
         if (singleJob) {
@@ -112,6 +112,9 @@ public class PrintSelectedJobListAdapter extends RecyclerView.Adapter<PrintSelec
                 //   jobtype = j.getBranchJobTypeByStatus(status);
             }
         }
+
+        holder.txt_start_time.setText(CommonMethods.getStartTime(branch.StartTime) + " - " + CommonMethods.getStartTime(branch.EndTime));
+        holder.txt_break_time.setText(j.ClientBreak);
 
         switch (jobtype) {
             case 1:

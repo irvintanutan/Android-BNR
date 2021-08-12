@@ -118,9 +118,9 @@ public class APICaller {
         process(Constants.SYNC, call, callback);
     }
 
-    public void SubmitBulkCollection(ApiCallback callback, Context context, String GroupKey) {
+    public void SubmitBulkCollection(ApiCallback callback, Context context, String GroupKey, String BranchCode, String PFunctionalCode) {
         this.context = context;
-        Call<ResponseBody> call = getService().SubmitBulkCollection(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getCollection(GroupKey, context));
+        Call<ResponseBody> call = getService().SubmitBulkCollection(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getCollection(GroupKey, context, BranchCode , PFunctionalCode));
         process(Constants.SUBMITBULKCOLLECTION, call, callback);
     }
 
@@ -150,9 +150,9 @@ public class APICaller {
         process(Constants.REQUESTFORRESCHEDULE, call, callback);
     }
 
-    public void SubmitDeliveryList(ApiCallback callback, Context context, String GroupKey) {
+    public void SubmitDeliveryList(ApiCallback callback, Context context, String GroupKey, String BranchCode , String PFunctionalCode) {
         this.context = context;
-        Call<ResponseBody> call = getService().SubmitDeliveryList(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getDelivery(GroupKey, context));
+        Call<ResponseBody> call = getService().SubmitDeliveryList(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getDelivery(GroupKey, context, BranchCode , PFunctionalCode));
         process(Constants.SUBMITDELIVERYLIST, call, callback);
     }
 

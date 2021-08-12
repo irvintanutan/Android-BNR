@@ -42,6 +42,7 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
     Context context;
     Button btn_rescedule, btn_cancel;
     DialogResult mDialogResult;
+    Job job;
 //    int PointId;
     String GroupKey;
     View llreasonother;
@@ -51,9 +52,10 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
     ImageView img_erase;
     SignatureView signatureView;
 
-    public PostponeDialog(Context context, String GroupKey, DialogResult mDialogResult) {
+    public PostponeDialog(Context context, String GroupKey, DialogResult mDialogResult, Job job) {
         super(context, R.style.Theme_AppCompat_Light_Dialog);
         this.context = context;
+        this.job = job;
 //        this.PointId = PointId;
         this.GroupKey = GroupKey;
         this.mDialogResult = mDialogResult;
@@ -125,7 +127,7 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
                 } else if (sign == null) {
                     Toast.makeText(context, "Signature is empty", Toast.LENGTH_SHORT).show();
                 } else {
-                    List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey);
+                    List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, job.BranchCode , job.PFunctionalCode);
                     String TransportIds = "";
                     for (int i = 0; i < jobs.size(); i++) {
                         if (TransportIds.equals(""))

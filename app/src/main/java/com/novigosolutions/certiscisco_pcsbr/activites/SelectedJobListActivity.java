@@ -61,6 +61,7 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
     private SelectedJobListAdapter listAdapter;
     private SelectedJobGridAdapter gridAdapter;
     String status = "";
+    String title = "";
     List<Job> jobList;
     CardView cardnodata;
     protected MenuItem refreshItem = null;
@@ -88,7 +89,7 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
 
-        mTitle.setText(status);
+        mTitle.setText(title);
         TextView UserName = (TextView) toolbar.findViewById(R.id.UserName);
         UserName.setText(Preferences.getString("UserName", this));
         imgnetwork = (ImageView) toolbar.findViewById(R.id.imgnetwork);
@@ -104,13 +105,13 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
             isDelivered = extras.getInt("isDelivered");
 
             if (isCollection == 1) {
-                status = "Collection List";
+                title = "Collection List";
             } else {
-                status = "Delivery List";
+                title = "Delivery List";
             }
 
             if (Constants.isAll) {
-                status = "ALL JOBS";
+                title = "ALL JOBS";
             }
         }
         isgridview = Preferences.getBoolean("isgridview", this);
@@ -141,12 +142,15 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
             jobtype = 1;
         }
 
+        String BranchCode = job.BranchCode;
+        String PFunctionalCode = job.PFunctionalCode;
+
         isCollection = job.IsCollectionOrder ? 1 : 0;
         isDelivered = job.IsFloatDeliveryOrder ? 1 : 0;
 
         Constants.TRANSPORT_MASTER_ID = TransportMasterId;
 
-        List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey);
+        List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
         branch.updateJobStartTime(CommonMethods.getCurrentDateTime(this));
         Intent intent = null;
         if (job.Status.equals("COMPLETED") || (jobtype == 1 && job.isOfflineSaved) || (jobtype == 2 && (job.isOfflineSaved || Reschedule.isOfflineRescheduled(GroupKey))) || (jobtype == 3 && job.isOfflineSaved && Reschedule.isOfflineRescheduled(GroupKey))) {
@@ -158,7 +162,7 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
             intent.putExtra("isDelivery", isDelivered);
             intent.putExtra("isCollection", isCollection);
             intent.putExtra("isSummary", true);
-        } else if (jobtype == 1 || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey).size() == 0 || branch.isDelOffline))) {
+        } else if (jobtype == 1 || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode).size() == 0 || branch.isDelOffline))) {
             Job.updateJobStartTime(job.TransportMasterId, CommonMethods.getCurrentDateTime(this));
             intent = new Intent(SelectedJobListActivity.this, ConfirmationActivity.class);
             intent.putExtra("TransportMasterId", TransportMasterId);
@@ -354,6 +358,7 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
             intent.putExtra("status", "COMPLETED");
             intent.putExtra("transporterMasterId", 123);
             startActivity(intent);
+            finish();
         }
     }
 

@@ -56,6 +56,8 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
     ImageView imgnetwork;
     Button button_submit;
     View bll;
+    String BranchCode;
+    String PFunctionalCode;
     LinearLayout ll_lists, ll_delivery;
     Button btn_ok, btn_print, btnCancel;
     int TransportMasterId;
@@ -102,6 +104,8 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
 
         Branch branch = Branch.getSingle(GroupKey);
         Job job = Job.getSingle(TransportMasterId);
+        BranchCode = job.BranchCode;
+        PFunctionalCode = job.PFunctionalCode;
         isOffline = job.isOfflineSaved;
         if (isSummary(branch, job)) {
             bll = findViewById(R.id.bll);
@@ -132,7 +136,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
 //            txt_functional_code.setText(job.OrderNo);
 //        }
 
-        txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, "COMPLETED"));
+        txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey , job.BranchCode , job.PFunctionalCode ,"COMPLETED", job.PDFunctionalCode));
 
 //        String street_tower = branch.StreetName;
 //        if (!branch.Tower.isEmpty()) {
@@ -155,7 +159,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             ll_lists = findViewById(R.id.ll_lists);
             List<Job> jobs = new ArrayList<>();
             if (isSummary(branch, job))
-                jobs = Job.getCollectionJobsOfPoint(GroupKey, "COMPLETED");
+                jobs = Job.getCollectionJobsOfPoint(GroupKey, BranchCode ,PFunctionalCode, "COMPLETED");
                 // jobs.add(Job.getSingle(TransportMasterId));
             else
 //                jobs = Job.getIncompleteCollectionJobsOfPoint(GroupKey);
@@ -234,8 +238,8 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                 dlist.setVisibility(View.GONE);
             } else {
                 List<Delivery> bagList = null;
-                if (isSummary(branch, job)) bagList = Delivery.getSealedByPointId(GroupKey);
-                else bagList = Delivery.getPendingSealedByPointId(GroupKey);
+                if (isSummary(branch, job)) bagList = Delivery.getSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode);
+                else bagList = Delivery.getPendingSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode);
                 if (bagList.size() > 0) {
 
                     bagList =  bagList.stream().filter( distinctByKey(p -> p.SealNo) )
@@ -268,8 +272,8 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                 //nidheesh ** end
 
                 List<Delivery> boxList = null;
-                if (isSummary(branch, job)) boxList = Delivery.getUnSealedByPointId(GroupKey);
-                else boxList = Delivery.getPendingUnSealedByPointId(GroupKey);
+                if (isSummary(branch, job)) boxList = Delivery.getUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode);
+                else boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode);
                 if (boxList.size() > 0) {
                     RecyclerView boxlistView = findViewById(R.id.boxlistview);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());

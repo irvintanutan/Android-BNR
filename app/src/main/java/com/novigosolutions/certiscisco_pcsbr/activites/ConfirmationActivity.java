@@ -79,7 +79,7 @@ public class ConfirmationActivity extends AppCompatActivity implements NetworkCh
 
 
         if(jobType == 1){
-            txtJobId.setText("Job ID:"+job.OrderNo);
+            txtJobId.setText("Job ID:"+Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode , "PENDING", job.PDFunctionalCode));
             txtBranchName.setText(branch.BranchCode);
             String address = "";
             if (!TextUtils.isEmpty(job.BranchStreetName) && job.BranchStreetName != null){
@@ -97,7 +97,7 @@ public class ConfirmationActivity extends AppCompatActivity implements NetworkCh
             txtAddress.setText("Address: "+address);
 
         }else if (jobType == 2){
-            txtJobId.setText("Job ID: "+Job.getAllOrderNos(GroupKey, "PENDING"));
+            txtJobId.setText("Job ID: "+Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode , "PENDING", job.PDFunctionalCode));
             txtBranchName.setVisibility(View.GONE);
             txtAddress.setVisibility(View.GONE);
         }

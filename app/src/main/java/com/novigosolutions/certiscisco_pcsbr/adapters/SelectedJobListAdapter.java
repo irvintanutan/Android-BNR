@@ -3,6 +3,7 @@ package com.novigosolutions.certiscisco_pcsbr.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,7 +94,8 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
             holder.txt_pos.setText(job.SequenceNo);
         holder.txt_customer_name.setText(job.CustomerName);
         if (job.IsFloatDeliveryOrder) {
-            List<Job> jjl = Job.getDeliveryJobsOfPoint(job.GroupKey);
+
+            List<Job> jjl = Job.getDeliveryJobsOfPoint(job.GroupKey, job.BranchCode , job.PFunctionalCode);
             if (jjl.size() > 1) {
                 String rem = null;
                 for (Job jj : jjl) {
@@ -132,15 +134,15 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
 //        }
 
         if (job.Status.equals("COMPLETED"))
-            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, "COMPLETED"));
+            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode , "COMPLETED", job.PDFunctionalCode));
         else
-            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, "PENDING"));
+            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode ,"PENDING", job.PDFunctionalCode));
 
         holder.txt_start_time.setText(CommonMethods.getStartTime(b.StartTime) + " - " + CommonMethods.getStartTime(b.EndTime));
         holder.txt_break_time.setText(job.ClientBreak);
 
         if (job.IsCollectionOrder) {
-            holder.txt_branch_name.setText("Pick Up : " + b.BranchCode);//+" ("+job.FunctionalCode+")");
+            holder.txt_branch_name.setText("Pick Up : " + job.PFunctionalCode);//+" ("+job.FunctionalCode+")");
         } else if (job.IsFloatDeliveryOrder) {
             holder.txt_branch_name.setText("Drop Off : " + b.BranchCode);
         }
@@ -181,7 +183,7 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
         }
         boolean yellow = false;
         if (jobtype == 2) {
-            List<Job> js = Job.getDeliveryJobsOfPoint(job.GroupKey);
+            List<Job> js = Job.getDeliveryJobsOfPoint(job.GroupKey, job.BranchCode , job.PFunctionalCode);
             for (Job jb : js) {
                 if (TextUtils.isEmpty(jb.DependentOrderId)
                         && Job.checkPendingDependentCollections(jb.DependentOrderId).size() > 0) {

@@ -120,6 +120,8 @@ public class JobListActivity extends BaseActivity implements RecyclerViewClickLi
         Branch branch = Branch.getSingle(GroupKey);
 //        int branchType = branch.getBranchJobType();
         Job job = Job.getSingle(TransportMasterId);
+        String Branchcode = job.BranchCode;
+        String PFunctionalCode = job.PFunctionalCode;
         int jobtype = 0;
         if(job.IsCollectionOrder && job.IsFloatDeliveryOrder ) {
             jobtype = 3;
@@ -129,7 +131,7 @@ public class JobListActivity extends BaseActivity implements RecyclerViewClickLi
             jobtype = 1;
         }
 
-        List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey);
+        List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey, Branchcode , PFunctionalCode);
         branch.updateJobStartTime(CommonMethods.getCurrentDateTime(this));
         Intent intent = null;
         if (job.Status.equals("COMPLETED") || (jobtype == 1 && job.isOfflineSaved) || (jobtype == 2 && (job.isOfflineSaved || Reschedule.isOfflineRescheduled(GroupKey))) || (jobtype == 3 && job.isOfflineSaved &&  Reschedule.isOfflineRescheduled(GroupKey))) {
@@ -138,7 +140,7 @@ public class JobListActivity extends BaseActivity implements RecyclerViewClickLi
             intent.putExtra("GroupKey", GroupKey);
             intent.putExtra("summaryType", jobtype);
             intent.putExtra("isSummary",true);
-        } else if (jobtype == 1 || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey).size() == 0 || branch.isDelOffline))) {
+        } else if (jobtype == 1 || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey, Branchcode , PFunctionalCode).size() == 0 || branch.isDelOffline))) {
             Job.updateJobStartTime(job.TransportMasterId,CommonMethods.getCurrentDateTime(this));
             intent = new Intent(JobListActivity.this, ConfirmationActivity.class);
             intent.putExtra("TransportMasterId", TransportMasterId);

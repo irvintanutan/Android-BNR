@@ -65,20 +65,24 @@ public class GroupGridAdapter extends RecyclerView.Adapter<GroupGridAdapter.MyVi
         boolean singleJob = false;
         Job j = null;
         List<Job> js = Job.getByGroupKey(branches.get(position).GroupKey);
-        if(js.size()==1) {
+        if (js.size() == 1) {
             singleJob = true;
             j = js.get(0);
         }
-        if(singleJob) {
+
+        String BranchCode = js.get(0).BranchCode;
+        String PFunctionalCode = js.get(0).PFunctionalCode;
+
+        if (singleJob) {
             if (!TextUtils.isEmpty(j.SequenceNo) && !j.SequenceNo.equalsIgnoreCase("null"))
                 holder.txt_pos.setText(j.SequenceNo);
             else
                 holder.txt_pos.setText("");
-        }else{
-            holder.txt_pos.setText(Job.getMinimumSequenceNo(branches.get(position).GroupKey,status));
+        } else {
+            holder.txt_pos.setText(Job.getMinimumSequenceNo(branches.get(position).GroupKey, status));
         }
         int jobtype = 0;
-        if(!singleJob) {
+        if (!singleJob) {
             if ("ALL".equals(status)) {
                 jobtype = branches.get(position).getBranchJobType();
             } else {
@@ -86,14 +90,14 @@ public class GroupGridAdapter extends RecyclerView.Adapter<GroupGridAdapter.MyVi
             }
         }
         boolean yellow = false;
-        if(!singleJob && (jobtype == 2 || jobtype == 3)){
+        if (!singleJob && (jobtype == 2 || jobtype == 3)) {
             Log.d("TAG", "onBindViewHolder: ");
-            for(Job jb:js){
-                if(TextUtils.isEmpty(jb.DependentOrderId)
-                        && Job.checkPendingDependentCollections(jb.DependentOrderId).size()>0) {
+            for (Job jb : js) {
+                if (TextUtils.isEmpty(jb.DependentOrderId)
+                        && Job.checkPendingDependentCollections(jb.DependentOrderId).size() > 0) {
                     yellow = true;
                     break;
-                } else if(!Delivery.hasPendingDeliveryItems(jb.TransportMasterId)){
+                } else if (!Delivery.hasPendingDeliveryItems(jb.TransportMasterId)) {
                     yellow = true;
                     break;
                 }
@@ -101,17 +105,17 @@ public class GroupGridAdapter extends RecyclerView.Adapter<GroupGridAdapter.MyVi
         }
 
         if (!"COMPLETED".equals(status)) {
-            if (j!=null && j.isOfflineSaved) {
+            if (j != null && j.isOfflineSaved) {
                 holder.llmain.setBackgroundResource(R.drawable.brown_border);
             } else if (Job.getPendingJobsOfPoint(branches.get(position).GroupKey).size() == 0) {
                 holder.llmain.setBackgroundResource(R.drawable.green_border);
-            } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey).size() > 0 && !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey)) {
+            } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey, BranchCode, PFunctionalCode).size() > 0 && !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey, BranchCode , PFunctionalCode)) {
                 holder.llmain.setBackgroundResource(R.drawable.yellow_border);
-            } else if (singleJob  && j.IsFloatDeliveryOrder && TextUtils.isEmpty(j.DependentOrderId) && Job.checkPendingDependentCollections(j.DependentOrderId).size()>0) {
+            } else if (singleJob && j.IsFloatDeliveryOrder && TextUtils.isEmpty(j.DependentOrderId) && Job.checkPendingDependentCollections(j.DependentOrderId).size() > 0) {
                 holder.llmain.setBackgroundResource(R.drawable.yellow_border);
-            } else if (singleJob  && j.IsFloatDeliveryOrder && !Delivery.hasPendingDeliveryItems(j.TransportMasterId)){
+            } else if (singleJob && j.IsFloatDeliveryOrder && !Delivery.hasPendingDeliveryItems(j.TransportMasterId)) {
                 holder.llmain.setBackgroundResource(R.drawable.yellow_border);
-            } else if(yellow){
+            } else if (yellow) {
                 holder.llmain.setBackgroundResource(R.drawable.yellow_border);
             } else {
                 Date EndTime = CommonMethods.getBreakTime(branches.get(position).EndTime);
@@ -123,7 +127,7 @@ public class GroupGridAdapter extends RecyclerView.Adapter<GroupGridAdapter.MyVi
                     holder.llmain.setBackgroundResource(R.drawable.blue_border);
                 }
             }
-        }else{
+        } else {
             holder.llmain.setBackgroundResource(R.drawable.green_border);
         }
     }

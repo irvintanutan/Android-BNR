@@ -29,7 +29,7 @@ public class OfflineListUpdateCaller {
 //        final Branch branch = Branch.getOfflineSingleBranche();
         final Job job = Job.getOfflineSingleJob();
         final Boolean isCollectionUpdating;
-        Log.e("^^^^^OfflineUpdate", "single-job:"+(job==null?"null":job.TransportMasterId));
+        Log.e("^^^^^OfflineUpdate", "single-job:" + (job == null ? "null" : job.TransportMasterId));
         if (job != null) {
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
             httpClient.connectTimeout(30, TimeUnit.SECONDS);
@@ -43,10 +43,10 @@ public class OfflineListUpdateCaller {
             Call<ResponseBody> call = null;
             if (job.IsCollectionOrder) {
                 isCollectionUpdating = true;
-                call = retrofit.create(CertisCISCOServices.class).SubmitBulkCollection(Preferences.getString("AuthToken", context),Preferences.getInt("UserId", context), Branch.getCollection(job.GroupKey,context));
+                call = retrofit.create(CertisCISCOServices.class).SubmitBulkCollection(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getCollection(job.GroupKey, context, job.BranchCode, job.PFunctionalCode));
             } else {
                 isCollectionUpdating = false;
-                call = retrofit.create(CertisCISCOServices.class).SubmitDeliveryList(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getDelivery(job.GroupKey,context));
+                call = retrofit.create(CertisCISCOServices.class).SubmitDeliveryList(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getDelivery(job.GroupKey, context, job.BranchCode, job.PFunctionalCode));
             }
             if (call != null) {
                 call.enqueue(new Callback<ResponseBody>() {
@@ -58,11 +58,10 @@ public class OfflineListUpdateCaller {
                                 if (obj.getString("Result").equals("Success")) {
                                     if (isCollectionUpdating) {
 //                                        Branch.setColOfflineStatus(branch.GroupKey, 0);
-                                         Job.setIncompleteCollectionCollected(job.GroupKey);
+                                        Job.setIncompleteCollectionCollected(job.GroupKey);
                                         Log.e("^^^^^OfflineUpdate", "setIncompleteCollectionCollected");
 //                                        Branch.setCollected(branch.GroupKey);
-                                    }
-                                    else {
+                                    } else {
 //                                        Branch.setDelOfflineStatus(branch.GroupKey, 0);
                                         Job.setPendingDeliveryDelivered(job.GroupKey);
                                         Log.e("^^^^^OfflineUpdate", "setPendingDeliveryDelivered");
@@ -86,7 +85,7 @@ public class OfflineListUpdateCaller {
             }
         } else {
             Log.e("^^^^^OfflineUpdate", "all branches done - syncing");
-            APICaller.instance().sync(null,context);
+            APICaller.instance().sync(null, context);
         }
 
     }

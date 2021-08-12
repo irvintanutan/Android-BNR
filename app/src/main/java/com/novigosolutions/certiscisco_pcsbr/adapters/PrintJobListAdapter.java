@@ -84,8 +84,12 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
         }
 
 
+        String BranchCode = js.get(0).BranchCode;
+        String PFunctionalCode = js.get(0).PFunctionalCode;
+        String PDFunctionalCode = js.get(0).PDFunctionalCode;
+
         holder.txt_customer_name.setText(branches.get(position).CustomerName);
-        holder.txt_functional_code.setText(Job.getAllOrderNos(branches.get(position).GroupKey,status));
+        holder.txt_functional_code.setText(Job.getAllOrderNos(branches.get(0).GroupKey, BranchCode, PFunctionalCode ,status, PDFunctionalCode));
         holder.txt_start_time.setText(CommonMethods.getStartTime(branches.get(position).StartTime) + " - " + CommonMethods.getStartTime(branches.get(position).EndTime));
 
 
@@ -142,7 +146,7 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
         boolean yellow = false;
         if(!singleJob && (jobtype == 2 || jobtype == 3)){
             Log.d("TAG", "onBindViewHolder: ");
-            List<Job> jl = Job.getDeliveryJobsOfPoint(branches.get(position).GroupKey);
+            List<Job> jl = Job.getDeliveryJobsOfPoint(branches.get(position).GroupKey, js.get(0).BranchCode , js.get(0).PFunctionalCode);
             for(Job jb:jl){
                 if(TextUtils.isEmpty(jb.DependentOrderId)
                         && Job.checkPendingDependentCollections(jb.DependentOrderId).size()>0) {
@@ -176,7 +180,7 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
             } else if (Job.getPendingJobsOfPoint(branches.get(position).GroupKey).size() == 0) {
                 holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
                 holder.llsub.setBackgroundColor(Color.parseColor(colorLightGreen));
-            } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey).size() > 0 && !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey)) {
+            } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey, BranchCode, PFunctionalCode).size() > 0 && !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey, BranchCode, PFunctionalCode)) {
                 holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
                 holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
             } else if (singleJob && jobtype == 2 && TextUtils.isEmpty(j.DependentOrderId) && Job.checkPendingDependentCollections(j.DependentOrderId).size()>0) {

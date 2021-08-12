@@ -522,8 +522,8 @@ public class Branch extends Model implements Comparable<Branch> {
 //        return false;
 //    }
 
-    public static JsonObject getCollection(String GroupKey, Context context) {
-        List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey);
+    public static JsonObject getCollection(String GroupKey, Context context, String BranchCode, String PFunctionalCode) {
+        List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
         String receiptNo = "";
         //List<Job> jobs = Job.getCollectionJobsOfPoint(PointId);
         JsonObject jsonObject = new JsonObject();
@@ -648,11 +648,11 @@ public class Branch extends Model implements Comparable<Branch> {
         return jsonObject;
     }
 
-    public static JsonObject getDelivery(String GroupKey, Context context) {
+    public static JsonObject getDelivery(String GroupKey, Context context, String BranchCode, String PFunctionalCode) {
         JsonObject jsonObject = new JsonObject();
         JsonArray DeliveryList = new JsonArray();
         String receiptNo = "";
-        List<Job> deliveryjobs = Job.getFinishedPendingDeliveryJobsOfPoint(GroupKey);
+        List<Job> deliveryjobs = Job.getFinishedPendingDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
         for (int i = 0; i < deliveryjobs.size(); i++) {
             JsonObject Delivery = new JsonObject();
             receiptNo = deliveryjobs.get(i).ReceiptNo;

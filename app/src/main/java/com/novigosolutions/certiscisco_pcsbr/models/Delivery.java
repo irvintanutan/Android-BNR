@@ -78,8 +78,8 @@ public class Delivery extends Model {
 //        return deliveries;
 //    }
 
-    public static List<Delivery> getSealedByPointId(String GroupKey) {
-        List<Job> jobs = Job.getDeliveryJobsOfPoint(GroupKey);
+    public static List<Delivery> getSealedByPointId(String GroupKey , String BranchCode , String PFunctionalCode) {
+        List<Job> jobs = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
         List<Delivery> deliveries = new ArrayList<>();
         for (int i = 0; i < jobs.size(); i++) {
             deliveries.addAll(getSealedByByTransportMasterId(jobs.get(i).TransportMasterId));
@@ -96,8 +96,8 @@ public class Delivery extends Model {
 //        return deliveries;
 //    }
 
-    public static List<Delivery> getUnSealedByPointId(String GroupKey) {
-        List<Job> jobs = Job.getDeliveryJobsOfPoint(GroupKey);
+    public static List<Delivery> getUnSealedByPointId(String GroupKey, String BranchCode , String PFunctionalCode) {
+        List<Job> jobs = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
         List<Delivery> deliveries = new ArrayList<>();
         for (int i = 0; i < jobs.size(); i++) {
             deliveries.addAll(getUnSealedByTransportMasterId(jobs.get(i).TransportMasterId));
@@ -114,8 +114,8 @@ public class Delivery extends Model {
 //        return deliveries;
 //    }
 
-    public static List<Delivery> getPendingSealedByPointId(String GroupKey) {
-        List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey);
+    public static List<Delivery> getPendingSealedByPointId(String GroupKey, String BranchCode , String PFunctionalCode) {
+        List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
         List<Delivery> deliveries = new ArrayList<>();
         for (int i = 0; i < jobs.size(); i++) {
             deliveries.addAll(getSealedByByTransportMasterId(jobs.get(i).TransportMasterId));
@@ -158,8 +158,8 @@ public class Delivery extends Model {
 //        return deliveries;
 //    }
 
-    public static List<Delivery> getPendingUnSealedByPointId(String GroupKey) {
-        List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey);
+    public static List<Delivery> getPendingUnSealedByPointId(String GroupKey, String BranchCode , String PFunctionalCode) {
+        List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
         List<Delivery> deliveries = new ArrayList<>();
         for (int i = 0; i < jobs.size(); i++) {
             deliveries.addAll(getUnSealedByTransportMasterId(jobs.get(i).TransportMasterId));
@@ -180,8 +180,8 @@ public class Delivery extends Model {
 //        return (getPendingSealedByPointId(PointId).size() > 0 || getPendingUnSealedByPointId(PointId).size() > 0);
 //    }
 
-    public static boolean hasPendingDeliveryItems(String GroupKey) {
-        return (getPendingSealedByPointId(GroupKey).size() > 0 || getPendingUnSealedByPointId(GroupKey).size() > 0);
+    public static boolean hasPendingDeliveryItems(String GroupKey, String BranchCode , String PFunctionalCode) {
+        return (getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode).size() > 0 || getPendingUnSealedByPointId(GroupKey, BranchCode, PFunctionalCode).size() > 0);
     }
 
     public static boolean hasPendingDeliveryItems(int TransportMasterId) {
@@ -210,8 +210,8 @@ public class Delivery extends Model {
 //        return false;
 //    }
 
-    public static boolean setScanned(String GroupKey, String seal) {
-        List<Delivery> deliveries = getPendingSealedByPointId(GroupKey);
+    public static boolean setScanned(String GroupKey, String seal, String BranchCode , String PFunctionalCode) {
+        List<Delivery> deliveries = getPendingSealedByPointId(GroupKey, BranchCode , PFunctionalCode);
         for (int i = 0; i < deliveries.size(); i++) {
             if (deliveries.get(i).SealNo.equals(seal)) {
                 new Update(Delivery.class)
@@ -254,8 +254,8 @@ public class Delivery extends Model {
 //        }
 //    }
 
-    public static void clearBranchDelivery(String GroupKey) {
-        List<Job> deliveryjobs = Job.getPendingDeliveryJobsOfPoint(GroupKey);
+    public static void clearBranchDelivery(String GroupKey, String BranchCode , String PFunctionalCode) {
+        List<Job> deliveryjobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
         for (int i = 0; i < deliveryjobs.size(); i++) {
             new Update(Delivery.class)
                     .set("IsScanned=?", 0)
