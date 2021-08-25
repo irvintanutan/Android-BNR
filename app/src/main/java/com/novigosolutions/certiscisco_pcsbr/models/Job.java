@@ -495,6 +495,8 @@ public class Job extends Model implements Comparable<Job> {
 
     public static String getAllOrderNos(String groupKey, String BranchCode, String PFunctionalCode, String status, String PDFunctionalCode) {
         String ordernos = "";
+        PFunctionalCode    = PFunctionalCode != null ? PFunctionalCode : "";
+        PDFunctionalCode    = PDFunctionalCode != null ? PDFunctionalCode : "";
         List<Job> jobs;
         if ("ALL".equals(status)) {
             jobs = new Select().from(Job.class)

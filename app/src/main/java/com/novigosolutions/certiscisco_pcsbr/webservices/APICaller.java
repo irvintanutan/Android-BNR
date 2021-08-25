@@ -150,9 +150,9 @@ public class APICaller {
         process(Constants.REQUESTFORRESCHEDULE, call, callback);
     }
 
-    public void SubmitDeliveryList(ApiCallback callback, Context context, String GroupKey, String BranchCode , String PFunctionalCode) {
+    public void SubmitDeliveryList(ApiCallback callback, Context context, String GroupKey, String BranchCode, String PFunctionalCode) {
         this.context = context;
-        Call<ResponseBody> call = getService().SubmitDeliveryList(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getDelivery(GroupKey, context, BranchCode , PFunctionalCode));
+        Call<ResponseBody> call = getService().SubmitDeliveryList(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getDelivery(GroupKey, context, BranchCode, PFunctionalCode));
         process(Constants.SUBMITDELIVERYLIST, call, callback);
     }
 
@@ -198,7 +198,7 @@ public class APICaller {
 
                             if (api_code == Constants.GETRECEIPTNUMBER) {
                                 Log.e("RECEIPT NUMBER", result_body);
-                                Job.UpdateReceiptNo(Constants.TRANSPORT_MASTER_ID, result_body.replace("\"" , ""));
+                                Job.UpdateReceiptNo(Constants.TRANSPORT_MASTER_ID, result_body.replace("\"", ""));
                             }
                             if (api_code == Constants.SYNC) {
                                 JSONObject obj = new JSONObject(result_body);
