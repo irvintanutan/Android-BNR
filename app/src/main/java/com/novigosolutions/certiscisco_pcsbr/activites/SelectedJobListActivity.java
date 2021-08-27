@@ -184,7 +184,7 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
                 alert("Can not perform delivery since item(s) are not collected from pick-up location");
 //            } else if(TextUtils.isEmpty(job.DependentOrderId) && !Delivery.hasPendingDeliveryItems(job.TransportMasterId)){
             } else if (tmp == 2) {
-                alert("No items to deliver");
+                alert("No items to deliver " + job.OrderNo);
             } else {
                 Job.updateDeliveryJobsStartTime(GroupKey, CommonMethods.getCurrentDateTime(this));
                 intent = new Intent(SelectedJobListActivity.this, ConfirmationActivity.class);

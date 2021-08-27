@@ -113,7 +113,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
 
             String BranchCode = js.get(0).BranchCode;
             String PFunctionalCode = js.get(0).PFunctionalCode;
-            String PickUpPoint = js.get(0).PFunctionalCode;
+            String PickUpPoint = branches.get(position).BranchName;
 
             holder.txt_customer_name.setText(branches.get(position).CustomerName);
             holder.txt_functional_code.setText(Job.getAllOrderNos(branches.get(position).GroupKey, status));

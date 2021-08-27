@@ -240,7 +240,7 @@ public class Delivery extends Model {
 
     public static boolean isAllDeliveryScanned(int TransportMasterId) {
         return (new Select().from(Delivery.class)
-                .where("TransportMasterId=? AND IsScanned=?", TransportMasterId, 0)
+                .where("TransportMasterId=? AND IsScanned=?", TransportMasterId, 1)
                 .executeSingle() == null);
     }
 
