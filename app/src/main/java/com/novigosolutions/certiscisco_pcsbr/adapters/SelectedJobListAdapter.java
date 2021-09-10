@@ -142,7 +142,7 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
         holder.txt_break_time.setText(job.ClientBreak);
 
         if (job.IsCollectionOrder) {
-            holder.txt_branch_name.setText("Pick Up : " + job.PFunctionalCode);//+" ("+job.FunctionalCode+")");
+            holder.txt_branch_name.setText("Pick Up : " + b.BranchName);//+" ("+job.FunctionalCode+")");
         } else if (job.IsFloatDeliveryOrder) {
             holder.txt_branch_name.setText("Drop Off : " + b.BranchCode);
         }

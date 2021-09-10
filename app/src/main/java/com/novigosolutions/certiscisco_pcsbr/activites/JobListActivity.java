@@ -131,6 +131,7 @@ public class JobListActivity extends BaseActivity implements RecyclerViewClickLi
             jobtype = 1;
         }
 
+
         List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey, Branchcode , PFunctionalCode);
         branch.updateJobStartTime(CommonMethods.getCurrentDateTime(this));
         Intent intent = null;
