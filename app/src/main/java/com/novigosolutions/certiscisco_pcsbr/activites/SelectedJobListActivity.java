@@ -158,6 +158,10 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
         if (job.Status.equals("COMPLETED") || (jobtype == 1 && job.isOfflineSaved) || (jobtype == 2 && (job.isOfflineSaved || Reschedule.isOfflineRescheduled(GroupKey))) || (jobtype == 3 && job.isOfflineSaved && Reschedule.isOfflineRescheduled(GroupKey))) {
             Log.e("TRANSPORTMASTERID", Integer.toString(TransportMasterId));
             intent = new Intent(SelectedJobListActivity.this, SummaryActivity.class);
+
+            Log.e("ACTUALFROMTIME" , job.ActualFromTime);
+            Log.e("ACTUALTOTIME" , job.ActualToTime);
+
             intent.putExtra("TransportMasterId", TransportMasterId);
             intent.putExtra("GroupKey", GroupKey);
             intent.putExtra("summaryType", jobtype);

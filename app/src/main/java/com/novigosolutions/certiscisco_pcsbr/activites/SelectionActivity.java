@@ -22,12 +22,14 @@ import android.widget.Toast;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.DataAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.GridAdapter;
+import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.MenuForm;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +45,12 @@ public class SelectionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_selection);
 
         setuptoolbar();
+
+        try {
+            Job.UpdateDateFormats();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
