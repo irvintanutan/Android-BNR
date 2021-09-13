@@ -11,6 +11,7 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -152,6 +153,7 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
             intent.putExtra("isSummary",true);
         } else if (jobtype == 1 ) {
 //            || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey).size() == 0 || branch.isDelOffline))
+
             Job.updateJobStartTime(j.TransportMasterId,CommonMethods.getCurrentDateTime(this));
             intent = new Intent(GroupJobActivity.this, ConfirmationActivity.class);
             intent.putExtra("TransportMasterId", j.TransportMasterId);

@@ -93,7 +93,7 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.MyViewHo
         holder.txt_pos.setText(job.SequenceNo);
         holder.txt_customer_name.setText(job.CustomerName);
         if(job.IsFloatDeliveryOrder){
-            List<Job> jjl = Job.getDeliveryJobsOfPoint(job.GroupKey, job.BranchCode , job.PFunctionalCode);
+            List<Job> jjl = Job.getDeliveryJobsOfPoint(job.GroupKey, job.BranchCode , job.PFunctionalCode, job.ActualFromTime , job.ActualToTime);
             if(jjl.size()>1) {
                 String rem = null;
                 for (Job jj : jjl) {
@@ -132,9 +132,9 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.MyViewHo
 //        }
 
         if (job.Status.equals("COMPLETED"))
-            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode , "COMPLETED", job.PDFunctionalCode));
+            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode , "COMPLETED", job.PDFunctionalCode, job.ActualFromTime, job.ActualToTime));
         else
-            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode ,"PENDING", job.PDFunctionalCode));
+            holder.txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.BranchCode , job.PFunctionalCode ,"PENDING", job.PDFunctionalCode, job.ActualFromTime, job.ActualToTime));
 
         holder.txt_start_time.setText(CommonMethods.getStartTime(b.StartTime) + " - " + CommonMethods.getStartTime(b.EndTime));
         holder.txt_break_time.setText(job.ClientBreak);
@@ -181,7 +181,7 @@ public class JobListAdapter extends RecyclerView.Adapter<JobListAdapter.MyViewHo
         }
         boolean yellow = false;
         if(jobtype == 2) {
-            List<Job> js = Job.getDeliveryJobsOfPoint(job.GroupKey, job.BranchCode , job.PFunctionalCode);
+            List<Job> js = Job.getDeliveryJobsOfPoint(job.GroupKey, job.BranchCode , job.PFunctionalCode, job.ActualFromTime, job.ActualToTime);
             for (Job jb : js) {
                 if (TextUtils.isEmpty(jb.DependentOrderId)
                         && Job.checkPendingDependentCollections(jb.DependentOrderId).size() > 0) {

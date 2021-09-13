@@ -114,6 +114,8 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
             String BranchCode = js.get(0).BranchCode;
             String PFunctionalCode = js.get(0).PFunctionalCode;
             String PickUpPoint = branches.get(position).BranchName;
+            String actualFromTime = js.get(0).ActualFromTime;
+            String actualToTime = js.get(0).ActualToTime;
 
             holder.txt_customer_name.setText(branches.get(position).CustomerName);
             holder.txt_functional_code.setText(Job.getAllOrderNos(branches.get(position).GroupKey, status));
@@ -172,7 +174,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
             boolean yellow = false;
             if (!singleJob && (jobtype == 2 || jobtype == 3)) {
                 Log.d("TAG", "onBindViewHolder: ");
-                List<Job> jl = Job.getDeliveryJobsOfPoint(branches.get(position).GroupKey, BranchCode , PFunctionalCode);
+                List<Job> jl = Job.getDeliveryJobsOfPoint(branches.get(position).GroupKey, BranchCode , PFunctionalCode, actualFromTime , actualToTime);
                 for (Job jb : jl) {
                     if (TextUtils.isEmpty(jb.DependentOrderId)
                             && Job.checkPendingDependentCollections(jb.DependentOrderId).size() > 0) {

@@ -67,7 +67,7 @@ public class CollectionDetailActivity extends BaseActivity implements RecyclerVi
         Job job = Job.getSingle(TransportMasterId);
         txt_customer_name.setText(branch.CustomerName);
 //        txt_functional_code.setText(Job.getAllOrderNos(branch.PointId));
-        txt_functional_code.setText(Job.getAllOrderNos(GroupKey, job.BranchCode , job.PFunctionalCode , "PENDING", job.PDFunctionalCode));
+        txt_functional_code.setText(Job.getAllOrderNos(GroupKey, job.BranchCode , job.PFunctionalCode , "PENDING", job.PDFunctionalCode, job.ActualFromTime , job.ActualToTime));
         txt_branch_name.setText(branch.BranchCode);
         if (!TextUtils.isEmpty(Job.getSingle(TransportMasterId).OrderRemarks)) {
             txt_order_remarks.setVisibility(View.VISIBLE);
@@ -90,7 +90,7 @@ public class CollectionDetailActivity extends BaseActivity implements RecyclerVi
 
 //        jobs = Job.getCollectionJobsOfPoint(GroupKey);
         jobs = new ArrayList<>();
-        jobs.add(Job.getSingle(TransportMasterId));
+        jobs.add(Job.getSingle(Job.getHigherTransportMasterId(GroupKey, job.BranchCode , job.PFunctionalCode , "PENDING", job.PDFunctionalCode, job.ActualFromTime , job.ActualToTime)));
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

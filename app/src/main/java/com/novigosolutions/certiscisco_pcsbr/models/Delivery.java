@@ -78,8 +78,8 @@ public class Delivery extends Model {
 //        return deliveries;
 //    }
 
-    public static List<Delivery> getSealedByPointId(String GroupKey , String BranchCode , String PFunctionalCode) {
-        List<Job> jobs = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
+    public static List<Delivery> getSealedByPointId(String GroupKey , String BranchCode , String PFunctionalCode, String actualFromTime , String actualToTime) {
+        List<Job> jobs = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode, actualFromTime , actualToTime);
         List<Delivery> deliveries = new ArrayList<>();
         for (int i = 0; i < jobs.size(); i++) {
             deliveries.addAll(getSealedByByTransportMasterId(jobs.get(i).TransportMasterId));
@@ -96,8 +96,8 @@ public class Delivery extends Model {
 //        return deliveries;
 //    }
 
-    public static List<Delivery> getUnSealedByPointId(String GroupKey, String BranchCode , String PFunctionalCode) {
-        List<Job> jobs = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
+    public static List<Delivery> getUnSealedByPointId(String GroupKey, String BranchCode , String PFunctionalCode, String actualFromTime, String actualToTime) {
+        List<Job> jobs = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode, actualFromTime , actualToTime);
         List<Delivery> deliveries = new ArrayList<>();
         for (int i = 0; i < jobs.size(); i++) {
             deliveries.addAll(getUnSealedByTransportMasterId(jobs.get(i).TransportMasterId));

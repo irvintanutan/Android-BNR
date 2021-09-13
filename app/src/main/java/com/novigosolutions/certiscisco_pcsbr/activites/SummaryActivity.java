@@ -57,7 +57,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
     Button button_submit;
     View bll;
     String BranchCode;
-    String PFunctionalCode;
+    String PFunctionalCode, actualFromTime, actualToTime;
     LinearLayout ll_lists, ll_delivery;
     Button btn_ok, btn_print, btnCancel;
     int TransportMasterId;
@@ -106,6 +106,8 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
         Job job = Job.getSingle(TransportMasterId);
         BranchCode = job.BranchCode;
         PFunctionalCode = job.PFunctionalCode;
+        actualFromTime = job.ActualFromTime;
+        actualToTime = job.ActualToTime;
         isOffline = job.isOfflineSaved;
         if (isSummary(branch, job)) {
             bll = findViewById(R.id.bll);
@@ -136,7 +138,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
 //            txt_functional_code.setText(job.OrderNo);
 //        }
 
-        txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey , job.BranchCode , job.PFunctionalCode ,"COMPLETED", job.PDFunctionalCode));
+        txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey , job.BranchCode , job.PFunctionalCode ,"COMPLETED", job.PDFunctionalCode, job.ActualFromTime, job.ActualToTime));
 
 //        String street_tower = branch.StreetName;
 //        if (!branch.Tower.isEmpty()) {
@@ -238,7 +240,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                 dlist.setVisibility(View.GONE);
             } else {
                 List<Delivery> bagList = null;
-                if (isSummary(branch, job)) bagList = Delivery.getSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode);
+                if (isSummary(branch, job)) bagList = Delivery.getSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode, job.ActualFromTime , job.ActualToTime);
                 else bagList = Delivery.getPendingSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode);
                 if (bagList.size() > 0) {
 
@@ -272,7 +274,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                 //nidheesh ** end
 
                 List<Delivery> boxList = null;
-                if (isSummary(branch, job)) boxList = Delivery.getUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode);
+                if (isSummary(branch, job)) boxList = Delivery.getUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode, actualFromTime, actualToTime);
                 else boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode);
                 if (boxList.size() > 0) {
                     RecyclerView boxlistView = findViewById(R.id.boxlistview);

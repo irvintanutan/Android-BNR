@@ -82,7 +82,7 @@ public class PrintSelectedJobListAdapter extends RecyclerView.Adapter<PrintSelec
         if(j.IsFloatDeliveryOrder){
             holder.txt_functional_code.setText(Job.getAllDeliveryOrderNos(j.GroupKey, j.BranchCode , j.PFunctionalCode));
         } else{
-            holder.txt_functional_code.setText(Job.getAllOrderNos(j.GroupKey , j.BranchCode, j.PFunctionalCode, "COMPLETED", j.PDFunctionalCode));
+            holder.txt_functional_code.setText(Job.getAllOrderNos(j.GroupKey , j.BranchCode, j.PFunctionalCode, "COMPLETED", j.PDFunctionalCode, j.ActualFromTime  , j.ActualToTime));
         }
 
         if (singleJob) {
