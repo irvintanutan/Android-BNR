@@ -11,6 +11,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.activeandroid.query.Update;
+import com.activeandroid.util.SQLiteUtils;
 import com.google.gson.JsonObject;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
@@ -18,6 +19,8 @@ import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Content;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Denomination;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -300,9 +303,15 @@ public class Job extends Model implements Comparable<Job> {
     }
 
     public static List<Job> getJobListByType(int isDelivered, int isCollection) {
+
+//        List<Job> jl = SQLiteUtils.rawQuery(Job.class,
+//                "SELECT *, STRFTIME('%d-%m-%Y %H:%M:%S', ActualFromTime) , STRFTIME('%d-%m-%Y %H:%M:%S', ActualToTime) from Job where status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? Group By BranchCode, PFunctionalCode, GroupKey, ActualFromTime, ActualToTime" +
+//                        " Order By SequenceNo",
+//                new String[] { "COMPLETED", Integer.toString(isCollection), Integer.toString(isDelivered) });
+
         List<Job> jl = new Select().from(Job.class)
                 .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=?", "COMPLETED", isCollection, isDelivered)
-                .groupBy("BranchCode, PFunctionalCode, GroupKey, ActualFromTime, ActualToTime")
+                .groupBy("BranchCode, PFunctionalCode, GroupKey, ActualFromTime ,ActualToTime")
                 .orderBy("SequenceNo")
                 .execute();
 
@@ -335,7 +344,7 @@ public class Job extends Model implements Comparable<Job> {
 
     public static List<Job> getAllJobListByType() {
         List<Job> jl = new Select().from(Job.class)
-                .groupBy("BranchCode, Status, PFunctionalCode")
+                .groupBy("BranchCode, Status, PFunctionalCode, ActualFromTime, ActualToTime")
                 .execute();
 
         return jl;
@@ -1518,6 +1527,44 @@ public class Job extends Model implements Comparable<Job> {
 
     }
 
+    public static void UpdateDateFormats() throws ParseException {
+        List<Job> result = new Select().from(Job.class)
+                .execute();
+
+        boolean indicator = false;
+        String actualFromTime = "";
+        String actualToTime = "";
+        Date fromDate = new Date();
+        Date toDate = new Date();
+
+        for (Job job : result) {
+            if (!job.ActualFromTime.isEmpty() || !job.ActualFromTime.equals("")) {
+                DateFormat originalFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+                DateFormat targetFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+                try {
+                    fromDate = originalFormat.parse(job.ActualFromTime);
+                    toDate = originalFormat.parse(job.ActualToTime);
+                } catch (Exception e) {
+                    indicator = true;
+                    actualFromTime = job.ActualToTime;
+                    actualToTime = job.ActualToTime;
+                }
+
+                if (!indicator) {
+                    actualFromTime = targetFormat.format(fromDate);
+                    actualToTime = targetFormat.format(toDate);
+                }
+            }
+            Log.e(job.OrderNo, actualFromTime);
+            Log.e(job.OrderNo, actualToTime);
+            new Update(Job.class)
+                    .set("ActualFromTime=? , ActualToTime=?", actualFromTime, actualToTime)
+                    .where("TransportMasterId=?", job.TransportMasterId)
+                    .execute();
+        }
+    }
+
     public static List<Job> checkPendingDependentCollections(String DependentOrderId) {
         return new Select().from(Job.class)
                 .where(" OrderNo=? AND Status NOT IN ('COMPLETED')", DependentOrderId)
@@ -1564,6 +1611,7 @@ public class Job extends Model implements Comparable<Job> {
         return this.SequenceNo.compareTo(o.SequenceNo);
 //        }
     }
+
 
     public boolean isSelected() {
         return isSelected;
