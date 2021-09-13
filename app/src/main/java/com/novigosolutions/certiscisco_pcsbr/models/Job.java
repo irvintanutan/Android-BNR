@@ -1560,7 +1560,7 @@ public class Job extends Model implements Comparable<Job> {
             Log.e(job.OrderNo, actualToTime);
             new Update(Job.class)
                     .set("ActualFromTime=? , ActualToTime=?", actualFromTime, actualToTime)
-                    .where("TransportMasterId=?", job.TransportMasterId)
+                    .where("GroupKey=? and BranchCode=? and PFunctionalCode=?", job.GroupKey , job.BranchCode , job.PFunctionalCode)
                     .execute();
         }
     }
