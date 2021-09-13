@@ -122,6 +122,8 @@ public class JobListActivity extends BaseActivity implements RecyclerViewClickLi
         Job job = Job.getSingle(TransportMasterId);
         String Branchcode = job.BranchCode;
         String PFunctionalCode = job.PFunctionalCode;
+        String actualFromTime = job.ActualFromTime;
+        String actualToTime = job.ActualToTime;
         int jobtype = 0;
         if(job.IsCollectionOrder && job.IsFloatDeliveryOrder ) {
             jobtype = 3;
@@ -132,7 +134,7 @@ public class JobListActivity extends BaseActivity implements RecyclerViewClickLi
         }
 
 
-        List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey, Branchcode , PFunctionalCode);
+        List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey, Branchcode , PFunctionalCode, actualFromTime ,actualToTime);
         branch.updateJobStartTime(CommonMethods.getCurrentDateTime(this));
         Intent intent = null;
         if (job.Status.equals("COMPLETED") || (jobtype == 1 && job.isOfflineSaved) || (jobtype == 2 && (job.isOfflineSaved || Reschedule.isOfflineRescheduled(GroupKey))) || (jobtype == 3 && job.isOfflineSaved &&  Reschedule.isOfflineRescheduled(GroupKey))) {

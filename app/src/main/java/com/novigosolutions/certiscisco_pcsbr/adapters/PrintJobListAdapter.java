@@ -28,7 +28,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapter.MyViewHolder>{
+public class PrintJobListAdapter extends RecyclerView.Adapter<PrintJobListAdapter.MyViewHolder> {
 
     CheckBoxListnerCallBack checkBoxListnerCallBack;
     List<Branch> branches;
@@ -48,12 +48,12 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
     String colorWhite = "#FFFFFF";
     long serverTime;
 
-    public PrintJobListAdapter(List<Branch> branches,String status, Context context,CheckBoxListnerCallBack checkBoxListnerCallBack) {
+    public PrintJobListAdapter(List<Branch> branches, String status, Context context, CheckBoxListnerCallBack checkBoxListnerCallBack) {
         this.branches = branches;
         this.context = context;
         this.status = status;
         serverTime = CommonMethods.getServerTimeInms(context);
-        this.checkBoxListnerCallBack=checkBoxListnerCallBack;
+        this.checkBoxListnerCallBack = checkBoxListnerCallBack;
     }
 
     @NonNull
@@ -71,14 +71,14 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
         Job j = null;
         int jobtype = 0;
         List<Job> js = Job.getByGroupKey(branches.get(position).GroupKey);
-        if(js.size()==1){
+        if (js.size() == 1) {
             singleJob = true;
             j = js.get(0);
-            if(j.IsCollectionOrder && j.IsFloatDeliveryOrder ) {
+            if (j.IsCollectionOrder && j.IsFloatDeliveryOrder) {
                 jobtype = 3;
             } else if (j.IsFloatDeliveryOrder) {
                 jobtype = 2;
-            } else if (j.IsCollectionOrder){
+            } else if (j.IsCollectionOrder) {
                 jobtype = 1;
             }
         }
@@ -87,44 +87,45 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
         String BranchCode = js.get(0).BranchCode;
         String PFunctionalCode = js.get(0).PFunctionalCode;
         String PDFunctionalCode = js.get(0).PDFunctionalCode;
+        String actualFromTime = js.get(0).ActualFromTime;
+        String actualToTime = js.get(0).ActualToTime;
 
         holder.txt_customer_name.setText(branches.get(position).CustomerName);
-        holder.txt_functional_code.setText(Job.getAllOrderNos(branches.get(0).GroupKey, BranchCode, PFunctionalCode ,status, PDFunctionalCode));
+        holder.txt_functional_code.setText(Job.getAllOrderNos(branches.get(0).GroupKey, BranchCode, PFunctionalCode, status, PDFunctionalCode, actualFromTime, actualToTime));
         holder.txt_start_time.setText(CommonMethods.getStartTime(branches.get(position).StartTime) + " - " + CommonMethods.getStartTime(branches.get(position).EndTime));
 
 
-        if(singleJob) {
-            if(!TextUtils.isEmpty(j.SequenceNo) && !j.SequenceNo.equalsIgnoreCase("null"))
+        if (singleJob) {
+            if (!TextUtils.isEmpty(j.SequenceNo) && !j.SequenceNo.equalsIgnoreCase("null"))
                 holder.txt_pos.setText(j.SequenceNo);
             else
                 holder.txt_pos.setText("");
             holder.txt_break_time.setText(j.ClientBreak);
-            if(jobtype==1) {
+            if (jobtype == 1) {
                 holder.txt_branch_name.setText("Pick Up : " + branches.get(position).BranchCode);// + " (" + j.FunctionalCode + ")");
-            }else  if(jobtype==2){
+            } else if (jobtype == 2) {
                 holder.txt_branch_name.setText("Drop Off : " + branches.get(position).BranchCode);
             }
-        }
-        else {
+        } else {
 
-            holder.txt_pos.setText(Job.getMinimumSequenceNo(branches.get(position).GroupKey,status));
-            if(jobtype==1) {
+            holder.txt_pos.setText(Job.getMinimumSequenceNo(branches.get(position).GroupKey, status));
+            if (jobtype == 1) {
                 holder.txt_branch_name.setText("Pick Up : " + branches.get(position).BranchCode);// + " (" + j.FunctionalCode + ")");
-            }else  if(jobtype==2){
+            } else if (jobtype == 2) {
                 holder.txt_branch_name.setText("Drop Off : " + branches.get(position).BranchCode);
-            }else {
+            } else {
                 holder.txt_branch_name.setText(branches.get(position).BranchCode);
             }
         }
 
-        if(singleJob && !TextUtils.isEmpty(j.OrderRemarks)){
+        if (singleJob && !TextUtils.isEmpty(j.OrderRemarks)) {
             holder.txt_remarks.setVisibility(View.VISIBLE);
-            holder.txt_remarks.setText("Remarks: "+j.OrderRemarks);
-        }else{
+            holder.txt_remarks.setText("Remarks: " + j.OrderRemarks);
+        } else {
             holder.txt_remarks.setVisibility(View.GONE);
         }
- 
-        if(!singleJob) {
+
+        if (!singleJob) {
             if ("ALL".equals(status)) {
                 jobtype = branches.get(position).getBranchJobType();
             } else {
@@ -144,15 +145,15 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
                 break;
         }
         boolean yellow = false;
-        if(!singleJob && (jobtype == 2 || jobtype == 3)){
+        if (!singleJob && (jobtype == 2 || jobtype == 3)) {
             Log.d("TAG", "onBindViewHolder: ");
-            List<Job> jl = Job.getDeliveryJobsOfPoint(branches.get(position).GroupKey, js.get(0).BranchCode , js.get(0).PFunctionalCode);
-            for(Job jb:jl){
-                if(TextUtils.isEmpty(jb.DependentOrderId)
-                        && Job.checkPendingDependentCollections(jb.DependentOrderId).size()>0) {
+            List<Job> jl = Job.getDeliveryJobsOfPoint(branches.get(position).GroupKey, js.get(0).BranchCode, js.get(0).PFunctionalCode, js.get(0).ActualFromTime, js.get(0).ActualToTime);
+            for (Job jb : jl) {
+                if (TextUtils.isEmpty(jb.DependentOrderId)
+                        && Job.checkPendingDependentCollections(jb.DependentOrderId).size() > 0) {
                     yellow = true;
                     break;
-                } else if(!Delivery.hasPendingDeliveryItems(jb.TransportMasterId)){
+                } else if (!Delivery.hasPendingDeliveryItems(jb.TransportMasterId)) {
                     yellow = true;
                     break;
                 }
@@ -160,21 +161,21 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
         }
 
 
-        if(singleJob){
-            if(jobtype==1){
-                if(!TextUtils.isEmpty(j.BranchCode)) {
+        if (singleJob) {
+            if (jobtype == 1) {
+                if (!TextUtils.isEmpty(j.BranchCode)) {
                     holder.txt_drop_off_branch.setVisibility(View.VISIBLE);
-                    holder.txt_drop_off_branch.setText("Drop Off : "+j.BranchCode.toUpperCase());
+                    holder.txt_drop_off_branch.setText("Drop Off : " + j.BranchCode.toUpperCase());
                 }
-            }else {
+            } else {
                 holder.txt_drop_off_branch.setVisibility(View.GONE);
             }
-        }else {
+        } else {
             holder.txt_drop_off_branch.setVisibility(View.GONE);
         }
 
         if (!"COMPLETED".equals(status)) {
-            if (j!=null && j.isOfflineSaved) {
+            if (j != null && j.isOfflineSaved) {
                 holder.llmain.setBackgroundColor(Color.parseColor(colorBrown));
                 holder.llsub.setBackgroundColor(Color.parseColor(colorLightBrown));
             } else if (Job.getPendingJobsOfPoint(branches.get(position).GroupKey).size() == 0) {
@@ -183,17 +184,16 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
             } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey, BranchCode, PFunctionalCode).size() > 0 && !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey, BranchCode, PFunctionalCode)) {
                 holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
                 holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
-            } else if (singleJob && jobtype == 2 && TextUtils.isEmpty(j.DependentOrderId) && Job.checkPendingDependentCollections(j.DependentOrderId).size()>0) {
+            } else if (singleJob && jobtype == 2 && TextUtils.isEmpty(j.DependentOrderId) && Job.checkPendingDependentCollections(j.DependentOrderId).size() > 0) {
                 holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
                 holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
-            } else if (singleJob && jobtype == 2 && !Delivery.hasPendingDeliveryItems(j.TransportMasterId)){
+            } else if (singleJob && jobtype == 2 && !Delivery.hasPendingDeliveryItems(j.TransportMasterId)) {
                 holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
                 holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
-            } else if(yellow){
+            } else if (yellow) {
                 holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
                 holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
-            }
-            else {
+            } else {
                 Date endTime = CommonMethods.getBreakTime(branches.get(position).EndTime);
                 if (endTime != null && endTime.getTime() < serverTime) {
                     holder.llmain.setBackgroundColor(Color.parseColor(colorRed));
@@ -206,7 +206,7 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
                     holder.llsub.setBackgroundColor(Color.parseColor(colorWhite));
                 }
             }
-        }else {
+        } else {
             holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
             holder.llsub.setBackgroundColor(Color.parseColor(colorLightGreen));
         }
@@ -221,7 +221,7 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
                 b.setSelected(!b.isSelected());
                 holder.checkBox.setChecked(b.isSelected());
 
-                if(b.isSelected()) {
+                if (b.isSelected()) {
                     PrintActivity.list.add(branches.get(holder.getAdapterPosition()).GroupKey);
                 } else {
                     PrintActivity.list.remove(branches.get(holder.getAdapterPosition()).GroupKey);
@@ -231,8 +231,8 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
         });
     }
 
-    public void callBack(){
-        if(checkBoxListnerCallBack!=null) {
+    public void callBack() {
+        if (checkBoxListnerCallBack != null) {
             checkBoxListnerCallBack.onChange();
         }
     }
@@ -242,15 +242,17 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
     public int getItemCount() {
         return branches.size();
     }
-    public class MyViewHolder extends RecyclerView.ViewHolder{
-        TextView txt_customer_name, txt_functional_code,  txt_pos, txt_start_time,txt_break_time,
-                txt_branch_name,txt_remarks,txt_drop_off_branch; //txt_street_tower, txt_town_pin,
+
+    public class MyViewHolder extends RecyclerView.ViewHolder {
+        TextView txt_customer_name, txt_functional_code, txt_pos, txt_start_time, txt_break_time,
+                txt_branch_name, txt_remarks, txt_drop_off_branch; //txt_street_tower, txt_town_pin,
         ImageView img_type;
         View llmain, llsub;
         CheckBox checkBox;
+
         public MyViewHolder(@NonNull View view) {
             super(view);
-            checkBox=(CheckBox)view.findViewById(R.id.checkbox_job_list);
+            checkBox = (CheckBox) view.findViewById(R.id.checkbox_job_list);
             txt_customer_name = (TextView) view.findViewById(R.id.txt_customer_name);
             txt_functional_code = (TextView) view.findViewById(R.id.txt_functional_code);
             txt_remarks = (TextView) view.findViewById(R.id.txt_remarks);
@@ -260,14 +262,14 @@ public class PrintJobListAdapter  extends RecyclerView.Adapter<PrintJobListAdapt
             txt_pos = (TextView) view.findViewById(R.id.txt_pos);
             txt_start_time = (TextView) view.findViewById(R.id.txt_start_time);
             txt_break_time = (TextView) view.findViewById(R.id.txt_break_time);
-            txt_drop_off_branch=(TextView)view.findViewById(R.id.drop_off_branch);
+            txt_drop_off_branch = (TextView) view.findViewById(R.id.drop_off_branch);
             img_type = view.findViewById(R.id.img_type);
             llmain = view.findViewById(R.id.llmain);
             llsub = view.findViewById(R.id.llsub);
         }
     }
 
-    public interface CheckBoxListnerCallBack{
+    public interface CheckBoxListnerCallBack {
         void onChange();
     }
 

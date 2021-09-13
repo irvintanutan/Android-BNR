@@ -65,7 +65,7 @@ public class SelectedJobGridAdapter extends RecyclerView.Adapter<SelectedJobGrid
 
         boolean yellow = false;
         if(job.IsFloatDeliveryOrder) {
-            List<Job> js = Job.getDeliveryJobsOfPoint(job.GroupKey, job.BranchCode , job.PFunctionalCode);
+            List<Job> js = Job.getDeliveryJobsOfPoint(job.GroupKey, job.BranchCode , job.PFunctionalCode, job.ActualFromTime , job.ActualToTime);
             for (Job jb : js) {
                 if (TextUtils.isEmpty(jb.DependentOrderId)
                         && Job.checkPendingDependentCollections(jb.DependentOrderId).size() > 0) {

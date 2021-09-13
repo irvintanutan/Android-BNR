@@ -144,13 +144,15 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
 
         String BranchCode = job.BranchCode;
         String PFunctionalCode = job.PFunctionalCode;
+        String actualFromTime = job.ActualFromTime;
+        String actualToTime = job.ActualToTime;
 
         isCollection = job.IsCollectionOrder ? 1 : 0;
         isDelivered = job.IsFloatDeliveryOrder ? 1 : 0;
 
         Constants.TRANSPORT_MASTER_ID = TransportMasterId;
 
-        List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
+        List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode, actualFromTime, actualToTime);
         branch.updateJobStartTime(CommonMethods.getCurrentDateTime(this));
         Intent intent = null;
         if (job.Status.equals("COMPLETED") || (jobtype == 1 && job.isOfflineSaved) || (jobtype == 2 && (job.isOfflineSaved || Reschedule.isOfflineRescheduled(GroupKey))) || (jobtype == 3 && job.isOfflineSaved && Reschedule.isOfflineRescheduled(GroupKey))) {

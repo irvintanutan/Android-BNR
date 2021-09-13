@@ -61,7 +61,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
     private UnsealedListAdapter unsealedListAdapter;
     List<Delivery> bagList;
     List<Delivery> boxList;
-    String BranchCode , PFunctionalCode;
+    String BranchCode , PFunctionalCode, actualFromTime , actualToTime;
     ImageView imgnetwork, img_manual_entry;
     Button btn_scan, btn_submit, btn_ok, btn_postpone;
     EditText editText;
@@ -89,6 +89,8 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
 
         BranchCode = j.BranchCode;
         PFunctionalCode = j.PFunctionalCode;
+        actualFromTime = j.ActualFromTime;
+        actualToTime = j.ActualToTime;
 
         recyclerViewbag = findViewById(R.id.recyclerviewbag);
         recyclerViewbox = findViewById(R.id.recyclerviewbox);
@@ -148,7 +150,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         txt_branch_address = (TextView) findViewById(R.id.txt_txt_branch_address);
         Branch branch = Branch.getSingle(GroupKey);
         txt_customer_name.setText(branch.CustomerName);
-        txt_functional_code.setText(Job.getAllOrderNos(j.GroupKey, j.BranchCode , j.PFunctionalCode , "PENDING", j.PDFunctionalCode));
+        txt_functional_code.setText(Job.getAllOrderNos(j.GroupKey, j.BranchCode , j.PFunctionalCode , "PENDING", j.PDFunctionalCode, j.ActualFromTime, j.ActualToTime));
         txt_branch_name.setText(branch.BranchCode);
         String address = "Address: ";
         if(!TextUtils.isEmpty(j.StreetName)){
@@ -173,7 +175,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         }
         txt_branch_address.setText(address);
         txt_order_remarks = (TextView) findViewById(R.id.txt_order_remarks);
-        List<Job> jjl = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode);
+        List<Job> jjl = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode, actualFromTime ,actualToTime);
         if(jjl.size()>1){
             String rem = null;
             for(Job jj: jjl){
