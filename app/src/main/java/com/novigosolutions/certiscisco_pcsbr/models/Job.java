@@ -1529,6 +1529,7 @@ public class Job extends Model implements Comparable<Job> {
 
     public static void UpdateDateFormats() throws ParseException {
         List<Job> result = new Select().from(Job.class)
+                .where("Status=?", "COMPLETED")
                 .execute();
 
         boolean indicator = false;
