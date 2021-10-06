@@ -170,7 +170,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
             List<Job> jobs = new ArrayList<>();
             if (isSummary(branch, job))
 //                jobs = Job.getCollectionJobsOfPoint(GroupKey);
-                jobs = Job.getCollectionJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, "COMPLETED");
+                jobs = Job.getCollectionJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, "COMPLETED", actualFromTime, actualToTime);
             else
 //                jobs = Job.getIncompleteCollectionJobsOfPoint(GroupKey);
                 jobs.add(Job.getSingle(TransportMasterId));
@@ -246,7 +246,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 if (isSummary(branch, job))
                     bagList = Delivery.getSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime);
                 else
-                    bagList = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode);
+                    bagList = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
                 if (bagList.size() > 0) {
 
                     bagList = bagList.stream().filter(distinctByKey(p -> p.SealNo))
@@ -281,7 +281,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 if (isSummary(branch, job))
                     boxList = Delivery.getUnSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime ,actualToTime);
                 else
-                    boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode, PFunctionalCode);
+                    boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime);
                 if (boxList.size() > 0) {
                     RecyclerView boxlistView = findViewById(R.id.boxlistview);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -444,6 +444,8 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
 
                     Job job = Job.getSingle(TransportMasterId);
                     Branch.updateJobEndTime(GroupKey, CommonMethods.getCurrentDateTime(this));
+                    Constants.endTime = CommonMethods.getCurrentDateTime(this);
+
                     if (job.IsFloatDeliveryOrder) {
                         Job.updateDeliveryJobsEndTime(GroupKey, CommonMethods.getCurrentDateTime(this));
                         Job.setDeliveryJobsFinished(GroupKey);
@@ -453,7 +455,6 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                     }
 
                     if (summaryType == Constants.COLLECTION) {
-                        Job.UpdateReceiptNo(GroupKey, job.BranchCode, job.PDFunctionalCode, this);
                         Branch.updateColCustomerSignature(GroupKey, sign);
                         Job.UpdateCustomerSignature(TransportMasterId, sign);
                         Branch.UpdateNameandStaffIdD(GroupKey, name, staffID);
@@ -471,9 +472,8 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                             finish();
                             Toast.makeText(this, "Saved offline", Toast.LENGTH_SHORT).show();
                         }
-                    } else if (summaryType == Constants.DELIVERY) {
 
-                        Job.UpdateReceiptNo(GroupKey, job.BranchCode, job.PDFunctionalCode, this);
+                    } else if (summaryType == Constants.DELIVERY) {
                         Branch.updateDelCustomerSignature(GroupKey, sign);
                         Job.UpdateCustomerSignature(TransportMasterId, sign);
                         Branch.UpdateNameandStaffIdD(GroupKey, name, staffID);
@@ -524,9 +524,9 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 JSONObject obj = new JSONObject(result_data);
                 if (obj.getString("Result").equals("Success")) {
                     if (summaryType == Constants.COLLECTION) {
-                        Job.setCollected(GroupKey, BranchCode, PFunctionalCode);
+                        Job.setCollected(GroupKey, BranchCode, PFunctionalCode, Constants.startTime, Constants.endTime);
                     } else if (summaryType == Constants.DELIVERY) {
-                        Job.setDelivered(GroupKey, BranchCode, PFunctionalCode);
+                        Job.setDelivered(GroupKey, BranchCode, PFunctionalCode, Constants.startTime, Constants.endTime);
                     }
                     APICaller.instance().sync(null, getApplicationContext());
                     setResult(Constants.FINISHONRESULT);

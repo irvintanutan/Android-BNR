@@ -127,7 +127,7 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
                 } else if (sign == null) {
                     Toast.makeText(context, "Signature is empty", Toast.LENGTH_SHORT).show();
                 } else {
-                    List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, job.BranchCode , job.PFunctionalCode);
+                    List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, job.BranchCode , job.PFunctionalCode, job.ActualFromTime, job.ActualToTime);
                     String TransportIds = "";
                     for (int i = 0; i < jobs.size(); i++) {
                         if (TransportIds.equals(""))

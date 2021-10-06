@@ -19,7 +19,7 @@ import java.util.Locale;
 
 public class CommonMethods {
     private static ProgressDialog progressDialog;
-    private static DateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static DateFormat dateTimeFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
     private static DateFormat dateFormat = new SimpleDateFormat("d MMM yyyy");
     private static DateFormat timeFormat = new SimpleDateFormat("K:mma");
     private static DateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");

@@ -139,6 +139,9 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
         } else if (j.IsCollectionOrder){
             jobtype = 1;
         }
+
+        Log.e("GROUPKEY" , GroupKey);
+
         if(branchType != 2 && jobsList.size()>1 ){
             intent = new Intent(GroupJobActivity.this, JobListActivity.class);
             intent.putExtra("GroupKey", GroupKey);

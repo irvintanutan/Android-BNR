@@ -14,6 +14,7 @@ import com.activeandroid.query.Update;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 
 import java.util.ArrayList;
@@ -130,7 +131,11 @@ public class Branch extends Model implements Comparable<Branch> {
                 .executeSingle();
 
     }
+    public static List<Branch> getAllBranch() {
+        return new Select().from(Branch.class)
+               .execute();
 
+    }
     public static int getAllCount() {
         return new Select().from(Job.class)
                 .execute().size();
@@ -178,7 +183,8 @@ public class Branch extends Model implements Comparable<Branch> {
 
     public static List<Branch> getPendingBranches() {
         List<Branch> branches = new Select().from(Branch.class)
-                .where("GroupKey IN (select DISTINCT GroupKey from job where Status = 'PENDING' GROUP BY GroupKey)")
+                .where("GroupKey IN (select DISTINCT GroupKey from job where Status = 'PENDING')")
+                .groupBy("BranchCode")
                 .execute();
 
         for (Branch b : branches) {
@@ -529,8 +535,8 @@ public class Branch extends Model implements Comparable<Branch> {
         JsonObject jsonObject = new JsonObject();
         JsonArray CollectionHeaderList = new JsonArray();
 
-        String startTime = Branch.getSingle(GroupKey).JobStartTime;
-        String endTime = Branch.getSingle(GroupKey).JobEndTime;
+        String startTime = Constants.startTime;
+        String endTime = Constants.endTime;
 
         for (int i = 0; i < jobs.size(); i++) {
             Job job = jobs.get(i);
@@ -630,13 +636,14 @@ public class Branch extends Model implements Comparable<Branch> {
             }
             jobjson.add("Details", Details);
             Job.UpdateTime(TransportMasterId, startTime , endTime);
+            Job.UpdateReceiptNo(GroupKey, job.BranchCode, job.PDFunctionalCode, startTime, endTime, context);
             CollectionHeaderList.add(jobjson);
         }
         jsonObject.add("CollectionHeaderList", CollectionHeaderList);
         jsonObject.addProperty("ReceiptNo", receiptNo);
         jsonObject.addProperty("Sign", Branch.getSingle(GroupKey).colSignature);
-        jsonObject.addProperty("JobStartTime", Branch.getSingle(GroupKey).JobStartTime);
-        jsonObject.addProperty("JobEndTime", Branch.getSingle(GroupKey).JobEndTime);
+        jsonObject.addProperty("JobStartTime", startTime);
+        jsonObject.addProperty("JobEndTime", endTime);
         jsonObject.addProperty("UserId", Preferences.getInt("UserId", context));
         jsonObject.addProperty("StaffID", Branch.getSingle(GroupKey).StaffID);
         jsonObject.addProperty("CName", Branch.getSingle(GroupKey).CName);
@@ -656,6 +663,10 @@ public class Branch extends Model implements Comparable<Branch> {
         JsonObject jsonObject = new JsonObject();
         JsonArray DeliveryList = new JsonArray();
         String receiptNo = "";
+
+        String startTime = Constants.startTime;
+        String endTime = Constants.endTime;
+
         List<Job> deliveryjobs = Job.getFinishedPendingDeliveryJobsOfPoint(GroupKey, BranchCode, PFunctionalCode);
         for (int i = 0; i < deliveryjobs.size(); i++) {
             JsonObject Delivery = new JsonObject();
@@ -663,13 +674,14 @@ public class Branch extends Model implements Comparable<Branch> {
             Delivery.addProperty("TransportMasterId", deliveryjobs.get(i).TransportMasterId);
             Delivery.addProperty("FloatDeliveryOrderId", deliveryjobs.get(i).FloatDeliveryOrderId);
             DeliveryList.add(Delivery);
-            Job.UpdateTime(deliveryjobs.get(i).TransportMasterId, Branch.getSingle(GroupKey).JobStartTime, Branch.getSingle(GroupKey).JobEndTime);
+            Job.UpdateTime(deliveryjobs.get(i).TransportMasterId, startTime, endTime);
+            Job.UpdateReceiptNo(GroupKey, deliveryjobs.get(i).BranchCode, deliveryjobs.get(i).PDFunctionalCode, startTime , endTime, context);
         }
         jsonObject.add("DeliveryList", DeliveryList);
         jsonObject.addProperty("ReceiptNo", receiptNo);
         jsonObject.addProperty("Sign", Branch.getSingle(GroupKey).delSignature);
-        jsonObject.addProperty("JobStartTime", Branch.getSingle(GroupKey).JobStartTime);
-        jsonObject.addProperty("JobEndTime", Branch.getSingle(GroupKey).JobEndTime);
+        jsonObject.addProperty("JobStartTime", startTime);
+        jsonObject.addProperty("JobEndTime", endTime);
         jsonObject.addProperty("UserId", Preferences.getInt("UserId", context));
         jsonObject.addProperty("StaffID", Branch.getSingle(GroupKey).StaffID);
         jsonObject.addProperty("CName", Branch.getSingle(GroupKey).CName);

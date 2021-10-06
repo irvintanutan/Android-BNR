@@ -142,7 +142,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
                     list = Job.getSpecificJobListByType(transporterMasterId);
                 } else {
                     Job job = Job.getSingle(transporterMasterId);
-                    list = Job.getJobListByType(isDelivered, isCollection, job.GroupKey , job.BranchCode , job.PFunctionalCode);
+                    list = Job.getJobListByType(isDelivered, isCollection, job.GroupKey , job.BranchCode , job.PFunctionalCode, job.ActualFromTime, job.ActualToTime);
                 }
                 mainContainer.setVisibility(View.GONE);
                 checkBluetoothConnection();

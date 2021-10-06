@@ -246,6 +246,11 @@ public class Job extends Model implements Comparable<Job> {
 
     }
 
+    public static List<Job> getAllJobs() {
+        return new Select().from(Job.class)
+                .where("Status=?", "COMPLETED").execute();
+    }
+
     public static Job getSingleByReceiptNo(String receiptNo) {
         return new Select().from(Job.class)
                 .where("ReceiptNo=?", receiptNo)
@@ -318,21 +323,23 @@ public class Job extends Model implements Comparable<Job> {
         return jl;
     }
 
-    public static List<Job> getJobListByType(int isDelivered, int isCollection, String GroupKey, String BranchCode, String PFunctionalCode) {
+    public static List<Job> getJobListByType(int isDelivered, int isCollection, String GroupKey, String BranchCode, String PFunctionalCode, String startTime, String endTime) {
         List<Job> jl;
 
         if (PFunctionalCode == null) {
             jl = new Select().from(Job.class)
-                    .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=? AND BranchCode=?", "COMPLETED", isCollection, isDelivered,
-                            GroupKey, BranchCode)
-                    .groupBy("BranchCode, GroupKey")
+                    .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=? AND BranchCode=? AND ActualFromTime=? " +
+                                    "AND ActualToTime=?", "COMPLETED", isCollection, isDelivered,
+                            GroupKey, BranchCode, startTime, endTime)
+                    .groupBy("BranchCode, GroupKey, ActualFromTime, ActualToTime")
                     .orderBy("SequenceNo")
                     .execute();
         } else {
             jl = new Select().from(Job.class)
-                    .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=? AND BranchCode=? AND PFunctionalCode=?", "COMPLETED", isCollection, isDelivered,
-                            GroupKey, BranchCode, PFunctionalCode)
-                    .groupBy("BranchCode, PFunctionalCode, GroupKey")
+                    .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=? AND BranchCode=? AND PFunctionalCode=? AND ActualFromTime=? " +
+                                    " AND ActualToTime=?", "COMPLETED", isCollection, isDelivered,
+                            GroupKey, BranchCode, PFunctionalCode, startTime,  endTime)
+                    .groupBy("BranchCode, PFunctionalCode, GroupKey, ActualFromTime, ActualToTime")
                     .orderBy("SequenceNo")
                     .execute();
         }
@@ -351,9 +358,10 @@ public class Job extends Model implements Comparable<Job> {
     }
 
 
-    public static List<Job> getJobListByTypeByGroupKey(int isDelivered, int isCollection, String groupKey, String branchCode) {
+    public static List<Job> getJobListByTypeByGroupKey(int isDelivered, int isCollection, String groupKey, String branchCode, String startTime, String endTime) {
         List<Job> jl = new Select().from(Job.class)
-                .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=? and BranchCode=?", "COMPLETED", isCollection, isDelivered, groupKey, branchCode)
+                .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=? and BranchCode=? and ActualFromTime=? and ActualToTime=?",
+                        "COMPLETED", isCollection, isDelivered, groupKey, branchCode, startTime , endTime)
                 .execute();
 
         return jl;
@@ -402,9 +410,10 @@ public class Job extends Model implements Comparable<Job> {
                 .execute();
     }
 
-    public static List<Job> getCollectionJobsOfPoint(String GroupKey, String BranchCode, String PFunctionalCode, String status) {
+    public static List<Job> getCollectionJobsOfPoint(String GroupKey, String BranchCode, String PFunctionalCode, String status, String startTime, String endTime) {
         return new Select().from(Job.class)
-                .where("IsCollectionOrder=? AND GroupKey=? AND Status=? AND BranchCode=? AND PFunctionalCode=?", 1, GroupKey, status, BranchCode, PFunctionalCode)
+                .where("IsCollectionOrder=? AND GroupKey=? AND Status=? AND BranchCode=? AND PFunctionalCode=? " +
+                        "AND ActualFromTime=? AND ActualToTime=?", 1, GroupKey, status, BranchCode, PFunctionalCode, startTime, endTime)
                 .execute();
     }
 
@@ -500,17 +509,21 @@ public class Job extends Model implements Comparable<Job> {
 //                .execute();
 //    }
 
-    public static List<Job> getPendingDeliveryJobsOfPoint(String GroupKey, String BranchCode, String PFunctionalCode) {
+    public static List<Job> getPendingDeliveryJobsOfPoint(String GroupKey, String BranchCode, String PFunctionalCode, String startTime, String endTime) {
 
         List<Job> result;
 
         if (PFunctionalCode == null) {
             result = new Select().from(Job.class)
-                    .where("IsFloatDeliveryOrder=? AND GroupKey=? AND BranchCode=? AND Status NOT IN ('COMPLETED')", 1, GroupKey, BranchCode)
+                    .where("IsFloatDeliveryOrder=? AND GroupKey=? AND BranchCode=? AND ActualFromTime=? AND ActualToTime=? " +
+                                    "AND Status NOT IN ('COMPLETED')", 1,
+                            GroupKey, BranchCode, startTime, endTime)
                     .execute();
         } else {
             result = new Select().from(Job.class)
-                    .where("IsFloatDeliveryOrder=? AND GroupKey=? AND BranchCode=? AND PFunctionalCode=? AND Status NOT IN ('COMPLETED')", 1, GroupKey, BranchCode, PFunctionalCode)
+                    .where("IsFloatDeliveryOrder=? AND GroupKey=? AND BranchCode=? AND PFunctionalCode=?  AND ActualFromTime=? AND ActualToTime=? " +
+                                    "AND Status NOT IN ('COMPLETED')",
+                            1, GroupKey, BranchCode, PFunctionalCode, startTime, endTime)
                     .execute();
 
         }
@@ -825,21 +838,22 @@ public class Job extends Model implements Comparable<Job> {
     }
 
 
-    public static void UpdateReceiptNo(String groupKey, String branchCode, String PFunctionalCode, Context context) {
+    public static void UpdateReceiptNo(String groupKey, String branchCode, String PFunctionalCode, String startTime, String endTime, Context context) {
         int userId = Preferences.getInt("UserId", context);
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
         String formattedDate = df.format(c);
 
-        Job job;
+        Job job = null;
 
         if (PFunctionalCode == null) {
             job = new Select().from(Job.class)
-                    .where("GroupKey=? and BranchCode=?", groupKey, branchCode)
+                    .where("GroupKey=? and BranchCode=? AND ActualFromTime=? AND ActualToTime=?", groupKey, branchCode, startTime, endTime)
                     .executeSingle();
         } else {
             job = new Select().from(Job.class)
-                    .where("GroupKey=? and BranchCode=? and PFunctionalCode=?", groupKey, branchCode, PFunctionalCode)
+                    .where("GroupKey=? and BranchCode=? and PFunctionalCode=? AND ActualFromTime=? AND ActualToTime=?", groupKey, branchCode
+                            , PFunctionalCode, startTime, endTime)
                     .executeSingle();
         }
 
@@ -848,12 +862,12 @@ public class Job extends Model implements Comparable<Job> {
             if (PFunctionalCode == null) {
                 new Update(Job.class)
                         .set("ReceiptNo=?", "RN" + formattedDate + userId)
-                        .where("GroupKey=? and BranchCode=?", groupKey, branchCode)
+                        .where("GroupKey=? and BranchCode=? AND ActualFromTime=? AND ActualToTime=?", groupKey, branchCode, startTime, endTime)
                         .execute();
             } else {
                 new Update(Job.class)
                         .set("ReceiptNo=?", "RN" + formattedDate + userId)
-                        .where("GroupKey=? and BranchCode=? and PFunctionalCode=?", groupKey, branchCode, PFunctionalCode)
+                        .where("GroupKey=? and BranchCode=? and PFunctionalCode=?  AND ActualFromTime=? AND ActualToTime=?", groupKey, branchCode, PFunctionalCode, startTime, endTime)
                         .execute();
             }
         }
@@ -1148,11 +1162,11 @@ public class Job extends Model implements Comparable<Job> {
     }
 
     @SuppressLint("NewApi")
-    public static List<Content> getSelectedPrintContent(String groupKey, int isDelivery, String branchCode) {
+    public static List<Content> getSelectedPrintContent(String groupKey, int isDelivery, String branchCode, String startTime , String endTime) {
         Constants.BOX_QUANTITY = 0;
         List<Content> printContent = new ArrayList<>();
         int isCollection = isDelivery == 0 ? 1 : 0;
-        List<Job> list = Job.getJobListByTypeByGroupKey(isDelivery, isCollection, groupKey, branchCode);
+        List<Job> list = Job.getJobListByTypeByGroupKey(isDelivery, isCollection, groupKey, branchCode, startTime , endTime);
 
         int bagQty = 0, boxQty = 0, coinBagQty = 0;
         List<String> boxSealNoList = new ArrayList<>();
@@ -1314,9 +1328,9 @@ public class Job extends Model implements Comparable<Job> {
 //        return isAllScanned;
 //    }
 
-    public static boolean isAllDeliveryScanned(String GroupKey, String BranchCode, String PFunctionalCode) {
+    public static boolean isAllDeliveryScanned(String GroupKey, String BranchCode, String PFunctionalCode, String startTime, String endTime) {
         boolean isAllScanned = true;
-        List<Delivery> deliveries = getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode);
+        List<Delivery> deliveries = getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode, startTime, endTime);
         for (int i = 0; i < deliveries.size(); i++) {
             boolean result = deliveries.get(i).IsScanned;
             if (!result) {
@@ -1495,10 +1509,11 @@ public class Job extends Model implements Comparable<Job> {
                 .execute();
     }
 
-    public static void setCollected(String GroupKey, String BranchCode, String PFunctionalCode) {
+    public static void setCollected(String GroupKey, String BranchCode, String PFunctionalCode, String startTime, String endTime) {
         new Update(Job.class)
                 .set("isCollected=?,Status=?", 1, "COMPLETED")
-                .where("GroupKey=? AND BranchCode=? AND PFunctionalCode=?", GroupKey, BranchCode, PFunctionalCode)
+                .where("GroupKey=? AND BranchCode=? AND PFunctionalCode=? AND ActualFromTime=? AND ActualToTime=?",
+                        GroupKey, BranchCode, PFunctionalCode, startTime, endTime)
                 .execute();
 //        Job.UpdateCollectionCompleted(TransportMasterId);
 //        resetStatus(GroupKey);
@@ -1512,19 +1527,28 @@ public class Job extends Model implements Comparable<Job> {
 //                .execute();
 //    }
 
-    public static void setDelivered(String GroupKey, String BranchCode, String PFunctionalCode) {
+    public static void setDelivered(String GroupKey, String BranchCode, String PFunctionalCode, String startTime, String endTime) {
         if (PFunctionalCode == null) {
             new Update(Job.class)
                     .set("Status=?", "COMPLETED")
-                    .where("IsFloatDeliveryOrder=1 AND GroupKey=? AND BranchCode=?", GroupKey, BranchCode)
+                    .where("IsFloatDeliveryOrder=1 AND GroupKey=? AND BranchCode=? AND ActualFromTime=? AND ActualToTime=?", GroupKey, BranchCode, startTime, endTime)
                     .execute();
         } else {
             new Update(Job.class)
                     .set("Status=?", "COMPLETED")
-                    .where("IsFloatDeliveryOrder=1 AND GroupKey=? AND BranchCode=? AND PFunctionalCode=?", GroupKey, BranchCode, PFunctionalCode)
+                    .where("IsFloatDeliveryOrder=1 AND GroupKey=? AND BranchCode=? AND PFunctionalCode=? AND ActualFromTime=? AND ActualToTime=?", GroupKey, BranchCode, PFunctionalCode
+                            , startTime, endTime)
                     .execute();
         }
 
+    }
+
+
+    public static void updateLatestGroupKey(int transportMasterId, String groupKey) {
+        new Update(Job.class)
+                .set("GroupKey=?", groupKey)
+                .where("TransportMasterId=?", transportMasterId)
+                .execute();
     }
 
     public static void UpdateDateFormats() throws ParseException {
@@ -1539,30 +1563,34 @@ public class Job extends Model implements Comparable<Job> {
         Date toDate = new Date();
 
         for (Job job : result) {
-            if (!job.ActualFromTime.isEmpty() || !job.ActualFromTime.equals("")) {
-                DateFormat originalFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
-                DateFormat targetFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-                try {
-                    fromDate = originalFormat.parse(job.ActualFromTime);
-                    toDate = originalFormat.parse(job.ActualToTime);
-                } catch (Exception e) {
-                    indicator = true;
-                    actualFromTime = job.ActualToTime;
-                    actualToTime = job.ActualToTime;
-                }
+            if (job.OrderNo.equals("TJ2109210126")) {
 
-                if (!indicator) {
-                    actualFromTime = targetFormat.format(fromDate);
-                    actualToTime = targetFormat.format(toDate);
+                if (!job.ActualFromTime.isEmpty() || !job.ActualFromTime.equals("")) {
+                    DateFormat originalFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+                    DateFormat targetFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+                    try {
+                        fromDate = originalFormat.parse(job.ActualFromTime);
+                        toDate = originalFormat.parse(job.ActualToTime);
+                    } catch (Exception e) {
+                        indicator = true;
+                        actualFromTime = job.ActualToTime;
+                        actualToTime = job.ActualToTime;
+                    }
+
+                    if (!indicator) {
+                        actualFromTime = targetFormat.format(fromDate);
+                        actualToTime = targetFormat.format(toDate);
+                    }
                 }
+                Log.e(job.OrderNo, actualFromTime);
+                Log.e(job.OrderNo, actualToTime);
+                new Update(Job.class)
+                        .set("ActualFromTime=? , ActualToTime=?", actualFromTime, actualToTime)
+                        .where("TransportMasterId=?", job.TransportMasterId)
+                        .execute();
             }
-            Log.e(job.OrderNo, actualFromTime);
-            Log.e(job.OrderNo, actualToTime);
-            new Update(Job.class)
-                    .set("ActualFromTime=? , ActualToTime=?", actualFromTime, actualToTime)
-                    .where("GroupKey=? and BranchCode=? and PFunctionalCode=?", job.GroupKey , job.BranchCode , job.PFunctionalCode)
-                    .execute();
         }
     }
 

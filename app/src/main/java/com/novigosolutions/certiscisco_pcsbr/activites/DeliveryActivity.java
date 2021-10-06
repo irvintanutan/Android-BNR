@@ -119,12 +119,12 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
 //            bagList = Delivery.getPendingSealedByTransportId(Job.getSingleByOrderNo(j.DependentOrderId).TransportMasterId);
 //            boxList = Delivery.getPendingUnSealedByTransportId(Job.getSingleByOrderNo(j.DependentOrderId).TransportMasterId);
 //        }
-        List<Delivery> list = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode);
+        List<Delivery> list = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime);
         bagList = list.stream().filter( distinctByKey(p -> p.SealNo) )
                 .collect( Collectors.toList() );
 
         setSealedScannedCount();
-        boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode);
+        boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode, actualFromTime , actualToTime);
         recyclerViewbag.setLayoutManager(mLayoutManager);
         recyclerViewbag.setItemAnimator(new DefaultItemAnimator());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewbag.getContext(), DividerItemDecoration.VERTICAL);
@@ -299,7 +299,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
                 alert2();
                 break;
             case R.id.btn_submit:
-                if (Job.isAllDeliveryScanned(GroupKey, BranchCode , PFunctionalCode)) {
+                if (Job.isAllDeliveryScanned(GroupKey, BranchCode , PFunctionalCode, actualFromTime, actualToTime)) {
                     Intent intent = new Intent(this, SummaryActivity.class);
 //                    intent.putExtra("PointId", PointId);
                     intent.putExtra("TransportMasterId", TransportMasterId);
@@ -356,8 +356,8 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         if (data.isEmpty()) {
             invalidbarcodealert("Empty");
         } else {
-            if (Delivery.setScanned(GroupKey, data, BranchCode , PFunctionalCode)) {
-                List<Delivery> templist = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode);
+            if (Delivery.setScanned(GroupKey, data, BranchCode , PFunctionalCode, actualFromTime , actualToTime)) {
+                List<Delivery> templist = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime);
                 templist = templist.stream().filter( distinctByKey(p -> p.SealNo) )
                         .collect( Collectors.toList() );
                 bagList.clear();
@@ -378,7 +378,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         alertDialog.setMessage("Are you sure you want to go back?\nCurrent progress will be lost.");
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                Delivery.clearBranchDelivery(GroupKey, BranchCode , PFunctionalCode);
+                Delivery.clearBranchDelivery(GroupKey, BranchCode , PFunctionalCode, actualFromTime ,actualToTime);
                 finish();
             }
         });
@@ -468,7 +468,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         Branch branch = Branch.getSingle(GroupKey);
         if (branch.isRescheduled) {
 //            Job.setDelivered(TransportMasterId);
-            Job.setDelivered(GroupKey , BranchCode , PFunctionalCode);
+            Job.setDelivered(GroupKey , BranchCode , PFunctionalCode, Constants.startTime , Constants.endTime);
 //            if (Job.getIncompleteCollectionJobsOfPoint(GroupKey).size()>0) {
 //                Intent intent = new Intent(this, CollectionDetailActivity.class);
 ////                intent.putExtra("PointId", PointId);

@@ -161,7 +161,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             ll_lists = findViewById(R.id.ll_lists);
             List<Job> jobs = new ArrayList<>();
             if (isSummary(branch, job))
-                jobs = Job.getCollectionJobsOfPoint(GroupKey, BranchCode ,PFunctionalCode, "COMPLETED");
+                jobs = Job.getCollectionJobsOfPoint(GroupKey, BranchCode ,PFunctionalCode, "COMPLETED", actualFromTime, actualToTime);
                 // jobs.add(Job.getSingle(TransportMasterId));
             else
 //                jobs = Job.getIncompleteCollectionJobsOfPoint(GroupKey);
@@ -241,7 +241,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             } else {
                 List<Delivery> bagList = null;
                 if (isSummary(branch, job)) bagList = Delivery.getSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode, job.ActualFromTime , job.ActualToTime);
-                else bagList = Delivery.getPendingSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode);
+                else bagList = Delivery.getPendingSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode, job.ActualFromTime, job.ActualToTime);
                 if (bagList.size() > 0) {
 
                     bagList =  bagList.stream().filter( distinctByKey(p -> p.SealNo) )
@@ -275,7 +275,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
 
                 List<Delivery> boxList = null;
                 if (isSummary(branch, job)) boxList = Delivery.getUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode, actualFromTime, actualToTime);
-                else boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode);
+                else boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode, actualFromTime, actualToTime);
                 if (boxList.size() > 0) {
                     RecyclerView boxlistView = findViewById(R.id.boxlistview);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());

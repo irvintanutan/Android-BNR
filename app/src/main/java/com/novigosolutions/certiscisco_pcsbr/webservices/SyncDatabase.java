@@ -84,7 +84,7 @@ public class SyncDatabase {
                     if(jobObject.getString("Status").equals("COMPLETED")) {
                        Job.UpdateStatus(jobObject.getInt("TransportMasterId"));
                         Job.UpdateVersion(jobObject.getInt("TransportMasterId"),jobObject.getString("VersionNo"));
-                        Job.UpdateTime(jobObject.getInt("TransportMasterId"),jobObject.getString("ActualFromTime"),jobObject.getString("ActualToTime"));
+                        //Job.UpdateTime(jobObject.getInt("TransportMasterId"),jobObject.getString("ActualFromTime"),jobObject.getString("ActualToTime"));
                     }
                     else
                     {

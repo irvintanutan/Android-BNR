@@ -147,7 +147,7 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
                     //print.setBranchName(branch.BranchName);
                 }
 
-                print.setContentList(Job.getSelectedPrintContent(job.GroupKey, isDelivery, job.BranchCode));
+                print.setContentList(Job.getSelectedPrintContent(job.GroupKey, isDelivery, job.BranchCode, job.ActualFromTime, job.ActualToTime));
 
                 String ackSign = job.CustomerSign;
                 String customerSign = job.CustomerSignature;

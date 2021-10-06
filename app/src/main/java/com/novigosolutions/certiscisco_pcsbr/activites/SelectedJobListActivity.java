@@ -161,6 +161,7 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
 
             Log.e("ACTUALFROMTIME" , job.ActualFromTime);
             Log.e("ACTUALTOTIME" , job.ActualToTime);
+            Log.e("GROUP KEY" , job.GroupKey);
 
             intent.putExtra("TransportMasterId", TransportMasterId);
             intent.putExtra("GroupKey", GroupKey);
@@ -168,7 +169,7 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
             intent.putExtra("isDelivery", isDelivered);
             intent.putExtra("isCollection", isCollection);
             intent.putExtra("isSummary", true);
-        } else if (jobtype == 1 || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode).size() == 0 || branch.isDelOffline))) {
+        } else if (jobtype == 1 || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode, actualFromTime, actualToTime).size() == 0 || branch.isDelOffline))) {
             Job.updateJobStartTime(job.TransportMasterId, CommonMethods.getCurrentDateTime(this));
             intent = new Intent(SelectedJobListActivity.this, ConfirmationActivity.class);
             intent.putExtra("TransportMasterId", TransportMasterId);

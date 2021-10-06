@@ -207,7 +207,8 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
                 } else if (Job.getPendingJobsOfPoint(branches.get(position).GroupKey).size() == 0) {
                     holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
                     holder.llsub.setBackgroundColor(Color.parseColor(colorLightGreen));
-                } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey, BranchCode, PFunctionalCode).size() > 0 && !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey, BranchCode, PFunctionalCode)) {
+                } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime).size() > 0 &&
+                        !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime)) {
                     holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
                     holder.llsub.setBackgroundColor(Color.parseColor(colorLightYellow));
                 } else if (singleJob && jobtype == 2 && TextUtils.isEmpty(j.DependentOrderId) && Job.checkPendingDependentCollections(j.DependentOrderId).size() > 0) {
