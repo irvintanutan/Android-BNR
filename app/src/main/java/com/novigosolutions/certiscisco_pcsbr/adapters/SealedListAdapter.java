@@ -18,9 +18,11 @@ public class SealedListAdapter extends RecyclerView.Adapter<SealedListAdapter.My
     List<Delivery> deliveries;
     String colorGreen = "#43A047";
     String colorWhite = "#FFFFFF";
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView txt_seal;
         LinearLayout llmain;
+
         public MyViewHolder(View view) {
             super(view);
             txt_seal = view.findViewById(R.id.txt_seal);
@@ -41,13 +43,18 @@ public class SealedListAdapter extends RecyclerView.Adapter<SealedListAdapter.My
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        if(deliveries.get(position).ItemType.equals("Coin Box") || deliveries.get(position).ItemType.equals("BOX")){
-            if(deliveries.get(position).CoinSeriesId == 0)
-                holder.txt_seal.setText(deliveries.get(position).ItemType+"("+deliveries.get(position).SealNo+")");
+        if (deliveries.get(position).ItemType.equals("Coin Box") || deliveries.get(position).ItemType.equals("BOX")) {
+            if (deliveries.get(position).CoinSeriesId == 0)
+                holder.txt_seal.setText(deliveries.get(position).ItemType + "(" + deliveries.get(position).SealNo + ")");
             else
-                holder.txt_seal.setText(deliveries.get(position).ItemType+"("+deliveries.get(position).SealNo+")("+deliveries.get(position).CoinSeries+")");
-        }else
-            holder.txt_seal.setText(deliveries.get(position).ItemType+"("+deliveries.get(position).SealNo+")");
+                holder.txt_seal.setText(deliveries.get(position).ItemType + "(" + deliveries.get(position).SealNo + ")(" + deliveries.get(position).CoinSeries + ")");
+        } else {
+            if (deliveries.get(position).ItemType.equals("BAG")) {
+                holder.txt_seal.setText("Sealed " + deliveries.get(position).ItemType + "(" + deliveries.get(position).SealNo + ")");
+            } else
+                holder.txt_seal.setText(deliveries.get(position).ItemType + "(" + deliveries.get(position).SealNo + ")");
+        }
+
         if (deliveries.get(position).IsScanned) {
             holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
         } else {

@@ -88,7 +88,7 @@ public class CollectionSummaryAdapter extends RecyclerView.Adapter<CollectionSum
     }
 
     private void delete(int pos) {
-        if (collectionSummaries.get(pos).Collection_type.equals("Bag")) {
+        if (collectionSummaries.get(pos).Collection_type.equals("Sealed Bag")) {
             Bags.removeSingle(collectionSummaries.get(pos).id);
             collectionSummaries.remove(pos);
             notifyDataSetChanged();

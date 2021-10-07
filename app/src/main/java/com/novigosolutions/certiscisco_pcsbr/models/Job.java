@@ -921,7 +921,7 @@ public class Job extends Model implements Comparable<Job> {
         Job job = new Select().from(Job.class)
                 .where("TransportMasterId=?", TransportMasterId)
                 .executeSingle();
-        if (job.CanCollectedBag) collection_types.add("Bag");
+        if (job.CanCollectedBag) collection_types.add("Sealed Bag");
         if (job.CanCollectedEnvelop) collection_types.add("Envelope(s)");
         if (job.CanCollectedEnvelopInBag) collection_types.add("Envelope(s) In Bag");
         if (job.CanCollectedBox) collection_types.add("Box");
@@ -938,7 +938,7 @@ public class Job extends Model implements Comparable<Job> {
             Summary collectionSummary = new Summary();
             collectionSummary.Collection_type = "Bag";
             collectionSummary.id = bags.get(i).getId();
-            collectionSummary.Head = "Bag";
+            collectionSummary.Head = "Sealed Bag";
             String message = bags.get(i).firstbarcode;
             if (!bags.get(i).secondbarcode.isEmpty()) message += ", " + bags.get(i).secondbarcode;
             collectionSummary.Message = message;
@@ -1261,7 +1261,7 @@ public class Job extends Model implements Comparable<Job> {
                         }
                         Denomination envelopDeno = new Denomination();
                         enveInBagQty++;
-                        envelopDeno.setBagName("Bag " + enveInBagQty);
+                        envelopDeno.setBagName("Sealed Bag " + enveInBagQty);
                         envelopDeno.setSealNo(envelopeBag.bagcode);
                         envelopDeno.setEnvelopsList(envelopList);
                         envelopDenomination.add(envelopDeno);
@@ -1287,7 +1287,7 @@ public class Job extends Model implements Comparable<Job> {
         }
         if (!bagSealNoList.isEmpty()) {
             Content bagContent = new Content();
-            bagContent.setDescription("Bag");
+            bagContent.setDescription("Sealed Bag");
             bagContent.setQty(bagQty);
             bagContent.setSealNoList(bagSealNoList);
             printContent.add(bagContent);

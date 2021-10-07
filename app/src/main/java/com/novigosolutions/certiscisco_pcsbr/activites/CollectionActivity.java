@@ -181,7 +181,7 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
 
     private void openDialoge() {
         String collection_type = spinner.getSelectedItem().toString();
-        if (collection_type.equals("Bag")) {
+        if (collection_type.equals("Sealed Bag")) {
             BagDialog bagDialog = new BagDialog(CollectionActivity.this, trasportMasterId, this);
             bagDialog.setCancelable(false);
             bagDialog.show();
