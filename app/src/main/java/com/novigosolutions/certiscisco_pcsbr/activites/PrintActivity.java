@@ -19,27 +19,17 @@ import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.PrintJobListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.PrintCallBack;
-import com.novigosolutions.certiscisco_pcsbr.models.Bags;
-import com.novigosolutions.certiscisco_pcsbr.models.Box;
-import com.novigosolutions.certiscisco_pcsbr.models.BoxBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
-import com.novigosolutions.certiscisco_pcsbr.models.Break;
-import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.zebra.BulkImageGenerator;
-import com.novigosolutions.certiscisco_pcsbr.zebra.BulkPrintData;
 import com.novigosolutions.certiscisco_pcsbr.zebra.BulkSelectedPrintData;
-import com.novigosolutions.certiscisco_pcsbr.zebra.Content;
 import com.novigosolutions.certiscisco_pcsbr.zebra.GenerateImage;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Print;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Printer;
-import com.novigosolutions.certiscisco_pcsbr.zebra.ZPLUtil;
-import com.zebra.sdk.util.internal.StringUtilities;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +38,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import static com.novigosolutions.certiscisco_pcsbr.applications.CertisCISCO.getContext;
 
 public class PrintActivity extends BaseActivity implements View.OnClickListener, PrintJobListAdapter.CheckBoxListnerCallBack, NetworkChangekListener, PrintCallBack {
     Button btnBack,btnPrint,btnPrintAll,btnSelectedPrint,btnCancel;

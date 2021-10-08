@@ -20,6 +20,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
 import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
+import com.novigosolutions.certiscisco_pcsbr.models.Wagon;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 
 import androidx.multidex.MultiDex;
@@ -34,7 +35,10 @@ public class CertisCISCO extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Configuration dbConfiguration = new Configuration.Builder(this).setDatabaseName("certiscisco.db").setDatabaseVersion(3).addModelClasses(Job.class, Bags.class, Box.class, Envelope.class, EnvelopeBag.class, Currency.class, BoxBag.class, Branch.class, Delivery.class, ChatMessage.class, Break.class, Reschedule.class, CoinSeries.class).create();
+        Configuration dbConfiguration = new Configuration.Builder(this).setDatabaseName("certiscisco.db").setDatabaseVersion(3).addModelClasses(
+                Job.class, Bags.class, Box.class, Envelope.class, EnvelopeBag.class,
+                Currency.class, BoxBag.class, Branch.class, Delivery.class, ChatMessage.class,
+                Break.class, Reschedule.class, CoinSeries.class, Wagon.class).create();
         ActiveAndroid.initialize(dbConfiguration);
         mContext = this;
         if (TextUtils.isEmpty(Preferences.getString("API_URL", mContext))) {

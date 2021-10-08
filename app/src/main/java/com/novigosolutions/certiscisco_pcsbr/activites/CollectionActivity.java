@@ -20,6 +20,7 @@ import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.BoxDialog;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.CoinBoxDialog;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.EnvelopeDialog;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.PalletDialog;
+import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.WagonDialog;
 import com.novigosolutions.certiscisco_pcsbr.adapters.CollectionSummaryAdapter;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
@@ -58,9 +59,6 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
         setContentView(R.layout.activity_collection);
         setuptoolbar();
 
-//        if (android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.contains("Motorola Solutions")) {
-//            emdkWrapper = new EMDKWrapper(this);
-//        }
         spinner = findViewById(R.id.spn_collection_type);
 
         from_customer_name = findViewById(R.id.from_customer_name);
@@ -208,22 +206,15 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
             coinBoxDialog.show();
             Window window=coinBoxDialog.getWindow();
             window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        } else if (collection_type.equals("Wagon")) {
+            WagonDialog wagonDialog = new WagonDialog(CollectionActivity.this, trasportMasterId, this);
+            wagonDialog.setCancelable(false);
+            wagonDialog.show();
         }
     }
 
     private void refresh() {
         List<Summary> tempList = Job.getCollectionSummary(trasportMasterId);
-//        List<CollectionSummary> oldList = new ArrayList<>();
-//        oldList.addAll(collectionSummaries);
-//        collectionSummaries.clear();
-//        for (int i = 0; i < oldList.size(); i++) {
-//            if (tempList.contains(oldList.get(i)))
-//                collectionSummaries.add(oldList.get(i));
-//        }
-//        for (int i = 0; i < tempList.size(); i++) {
-//            if (!collectionSummaries.contains(tempList.get(i)))
-//                collectionSummaries.add(tempList.get(i));
-//        }
         collectionSummaries.clear();
         collectionSummaries.addAll(tempList);
         mAdapter.notifyDataSetChanged();
@@ -266,14 +257,4 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
         });
         alertDialog.show();
     }
-
-//    public void scan(ScanDataPass scanDataPass) {
-//        try {
-//            if (emdkWrapper != null)
-//                emdkWrapper.scansoft(scanDataPass);
-//            else Toast.makeText(this, "Scanner not supported", Toast.LENGTH_SHORT).show();
-//        } catch (ScannerException e) {
-//            e.printStackTrace();
-//        }
-//    }
 }

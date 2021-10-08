@@ -335,6 +335,12 @@ public class Branch extends Model implements Comparable<Branch> {
                 .where("firstbarcode=? OR secondbarcode=?", ScanValue, ScanValue)
                 .executeSingle();
         if (bags != null) return true;
+
+        Wagon wagon = new Select().from(Wagon.class)
+                .where("firstbarcode=? OR secondbarcode=?", ScanValue, ScanValue)
+                .executeSingle();
+        if (wagon != null) return true;
+
         BoxBag boxBag = new Select().from(BoxBag.class)
                 .where("bagcode=?", ScanValue)
                 .executeSingle();
@@ -563,6 +569,20 @@ public class Branch extends Model implements Comparable<Branch> {
                 Details.add(Detail);
             }
 
+            List<Wagon> wagons = Wagon.getByTransportMasterId(TransportMasterId);
+            for (int j = 0; j < wagons.size(); j++) {
+                Wagon wagon = wagons.get(j);
+                JsonObject Detail = new JsonObject();
+                Detail.addProperty("ItemType", "Wagon");
+                Detail.addProperty("DenoId", 0);
+                Detail.addProperty("SealNo1", wagon.firstbarcode);
+                Detail.addProperty("SealNo2", wagon.secondbarcode);
+                Detail.addProperty("Qty", 1);
+                Detail.addProperty("CoinSeriesId", 0);
+                Detail.add("EnvelopeSeal", null);
+                Details.add(Detail);
+            }
+
             List<EnvelopeBag> envelopeBags = EnvelopeBag.getByTransportMasterId(TransportMasterId);
             for (int j = 0; j < envelopeBags.size(); j++) {
                 EnvelopeBag envelopeBag = envelopeBags.get(j);
@@ -703,6 +723,7 @@ public class Branch extends Model implements Comparable<Branch> {
         remove();
         Job.remove();
         Bags.remove();
+        Wagon.remove();
         Box.remove();
         BoxBag.remove();
         Currency.remove();
