@@ -17,6 +17,7 @@ import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.BagDialog;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.BarCodeScanActivity;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.BoxDialog;
+import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.CageDialog;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.CoinBoxDialog;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.EnvelopeDialog;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.PalletDialog;
@@ -44,7 +45,7 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
     Spinner spinner;
     int trasportMasterId;
     TextView from_customer_name, from_functional_code, from_street_tower, from_town_pin, to_customer_name, to_functional_code, to_street_tower, to_town_pin;
-    Button btn_go, btn_next,btnCancel;
+    Button btn_go, btn_next,btnCancel, btn_cage;
     RecyclerView recyclerView;
     private CollectionSummaryAdapter mAdapter;
     List<Summary> collectionSummaries;
@@ -73,6 +74,7 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
 
         btn_go = findViewById(R.id.btn_go);
         btn_next = findViewById(R.id.btn_next);
+        btn_cage = findViewById(R.id.btn_assign_to_cage);
         recyclerView = findViewById(R.id.recyclerview);
         btnCancel = findViewById(R.id.btn_cancel);
 
@@ -129,25 +131,21 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
         }
         to_town_pin.setText(ttown_pin);
 
-        btn_go.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openDialoge();
-            }
-        });
-        btn_next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
+        btn_go.setOnClickListener(v -> openDialoge());
+
+        btn_cage.setOnClickListener(view -> {
+            openCageDialog();
         });
 
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alert();
-            }
-        });
+        btn_next.setOnClickListener(v -> onBackPressed());
+
+        btnCancel.setOnClickListener(view -> alert());
+    }
+
+    private void openCageDialog() {
+        CageDialog bagDialog = new CageDialog(CollectionActivity.this, trasportMasterId, this);
+        bagDialog.setCancelable(false);
+        bagDialog.show();
     }
 
     private void setuptoolbar() {
