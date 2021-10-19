@@ -9,35 +9,32 @@ import com.activeandroid.query.Select;
 
 import java.util.List;
 
-@Table(name = "bags")
-public class Bags extends Model {
+@Table(name = "cage")
+public class Cage extends Model {
     @Column(name = "TransportMasterId")
     public int TransportMasterId;
-
-    @Column(name = "firstbarcode")
-    public String firstbarcode;
-
-    @Column(name = "secondbarcode")
-    public String secondbarcode;
 
     @Column(name = "CageNo")
     public String CageNo;
 
+    @Column(name = "CageSeal")
+    public String CageSeal;
 
-    public static List<Bags> getByTransportMasterId(int TransportMasterId) {
-        return new Select().from(Bags.class)
+
+    public static List<Cage> getByTransportMasterId(int TransportMasterId) {
+        return new Select().from(Cage.class)
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();
     }
 
     public static void removeSingle(long id) {
-        new Delete().from(Bags.class)
+        new Delete().from(Cage.class)
                 .where("id=?",id)
                 .execute();
     }
 
     public static void remove() {
-        new Delete().from(Bags.class)
+        new Delete().from(Cage.class)
                 .execute();
     }
 

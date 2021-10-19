@@ -20,6 +20,9 @@ public class Wagon extends Model {
     @Column(name = "secondbarcode")
     public String secondbarcode;
 
+    @Column(name = "CageNo")
+    public String CageNo;
+
 
     public static List<Wagon> getByTransportMasterId(int TransportMasterId) {
         return new Select().from(Wagon.class)

@@ -29,6 +29,9 @@ public class BoxBag extends Model {
     @Column(name = "CoinSeriesId")
     public int  CoinSeriesId;
 
+    @Column(name = "CageNo")
+    public String CageNo;
+
     public static BoxBag getById(long id) {
         return new Select().from(BoxBag.class)
                 .where("id=?", id)

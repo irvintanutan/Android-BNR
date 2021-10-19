@@ -59,7 +59,7 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
     List<String> bar_code_list = new ArrayList<>();
     StringDeleteAdapter listAdapter;
     ImageView imgCageNo, imgCageSeal;
-    Button btnScanCageNo, btnScanCageSeal;
+    Button btnScanCageNo, btnScanCageSeal, cancel , confirm;
     String scanType;
 
     public CageDialog(Context context, int TransportMasterId, DialogResult mDialogResult) {
@@ -86,6 +86,11 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
         txt_cage_seal = findViewById(R.id.barcodeTextCageSeal);
         btnScanCageNo = findViewById(R.id.btnScanCageNo);
         btnScanCageSeal = findViewById(R.id.btnScanCageSeal);
+        cancel = findViewById(R.id.cancel);
+        confirm = findViewById(R.id.confirm);
+
+        cancel.setOnClickListener(this);
+        confirm.setOnClickListener(this);
         btnScanCageSeal.setOnClickListener(this);
         btnScanCageNo.setOnClickListener(this);
 
@@ -112,7 +117,19 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
                     e.printStackTrace();
                 }
                 break;
+
+            case R.id.cancel:
+                dismiss();
+                break;
+
+            case R.id.confirm:
+                saveToCage();
+                break;
         }
+    }
+
+    private void saveToCage() {
+
     }
 
     @Override

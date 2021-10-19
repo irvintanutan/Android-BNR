@@ -32,6 +32,10 @@ public class Box extends Model {
     public int  CoinSeriesId;
 
 
+    @Column(name = "CageNo")
+    public String CageNo;
+
+
     public static List<Box> getBoxByTransportMasterId(int TransportMasterId) {
         return new Select().from(Box.class)
                 .where("TransportMasterId=?", TransportMasterId)

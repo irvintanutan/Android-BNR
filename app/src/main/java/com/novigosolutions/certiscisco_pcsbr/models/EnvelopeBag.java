@@ -20,6 +20,10 @@ public class EnvelopeBag extends Model {
     @Column(name = "bagcode")
     public String bagcode;
 
+
+    @Column(name = "CageNo")
+    public String CageNo;
+
     public static EnvelopeBag getById(long id) {
         return new Select().from(EnvelopeBag.class)
                 .where("id=?", id)

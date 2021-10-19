@@ -12,6 +12,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.BoxBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Break;
+import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.ChatMessage;
 import com.novigosolutions.certiscisco_pcsbr.models.CoinSeries;
 import com.novigosolutions.certiscisco_pcsbr.models.Currency;
@@ -38,7 +39,7 @@ public class CertisCISCO extends Application {
         Configuration dbConfiguration = new Configuration.Builder(this).setDatabaseName("certiscisco.db").setDatabaseVersion(3).addModelClasses(
                 Job.class, Bags.class, Box.class, Envelope.class, EnvelopeBag.class,
                 Currency.class, BoxBag.class, Branch.class, Delivery.class, ChatMessage.class,
-                Break.class, Reschedule.class, CoinSeries.class, Wagon.class).create();
+                Break.class, Reschedule.class, CoinSeries.class, Wagon.class, Cage.class).create();
         ActiveAndroid.initialize(dbConfiguration);
         mContext = this;
         if (TextUtils.isEmpty(Preferences.getString("API_URL", mContext))) {
