@@ -2,6 +2,7 @@ package com.novigosolutions.certiscisco_pcsbr.models;
 
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
 import android.content.Context;
 import android.util.Log;
 
@@ -13,6 +14,7 @@ import com.activeandroid.query.Select;
 import com.activeandroid.query.Update;
 import com.activeandroid.util.SQLiteUtils;
 import com.google.gson.JsonObject;
+import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
@@ -431,13 +433,11 @@ public class Job extends Model implements Comparable<Job> {
     }
 
 
-
     public static List<Job> getPendingJobsOfPoint(String GroupKey) {
         return new Select().from(Job.class)
                 .where("GroupKey=? AND Status NOT IN ('COMPLETED')", GroupKey)
                 .execute();
     }
-
 
 
     public static List<Job> getDeliveryJobsOfPoint(String GroupKey, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
@@ -457,7 +457,6 @@ public class Job extends Model implements Comparable<Job> {
 
         return result;
     }
-
 
 
     public static List<Job> getPendingDeliveryJobsOfPoint(String GroupKey, String BranchCode, String PFunctionalCode, String startTime, String endTime) {
@@ -827,35 +826,50 @@ public class Job extends Model implements Comparable<Job> {
         if (job.CanCollectedBox) collection_types.add("Box");
         if (job.CanCollectPallet) collection_types.add("Pallet");
         if (job.CanCollectCoinBox) collection_types.add("Coin Bag");
-        if (job.CanCollectWagon)    collection_types.add("Wagon");
+        if (job.CanCollectWagon) collection_types.add("Wagon");
 
 
         return collection_types;
     }
 
+    public static void saveItemsToCage(int TransportMasterId, String cageNo, String cageSeal) {
+        Bags.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
+        Box.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
+        EnvelopeBag.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
 
-    public static List<Summary> getCollectionSummary(int TransportMasterId) {
+        List<EnvelopeBag> envelopebags = EnvelopeBag.getByTransportMasterId(TransportMasterId);
+        for (int a = 0; a < envelopebags.size(); a++) {
+            if (envelopebags.get(a).envolpeType.equals("Envelopes"))
+                Envelope.setCageNoCageSeal(envelopebags.get(a).getId(), cageNo, cageSeal);
+        }
+        BoxBag.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
+        Wagon.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
+    }
+
+    public static List<Summary> getCollectionSummaryWithoutCage(int TransportMasterId) {
         List<Summary> collection_summary = new ArrayList<>();
-        List<Bags> bags = Bags.getByTransportMasterId(TransportMasterId);
+        List<Bags> bags = Bags.getByTransportMasterIdWithOutCage(TransportMasterId);
         for (int i = 0; i < bags.size(); i++) {
             Summary collectionSummary = new Summary();
             collectionSummary.Collection_type = "Bag";
             collectionSummary.id = bags.get(i).getId();
             collectionSummary.Head = "Sealed Bag";
             String message = bags.get(i).firstbarcode;
-            if (!bags.get(i).secondbarcode.isEmpty()) message += ", " + bags.get(i).secondbarcode;
+            if (!bags.get(i).secondbarcode.isEmpty())
+                message += ", " + bags.get(i).secondbarcode;
             collectionSummary.Message = message;
             collection_summary.add(collectionSummary);
         }
 
         List<Wagon> wagons = Wagon.getByTransportMasterId(TransportMasterId);
-        for (int a = 0 ; a < wagons.size(); a++) {
+        for (int a = 0; a < wagons.size(); a++) {
             Summary collectionSummary = new Summary();
             collectionSummary.Collection_type = "Wagon";
             collectionSummary.id = wagons.get(a).getId();
             collectionSummary.Head = "Wagon";
             String message = wagons.get(a).firstbarcode;
-            if (!wagons.get(a).secondbarcode.isEmpty()) message += ", " + wagons.get(a).secondbarcode;
+            if (!wagons.get(a).secondbarcode.isEmpty())
+                message += ", " + wagons.get(a).secondbarcode;
             collectionSummary.Message = message;
             collection_summary.add(collectionSummary);
         }
@@ -878,7 +892,8 @@ public class Job extends Model implements Comparable<Job> {
                     message.append(envelopes.get(j).barcode);
                     message.append(", ");
                 }
-                if (message.length() > 0) message.delete(message.length() - 2, message.length());
+                if (message.length() > 0)
+                    message.delete(message.length() - 2, message.length());
                 Summary collectionSummary = new Summary();
                 collectionSummary.Collection_type = "EnvelopeBag";
                 collectionSummary.id = envelopebags.get(i).getId();
@@ -930,6 +945,188 @@ public class Job extends Model implements Comparable<Job> {
         return collection_summary;
     }
 
+    public static List<Summary> getCollectionSummary(int TransportMasterId) {
+        List<Summary> collection_summary = new ArrayList<>();
+        List<Bags> bags = Bags.getByTransportMasterId(TransportMasterId);
+        for (int i = 0; i < bags.size(); i++) {
+            Summary collectionSummary = new Summary();
+            collectionSummary.Collection_type = "Bag";
+            collectionSummary.id = bags.get(i).getId();
+            collectionSummary.Head = "Sealed Bag";
+            String message = bags.get(i).firstbarcode;
+            if (!bags.get(i).secondbarcode.isEmpty())
+                message += ", " + bags.get(i).secondbarcode;
+            collectionSummary.Message = message;
+            collection_summary.add(collectionSummary);
+        }
+
+        List<Wagon> wagons = Wagon.getByTransportMasterId(TransportMasterId);
+        for (int a = 0; a < wagons.size(); a++) {
+            Summary collectionSummary = new Summary();
+            collectionSummary.Collection_type = "Wagon";
+            collectionSummary.id = wagons.get(a).getId();
+            collectionSummary.Head = "Wagon";
+            String message = wagons.get(a).firstbarcode;
+            if (!wagons.get(a).secondbarcode.isEmpty())
+                message += ", " + wagons.get(a).secondbarcode;
+            collectionSummary.Message = message;
+            collection_summary.add(collectionSummary);
+        }
+
+        List<EnvelopeBag> envelopebags = EnvelopeBag.getByTransportMasterId(TransportMasterId);
+        for (int i = 0; i < envelopebags.size(); i++) {
+            List<Envelope> envelopes = Envelope.getByBagId(envelopebags.get(i).getId());
+            if (envelopebags.get(i).envolpeType.equals("Envelopes")) {
+                for (int j = 0; j < envelopes.size(); j++) {
+                    Summary collectionSummary = new Summary();
+                    collectionSummary.Collection_type = "Envelopes";
+                    collectionSummary.id = envelopes.get(j).getId();
+                    collectionSummary.Head = "Envelope";
+                    collectionSummary.Message = envelopes.get(j).barcode;
+                    collection_summary.add(collectionSummary);
+                }
+            } else {
+                StringBuilder message = new StringBuilder();
+                for (int j = 0; j < envelopes.size(); j++) {
+                    message.append(envelopes.get(j).barcode);
+                    message.append(", ");
+                }
+                if (message.length() > 0)
+                    message.delete(message.length() - 2, message.length());
+                Summary collectionSummary = new Summary();
+                collectionSummary.Collection_type = "EnvelopeBag";
+                collectionSummary.id = envelopebags.get(i).getId();
+                collectionSummary.Head = "Envelope(s) In Bag (" + envelopebags.get(i).bagcode + ")";
+                collectionSummary.Message = message.toString();
+                collection_summary.add(collectionSummary);
+            }
+        }
+
+        List<Box> boxes = Box.getBoxByTransportMasterId(TransportMasterId);
+        for (int i = 0; i < boxes.size(); i++) {
+            Summary collectionSummary = new Summary();
+            collectionSummary.Collection_type = "Box";
+            collectionSummary.id = boxes.get(i).getId();
+            collectionSummary.Head = "Box";
+            // collectionSummary.Message = boxes.get(i).ProductName + "(" + boxes.get(i).count + ")";
+            if ((boxes.get(i).CoinSeriesId) == 0) {
+                collectionSummary.Message = boxes.get(i).ProductName + "(" + boxes.get(i).count + ")";
+            } else {
+                collectionSummary.Message = boxes.get(i).ProductName + "(" + boxes.get(i).count + ")" + "(" + boxes.get(i).CoinSeries + ")";
+            }
+            collection_summary.add(collectionSummary);
+        }
+
+        List<BoxBag> boxBags = BoxBag.getByTransportMasterId(TransportMasterId);
+        for (int i = 0; i < boxBags.size(); i++) {
+            Summary collectionSummary = new Summary();
+            collectionSummary.Collection_type = "CoinBox";
+            collectionSummary.id = boxBags.get(i).getId();
+            collectionSummary.Head = "Coin Bag(" + boxBags.get(i).bagcode + ")";
+//            collectionSummary.Message = boxBags.get(i).ProductName;
+            if (boxBags.get(i).CoinSeriesId == 0)
+                collectionSummary.Message = boxBags.get(i).ProductName;
+            else
+                collectionSummary.Message = boxBags.get(i).ProductName + "(" + boxBags.get(i).CoinSeries + ")";
+            collection_summary.add(collectionSummary);
+        }
+
+        int palletCount = getSingle(TransportMasterId).palletCount;
+        if (palletCount > 0) {
+            Summary collectionSummary = new Summary();
+            collectionSummary.Collection_type = "Pallet";
+            collectionSummary.id = TransportMasterId;
+            collectionSummary.Head = "Pallet";
+            collectionSummary.Message = String.valueOf(palletCount);
+            collection_summary.add(collectionSummary);
+        }
+
+        return collection_summary;
+    }
+
+    public static List<Items> getCageCollectionSummary(int TransportMasterId, String cageNo, String cageSeal) {
+        List<Items> items = new ArrayList<>();
+        List<Bags> bags = Bags.getByTransportMasterIdWithCage(TransportMasterId, cageNo , cageSeal);
+        for (int i = 0; i < bags.size(); i++) {
+            Items collectionSummary = new Items();
+            collectionSummary.setHead("Sealed Bag");
+            String message = bags.get(i).firstbarcode;
+            if (!bags.get(i).secondbarcode.isEmpty())
+                message += ", " + bags.get(i).secondbarcode;
+            collectionSummary.setSummary(message);
+            items.add(collectionSummary);
+        }
+
+        List<Wagon> wagons = Wagon.getByTransportMasterId(TransportMasterId);
+        for (int a = 0; a < wagons.size(); a++) {
+            Items collectionSummary = new Items();
+            collectionSummary.setHead("Wagon");
+            String message = wagons.get(a).firstbarcode;
+            if (!wagons.get(a).secondbarcode.isEmpty())
+                message += ", " + wagons.get(a).secondbarcode;
+            collectionSummary.setSummary(message);
+            items.add(collectionSummary);
+        }
+
+        List<EnvelopeBag> envelopebags = EnvelopeBag.getByTransportMasterId(TransportMasterId);
+        for (int i = 0; i < envelopebags.size(); i++) {
+            List<Envelope> envelopes = Envelope.getByBagId(envelopebags.get(i).getId());
+            if (envelopebags.get(i).envolpeType.equals("Envelopes")) {
+                for (int j = 0; j < envelopes.size(); j++) {
+                    Items collectionSummary = new Items();
+                    collectionSummary.setHead("Envelope");
+                    collectionSummary.setSummary(envelopes.get(j).barcode);
+                    items.add(collectionSummary);
+                }
+            } else {
+                StringBuilder message = new StringBuilder();
+                for (int j = 0; j < envelopes.size(); j++) {
+                    message.append(envelopes.get(j).barcode);
+                    message.append(", ");
+                }
+                if (message.length() > 0)
+                    message.delete(message.length() - 2, message.length());
+                Items collectionSummary = new Items();
+                collectionSummary.setHead("Envelope(s) In Bag (" + envelopebags.get(i).bagcode + ")");
+                collectionSummary.setSummary(message.toString());
+                items.add(collectionSummary);
+            }
+        }
+
+        List<Box> boxes = Box.getBoxByTransportMasterId(TransportMasterId);
+        for (int i = 0; i < boxes.size(); i++) {
+            Items collectionSummary = new Items();
+            collectionSummary.setHead("Box");
+            if ((boxes.get(i).CoinSeriesId) == 0) {
+                collectionSummary.setSummary(boxes.get(i).ProductName + "(" + boxes.get(i).count + ")");
+            } else {
+                collectionSummary.setSummary(boxes.get(i).ProductName + "(" + boxes.get(i).count + ")" + "(" + boxes.get(i).CoinSeries + ")");
+            }
+            items.add(collectionSummary);
+        }
+
+        List<BoxBag> boxBags = BoxBag.getByTransportMasterId(TransportMasterId);
+        for (int i = 0; i < boxBags.size(); i++) {
+            Items collectionSummary = new Items();
+            collectionSummary.setHead("Coin Bag(" + boxBags.get(i).bagcode + ")");
+//            collectionSummary.Message = boxBags.get(i).ProductName;
+            if (boxBags.get(i).CoinSeriesId == 0)
+                collectionSummary.setSummary(boxBags.get(i).ProductName);
+            else
+                collectionSummary.setSummary(boxBags.get(i).ProductName + "(" + boxBags.get(i).CoinSeries + ")");
+            items.add(collectionSummary);
+        }
+
+        int palletCount = getSingle(TransportMasterId).palletCount;
+        if (palletCount > 0) {
+            Items collectionSummary = new Items();
+            collectionSummary.setHead("Pallet");
+            collectionSummary.setSummary(String.valueOf(palletCount));
+            items.add(collectionSummary);
+        }
+
+        return items;
+    }
 
     public static List<Content> getPrintContent(int transportMasterId) {
         List<Content> printContent = new ArrayList<>();
@@ -1058,13 +1255,15 @@ public class Job extends Model implements Comparable<Job> {
 
 
     @SuppressLint("NewApi")
-    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
+    public static <
+            T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
         Map<Object, Boolean> map = new ConcurrentHashMap<>();
         return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     @SuppressLint("NewApi")
-    public static List<Content> getSelectedPrintContent(String groupKey, int isDelivery, String branchCode, String startTime, String endTime) {
+    public static List<Content> getSelectedPrintContent(String groupKey, int isDelivery, String
+            branchCode, String startTime, String endTime) {
         Constants.BOX_QUANTITY = 0;
         List<Content> printContent = new ArrayList<>();
         int isCollection = isDelivery == 0 ? 1 : 0;
@@ -1245,7 +1444,8 @@ public class Job extends Model implements Comparable<Job> {
         return printContent;
     }
 
-    public static boolean isAllDeliveryScanned(String GroupKey, String BranchCode, String PFunctionalCode, String startTime, String endTime) {
+    public static boolean isAllDeliveryScanned(String GroupKey, String BranchCode, String
+            PFunctionalCode, String startTime, String endTime) {
         boolean isAllScanned = true;
         List<Delivery> deliveries = getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode, startTime, endTime);
         for (int i = 0; i < deliveries.size(); i++) {
@@ -1393,7 +1593,8 @@ public class Job extends Model implements Comparable<Job> {
                 .execute();
     }
 
-    public static void updateJobEndTime(String groupKey, String BranchCode, String PDFunctionalCode, String JobEndTime) {
+    public static void updateJobEndTime(String groupKey, String BranchCode, String
+            PDFunctionalCode, String JobEndTime) {
         new Update(Job.class)
                 .set("JobEndTime=?", JobEndTime)
                 .where("BranchCode=? and PFunctionalCode=? and GroupKey=?", BranchCode, PDFunctionalCode, groupKey)
@@ -1421,7 +1622,8 @@ public class Job extends Model implements Comparable<Job> {
                 .execute();
     }
 
-    public static void setCollected(String GroupKey, String BranchCode, String PFunctionalCode, String startTime, String endTime) {
+    public static void setCollected(String GroupKey, String BranchCode, String
+            PFunctionalCode, String startTime, String endTime) {
         new Update(Job.class)
                 .set("isCollected=?,Status=?", 1, "COMPLETED")
                 .where("GroupKey=? AND BranchCode=? AND PFunctionalCode=? AND ActualFromTime=? AND ActualToTime=?",
@@ -1430,7 +1632,8 @@ public class Job extends Model implements Comparable<Job> {
     }
 
 
-    public static void setDelivered(String GroupKey, String BranchCode, String PFunctionalCode, String startTime, String endTime) {
+    public static void setDelivered(String GroupKey, String BranchCode, String
+            PFunctionalCode, String startTime, String endTime) {
         if (PFunctionalCode == null) {
             new Update(Job.class)
                     .set("Status=?", "COMPLETED")

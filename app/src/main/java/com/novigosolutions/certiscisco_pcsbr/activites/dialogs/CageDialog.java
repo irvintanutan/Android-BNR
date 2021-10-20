@@ -32,6 +32,7 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.IOnScannerData;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Bags;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
+import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
@@ -61,6 +62,7 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
     ImageView imgCageNo, imgCageSeal;
     Button btnScanCageNo, btnScanCageSeal, cancel , confirm;
     String scanType;
+    String noBarcode = "0000000000000";
 
     public CageDialog(Context context, int TransportMasterId, DialogResult mDialogResult) {
         super(context, R.style.Theme_AppCompat_Light_Dialog);
@@ -75,6 +77,7 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.cage_dialog);
         initialize();
+        initializeBarcode();
     }
 
 
@@ -129,8 +132,55 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
     }
 
     private void saveToCage() {
+        if (txt_cage_seal.getText().toString().equals(noBarcode) || txt_cage_no.getText().toString().equals(noBarcode)) {
+            Toast.makeText(context , "No Barcode Scanned" , Toast.LENGTH_LONG).show();
+        } else {
 
+            String cageNo = txt_cage_no.getText().toString();
+            String cageSeal = txt_cage_seal.getText().toString();
+
+            Cage cage = new Cage();
+            cage.TransportMasterId = TransportMasterId;
+            cage.CageSeal = cageSeal;
+            cage.CageNo = cageNo;
+            cage.save();
+
+            Job.saveItemsToCage(TransportMasterId , cageNo , cageSeal);
+
+            if (mDialogResult != null) {
+                mDialogResult.onResult();
+            }
+
+            dismiss();
+        }
     }
+
+
+    private void initializeBarcode() {
+        String noBarcode = "0000000000000";
+        txt_cage_no.setText(noBarcode);
+        MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+        try {
+            BitMatrix bitMatrix = multiFormatWriter.encode(noBarcode, BarcodeFormat.CODABAR, 150, 50);
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
+            imgCageNo.setImageBitmap(bitmap);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+
+        txt_cage_seal.setText(noBarcode);
+        MultiFormatWriter multiFormatWriter2 = new MultiFormatWriter();
+        try {
+            BitMatrix bitMatrix = multiFormatWriter2.encode(noBarcode, BarcodeFormat.CODABAR, 150, 50);
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
+            imgCageSeal.setImageBitmap(bitmap);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void onDataScanned(String data) {
@@ -138,7 +188,7 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
             txt_cage_no.setText(data);
             MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
             try {
-                BitMatrix bitMatrix = multiFormatWriter.encode(data, BarcodeFormat.CODABAR, 150, 50);
+                BitMatrix bitMatrix = multiFormatWriter.encode(data, BarcodeFormat.CODE_128, 150, 50);
                 BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
                 Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
                 imgCageNo.setImageBitmap(bitmap);
@@ -149,7 +199,7 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
             txt_cage_seal.setText(data);
             MultiFormatWriter multiFormatWriter2 = new MultiFormatWriter();
             try {
-                BitMatrix bitMatrix = multiFormatWriter2.encode(data, BarcodeFormat.CODABAR, 150, 50);
+                BitMatrix bitMatrix = multiFormatWriter2.encode(data, BarcodeFormat.CODE_128, 150, 50);
                 BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
                 Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
                 imgCageSeal.setImageBitmap(bitmap);

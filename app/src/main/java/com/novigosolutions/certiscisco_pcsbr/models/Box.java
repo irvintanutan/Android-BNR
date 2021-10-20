@@ -31,10 +31,37 @@ public class Box extends Model {
     @Column(name = "CoinSeriesId")
     public int  CoinSeriesId;
 
-
     @Column(name = "CageNo")
     public String CageNo;
 
+    @Column(name = "CageSeal")
+    public String CageSeal;
+
+
+    public static void setCageNoCageSeal(int TransportMasterId, String cageNo, String cageSeal) {
+        new Update(Box.class)
+                .set("CageNo=? , CageSeal=?", cageNo, cageSeal)
+                .where("TransportMasterId=? and CageNo IS NULL and CageSeal IS NULL", TransportMasterId)
+                .execute();
+    }
+
+    public static List<Bags> getByTransportMasterIdWithOutCage(int TransportMasterId) {
+        return new Select().from(Box.class)
+                .where("TransportMasterId=? and CageNo IS NULL and CageSeal IS NULL", TransportMasterId)
+                .execute();
+    }
+
+    public static List<Bags> getByTransportMasterIdWithCage(int TransportMasterId, String cageNo , String cageSeal) {
+        return new Select().from(Box.class)
+                .where("TransportMasterId=? and CageNo=? and CageSeal=?", TransportMasterId, cageNo , cageSeal)
+                .execute();
+    }
+
+    public static List<Bags> getByTransportMasterId(int TransportMasterId , String cageNo , String cageSeal) {
+        return new Select().from(Box.class)
+                .where("TransportMasterId=? AND CageNo!=? AND CageSeal!=?", TransportMasterId, cageNo, cageSeal)
+                .execute();
+    }
 
     public static List<Box> getBoxByTransportMasterId(int TransportMasterId) {
         return new Select().from(Box.class)

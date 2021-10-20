@@ -20,6 +20,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Bags;
 import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.BoxBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
+import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.CoinSeries;
 import com.novigosolutions.certiscisco_pcsbr.models.Currency;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
@@ -360,6 +361,12 @@ public class SyncDatabase {
                         Job.updatePalletCount(deliveryobject.getInt("TransportMasterId"), deliveryobject.getInt("Qty"));
                         break;
 
+                    case "CAGE":
+                        Cage cage = new Cage();
+                        cage.TransportMasterId = deliveryobject.getInt("TransportMasterId");
+                        cage.CageNo = deliveryobject.getString("CageNo");
+                        cage.CageSeal = deliveryobject.getString("CageSeal");
+                        cage.save();
                 }
 
 
