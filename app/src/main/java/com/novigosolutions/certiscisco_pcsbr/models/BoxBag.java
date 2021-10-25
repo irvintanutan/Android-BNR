@@ -42,20 +42,26 @@ public class BoxBag extends Model {
                 .where("TransportMasterId=? and CageNo IS NULL and CageSeal IS NULL", TransportMasterId)
                 .execute();
     }
-    public static List<Bags> getByTransportMasterIdWithOutCage(int TransportMasterId) {
+    public static List<BoxBag> getByTransportMasterIdWithOutCage(int TransportMasterId) {
         return new Select().from(BoxBag.class)
                 .where("TransportMasterId=? and CageNo IS NULL and CageSeal IS NULL", TransportMasterId)
                 .execute();
     }
 
-    public static List<Bags> getByTransportMasterIdWithCage(int TransportMasterId, String cageNo , String cageSeal) {
+    public static List<BoxBag> getByTransportMasterIdWithCage(int TransportMasterId, String cageNo , String cageSeal) {
         return new Select().from(BoxBag.class)
                 .where("TransportMasterId=? and CageNo=? and CageSeal=?", TransportMasterId, cageNo , cageSeal)
                 .execute();
     }
-    public static List<Bags> getByTransportMasterId(int TransportMasterId , String cageNo , String cageSeal) {
+    public static List<BoxBag> getByTransportMasterId(int TransportMasterId , String cageNo , String cageSeal) {
         return new Select().from(BoxBag.class)
                 .where("TransportMasterId=? AND CageNo!=? AND CageSeal!=?", TransportMasterId, cageNo, cageSeal)
+                .execute();
+    }
+
+    public static void removeByCageNoCageSeal(String cageNo , String cageSeal){
+        new Delete().from(BoxBag.class)
+                .where("CageNo=? AND CageSeal=?", cageNo , cageSeal)
                 .execute();
     }
 

@@ -110,6 +110,7 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
                     ((BarCodeScanActivity) context).scansoft();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Toast.makeText(context , "Barcode Not Recognized" , Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.btnScanCageSeal:

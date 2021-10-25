@@ -95,14 +95,14 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
-        recyclerView.addItemDecoration(dividerItemDecoration);
-        collectionSummaries = Job.getCollectionSummaryWithoutCage(trasportMasterId);
-        mAdapter = new CollectionSummaryAdapter(collectionSummaries, false, this);
-        recyclerView.setAdapter(mAdapter);
+//        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+//        recyclerView.setLayoutManager(mLayoutManager);
+//        recyclerView.setItemAnimator(new DefaultItemAnimator());
+//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
+//        recyclerView.addItemDecoration(dividerItemDecoration);
+//        collectionSummaries = Job.getCollectionSummaryWithoutCage(trasportMasterId);
+//        mAdapter = new CollectionSummaryAdapter(collectionSummaries, false, this);
+//        recyclerView.setAdapter(mAdapter);
 
         Job job = Job.getSingle(trasportMasterId);
         Branch branch = Branch.getSingle(job.GroupKey);
@@ -154,7 +154,7 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
         setCageListView();
     }
 
-    private void setCageListView() {
+    public void setCageListView() {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         cageRecyclerView.setLayoutManager(mLayoutManager);
         cageRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -173,7 +173,16 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
             cages.add(cage);
         }
 
-        cageAdapter = new CageAdapter(cages);
+        collectionSummaries = Job.getCollectionSummaryWithoutCage(trasportMasterId);
+        for (Summary summary : collectionSummaries) {
+            String id = String.valueOf(summary.id);
+            String head = summary.Head;
+            String detail = summary.Message;
+            Cage cage = new Cage(id + "\n" + head + "\n" + detail, new ArrayList<>());
+            cages.add(cage);
+        }
+
+        cageAdapter = new CageAdapter(cages, this, true);
         cageRecyclerView.setAdapter(cageAdapter);
     }
 
@@ -255,7 +264,7 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
 
     @Override
     public void onResult() {
-        refresh();
+        //refresh();
         setCageListView();
     }
 

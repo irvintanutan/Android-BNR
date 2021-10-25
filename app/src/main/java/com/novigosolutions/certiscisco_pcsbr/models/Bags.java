@@ -58,6 +58,12 @@ public class Bags extends Model {
                 .execute();
     }
 
+    public static void removeByCageNoCageSeal(String cageNo , String cageSeal){
+        new Delete().from(Bags.class)
+                .where("CageNo=? AND CageSeal=?", cageNo , cageSeal)
+                .execute();
+    }
+
     public static void removeSingle(long id) {
         new Delete().from(Bags.class)
                 .where("id=?", id)

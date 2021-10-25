@@ -35,13 +35,13 @@ public class EnvelopeBag extends Model {
                 .execute();
     }
 
-    public static List<Bags> getByTransportMasterIdWithOutCage(int TransportMasterId) {
+    public static List<EnvelopeBag> getByTransportMasterIdWithOutCage(int TransportMasterId) {
         return new Select().from(EnvelopeBag.class)
                 .where("TransportMasterId=? and CageNo IS NULL and CageSeal IS NULL", TransportMasterId)
                 .execute();
     }
 
-    public static List<Bags> getByTransportMasterIdWithCage(int TransportMasterId, String cageNo , String cageSeal) {
+    public static List<EnvelopeBag> getByTransportMasterIdWithCage(int TransportMasterId, String cageNo , String cageSeal) {
         return new Select().from(EnvelopeBag.class)
                 .where("TransportMasterId=? and CageNo=? and CageSeal=?", TransportMasterId, cageNo , cageSeal)
                 .execute();
@@ -74,6 +74,12 @@ public class EnvelopeBag extends Model {
     public static List<EnvelopeBag> getEnvelopesInBagByTransportMasterId(int TransportMasterId) {
         return new Select().from(EnvelopeBag.class)
                 .where("TransportMasterId=? AND envolpeType=?", TransportMasterId,"EnvelopeBag")
+                .execute();
+    }
+
+    public static void removeByCageNoCageSeal(String cageNo , String cageSeal){
+        new Delete().from(EnvelopeBag.class)
+                .where("CageNo=? AND CageSeal=?", cageNo , cageSeal)
                 .execute();
     }
 

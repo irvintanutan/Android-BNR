@@ -37,15 +37,15 @@ public class Envelope extends Model {
                 .where("bagid=? and CageNo IS NULL and CageSeal IS NULL", bagid)
                 .execute();
     }
-    public static List<Bags> getByTransportMasterIdWithOutCage(int TransportMasterId) {
+    public static List<Envelope> getByTransportMasterIdWithOutCage(long bagId) {
         return new Select().from(Envelope.class)
-                .where("bagid=? and CageNo IS NULL and CageSeal IS NULL", TransportMasterId)
+                .where("bagid=? and CageNo IS NULL and CageSeal IS NULL", bagId)
                 .execute();
     }
 
-    public static List<Bags> getByTransportMasterIdWithCage(int TransportMasterId, String cageNo , String cageSeal) {
+    public static List<Envelope> getByTransportMasterIdWithCage(long bagId, String cageNo , String cageSeal) {
         return new Select().from(Envelope.class)
-                .where("bagid=? and CageNo=? and CageSeal=?", TransportMasterId, cageNo , cageSeal)
+                .where("bagid=? and CageNo=? and CageSeal=?", bagId, cageNo , cageSeal)
                 .execute();
     }
 
@@ -53,6 +53,12 @@ public class Envelope extends Model {
     public static List<Bags> getByTransportMasterId(long bagId , String cageNo , String cageSeal) {
         return new Select().from(Envelope.class)
                 .where("bagid=? AND CageNo!=? AND CageSeal!=?", bagId, cageNo, cageSeal)
+                .execute();
+    }
+
+    public static void removeByCageNoCageSeal(String cageNo , String cageSeal){
+        new Delete().from(Envelope.class)
+                .where("CageNo=? AND CageSeal=?", cageNo , cageSeal)
                 .execute();
     }
 

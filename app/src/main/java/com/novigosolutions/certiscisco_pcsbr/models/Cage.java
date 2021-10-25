@@ -27,6 +27,12 @@ public class Cage extends Model {
                 .execute();
     }
 
+    public static void removeByCageNoCageSeal(String cageNo , String cageSeal){
+        new Delete().from(Cage.class)
+                .where("CageNo=? AND CageSeal=?", cageNo , cageSeal)
+                .execute();
+    }
+
     public static void removeSingle(long id) {
         new Delete().from(Cage.class)
                 .where("id=?",id)

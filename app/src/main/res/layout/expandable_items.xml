@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/Gray900"
             android:text="asdasd"
-            android:textSize="18dp"/>
+            android:textSize="@dimen/_12sdp"/>
 
         <TextView
             android:layout_marginLeft="@dimen/_40sdp"

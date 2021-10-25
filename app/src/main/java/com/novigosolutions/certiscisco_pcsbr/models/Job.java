@@ -861,7 +861,7 @@ public class Job extends Model implements Comparable<Job> {
             collection_summary.add(collectionSummary);
         }
 
-        List<Wagon> wagons = Wagon.getByTransportMasterId(TransportMasterId);
+        List<Wagon> wagons = Wagon.getByTransportMasterIdWithOutCage(TransportMasterId);
         for (int a = 0; a < wagons.size(); a++) {
             Summary collectionSummary = new Summary();
             collectionSummary.Collection_type = "Wagon";
@@ -874,9 +874,9 @@ public class Job extends Model implements Comparable<Job> {
             collection_summary.add(collectionSummary);
         }
 
-        List<EnvelopeBag> envelopebags = EnvelopeBag.getByTransportMasterId(TransportMasterId);
+        List<EnvelopeBag> envelopebags = EnvelopeBag.getByTransportMasterIdWithOutCage(TransportMasterId);
         for (int i = 0; i < envelopebags.size(); i++) {
-            List<Envelope> envelopes = Envelope.getByBagId(envelopebags.get(i).getId());
+            List<Envelope> envelopes = Envelope.getByTransportMasterIdWithOutCage(envelopebags.get(i).getId());
             if (envelopebags.get(i).envolpeType.equals("Envelopes")) {
                 for (int j = 0; j < envelopes.size(); j++) {
                     Summary collectionSummary = new Summary();
@@ -903,7 +903,7 @@ public class Job extends Model implements Comparable<Job> {
             }
         }
 
-        List<Box> boxes = Box.getBoxByTransportMasterId(TransportMasterId);
+        List<Box> boxes = Box.getByTransportMasterIdWithOutCage(TransportMasterId);
         for (int i = 0; i < boxes.size(); i++) {
             Summary collectionSummary = new Summary();
             collectionSummary.Collection_type = "Box";
@@ -918,7 +918,7 @@ public class Job extends Model implements Comparable<Job> {
             collection_summary.add(collectionSummary);
         }
 
-        List<BoxBag> boxBags = BoxBag.getByTransportMasterId(TransportMasterId);
+        List<BoxBag> boxBags = BoxBag.getByTransportMasterIdWithOutCage(TransportMasterId);
         for (int i = 0; i < boxBags.size(); i++) {
             Summary collectionSummary = new Summary();
             collectionSummary.Collection_type = "CoinBox";
@@ -1057,7 +1057,7 @@ public class Job extends Model implements Comparable<Job> {
             items.add(collectionSummary);
         }
 
-        List<Wagon> wagons = Wagon.getByTransportMasterId(TransportMasterId);
+        List<Wagon> wagons = Wagon.getByTransportMasterIdWithCage(TransportMasterId, cageNo , cageSeal);
         for (int a = 0; a < wagons.size(); a++) {
             Items collectionSummary = new Items();
             collectionSummary.setHead("Wagon");
@@ -1068,9 +1068,9 @@ public class Job extends Model implements Comparable<Job> {
             items.add(collectionSummary);
         }
 
-        List<EnvelopeBag> envelopebags = EnvelopeBag.getByTransportMasterId(TransportMasterId);
+        List<EnvelopeBag> envelopebags = EnvelopeBag.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
         for (int i = 0; i < envelopebags.size(); i++) {
-            List<Envelope> envelopes = Envelope.getByBagId(envelopebags.get(i).getId());
+            List<Envelope> envelopes = Envelope.getByTransportMasterIdWithCage(envelopebags.get(i).getId(), cageNo, cageSeal);
             if (envelopebags.get(i).envolpeType.equals("Envelopes")) {
                 for (int j = 0; j < envelopes.size(); j++) {
                     Items collectionSummary = new Items();
@@ -1093,7 +1093,7 @@ public class Job extends Model implements Comparable<Job> {
             }
         }
 
-        List<Box> boxes = Box.getBoxByTransportMasterId(TransportMasterId);
+        List<Box> boxes = Box.getByTransportMasterIdWithCage(TransportMasterId, cageNo , cageSeal);
         for (int i = 0; i < boxes.size(); i++) {
             Items collectionSummary = new Items();
             collectionSummary.setHead("Box");
@@ -1105,7 +1105,7 @@ public class Job extends Model implements Comparable<Job> {
             items.add(collectionSummary);
         }
 
-        List<BoxBag> boxBags = BoxBag.getByTransportMasterId(TransportMasterId);
+        List<BoxBag> boxBags = BoxBag.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
         for (int i = 0; i < boxBags.size(); i++) {
             Items collectionSummary = new Items();
             collectionSummary.setHead("Coin Bag(" + boxBags.get(i).bagcode + ")");
@@ -1534,6 +1534,15 @@ public class Job extends Model implements Comparable<Job> {
         new Delete().from(BoxBag.class)
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();
+
+        new Delete().from(Cage.class)
+                .where("TransportMasterId=?", TransportMasterId)
+                .execute();
+
+        new Delete().from(Wagon.class)
+                .where("TransportMasterId=?", TransportMasterId)
+                .execute();
+
         new Update(Job.class)
                 .set("palletCount=?,isNoCollection=?", 0, 0)
                 .where("TransportMasterId=?", TransportMasterId)

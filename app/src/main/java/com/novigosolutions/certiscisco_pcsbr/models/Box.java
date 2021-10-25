@@ -45,13 +45,13 @@ public class Box extends Model {
                 .execute();
     }
 
-    public static List<Bags> getByTransportMasterIdWithOutCage(int TransportMasterId) {
+    public static List<Box> getByTransportMasterIdWithOutCage(int TransportMasterId) {
         return new Select().from(Box.class)
                 .where("TransportMasterId=? and CageNo IS NULL and CageSeal IS NULL", TransportMasterId)
                 .execute();
     }
 
-    public static List<Bags> getByTransportMasterIdWithCage(int TransportMasterId, String cageNo , String cageSeal) {
+    public static List<Box> getByTransportMasterIdWithCage(int TransportMasterId, String cageNo , String cageSeal) {
         return new Select().from(Box.class)
                 .where("TransportMasterId=? and CageNo=? and CageSeal=?", TransportMasterId, cageNo , cageSeal)
                 .execute();
@@ -107,6 +107,12 @@ public class Box extends Model {
                     .where("id=?", box.getId())
                     .execute();
         }
+    }
+
+    public static void removeByCageNoCageSeal(String cageNo , String cageSeal){
+        new Delete().from(Box.class)
+                .where("CageNo=? AND CageSeal=?", cageNo , cageSeal)
+                .execute();
     }
 
     public static void removeSingle(long id) {

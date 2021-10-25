@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
+import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 
@@ -12,14 +13,19 @@ import java.util.List;
 
 public class CageAdapter extends ExpandableRecyclerViewAdapter<CageViewHolder, ItemsViewHolder> {
 
-    public CageAdapter(List<? extends ExpandableGroup> groups) {
+    DialogResult mDialogResult;
+    boolean isCollection;
+
+    public CageAdapter(List<? extends ExpandableGroup> groups, DialogResult mDialogResult, boolean isCollection) {
         super(groups);
+        this.mDialogResult = mDialogResult;
+        this.isCollection = isCollection;
     }
 
     @Override
     public CageViewHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.expandable_cage, parent, false);
-        return new CageViewHolder(view);
+        return new CageViewHolder(view, parent.getContext());
     }
 
     @Override
@@ -37,6 +43,6 @@ public class CageAdapter extends ExpandableRecyclerViewAdapter<CageViewHolder, I
     @Override
     public void onBindGroupViewHolder(CageViewHolder holder, int flatPosition, ExpandableGroup group) {
         final Cage cage = (Cage) group;
-        holder.setCageTitle(cage);
+        holder.setCageTitle(cage, mDialogResult, isCollection);
     }
 }
