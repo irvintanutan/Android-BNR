@@ -51,6 +51,13 @@ public class Delivery extends Model {
     @Column(name = "CoinSeriesId")
     public int CoinSeriesId;
 
+    @Column(name = "CageNo")
+    public String CageNo;
+
+    @Column(name = "CageSeal")
+    public String CageSeal;
+
+
     public static List<Delivery> getByTransportMasterId(int TransportMasterId) {
         return new Select().from(Delivery.class)
                 .where("TransportMasterId=?", TransportMasterId)
@@ -66,6 +73,20 @@ public class Delivery extends Model {
     public static List<Delivery> getUnSealedByTransportMasterId(int TransportMasterId) {
         return new Select().from(Delivery.class)
                 .where("TransportMasterId=? AND ItemType IN ('BOX','PALLET')", TransportMasterId)
+                .execute();
+    }
+
+    public static List<Delivery> getSealedCageByByTransportMasterId(int TransportMasterId) {
+        return new Select().from(Delivery.class)
+                .where("TransportMasterId=? AND ItemType IN ('BAG','Envelope In Bag','Envelopes','Coin Box') AND " +
+                        "(CageNo IS NULL OR CageNo == '') AND (CageSeal IS NULL OR CageSeal == '')", TransportMasterId)
+                .execute();
+    }
+
+    public static List<Delivery> getUnSealedCageByTransportMasterId(int TransportMasterId) {
+        return new Select().from(Delivery.class)
+                .where("TransportMasterId=? AND ItemType IN ('BOX','PALLET') AND " +
+                        "(CageNo IS NULL OR CageNo == '') AND (CageSeal IS NULL OR CageSeal == '')", TransportMasterId)
                 .execute();
     }
 
@@ -123,6 +144,15 @@ public class Delivery extends Model {
         return deliveries;
     }
 
+    public static List<Delivery> getPendingCageSealedByPointId(String GroupKey, String BranchCode , String PFunctionalCode, String startTime, String endTime) {
+        List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode, startTime , endTime);
+        List<Delivery> deliveries = new ArrayList<>();
+        for (int i = 0; i < jobs.size(); i++) {
+            deliveries.addAll(getSealedCageByByTransportMasterId(jobs.get(i).TransportMasterId));
+        }
+        return deliveries;
+    }
+
     public static List<Delivery> distinct(List<Delivery> deliveries) {
         List<Delivery> result = new ArrayList<>();
         List<String> checker = new ArrayList<>();
@@ -163,6 +193,15 @@ public class Delivery extends Model {
         List<Delivery> deliveries = new ArrayList<>();
         for (int i = 0; i < jobs.size(); i++) {
             deliveries.addAll(getUnSealedByTransportMasterId(jobs.get(i).TransportMasterId));
+        }
+        return deliveries;
+    }
+
+    public static List<Delivery> getPendingCageUnSealedByPointId(String GroupKey, String BranchCode , String PFunctionalCode, String startTime, String endTime) {
+        List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, BranchCode , PFunctionalCode, startTime , endTime);
+        List<Delivery> deliveries = new ArrayList<>();
+        for (int i = 0; i < jobs.size(); i++) {
+            deliveries.addAll(getUnSealedCageByTransportMasterId(jobs.get(i).TransportMasterId));
         }
         return deliveries;
     }

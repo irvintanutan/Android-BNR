@@ -276,6 +276,11 @@ public class SyncDatabase {
                 Delivery delivery = gson.fromJson(deliveryobject.toString(), Delivery.class);
                 delivery.save();
 
+                String cageNo = deliveryobject.getString("CageNo").isEmpty() || deliveryobject.getString("CageNo") == null ?
+                        null : deliveryobject.getString("CageNo");
+                String cageSeal = deliveryobject.getString("CageSeal").isEmpty() || deliveryobject.getString("CageSeal") == null ?
+                        null : deliveryobject.getString("CageSeal");
+
                 String ItemType = deliveryobject.getString("ItemType");
                 switch (ItemType) {
                     case "BAG":
@@ -283,6 +288,8 @@ public class SyncDatabase {
                         bag.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         bag.firstbarcode = deliveryobject.getString("SealNo");
                         bag.secondbarcode = "";
+                        bag.CageNo = cageNo;
+                        bag.CageSeal = cageSeal;
                         bag.save();
                         break;
 
@@ -291,6 +298,8 @@ public class SyncDatabase {
                         wagon.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         wagon.firstbarcode = deliveryobject.getString("SealNo");
                         wagon.secondbarcode = "";
+                        wagon.CageNo = cageNo;
+                        wagon.CageSeal = cageSeal;
                         wagon.save();
                         break;
 
@@ -300,17 +309,23 @@ public class SyncDatabase {
                             Envelope envelope = new Envelope();
                             envelope.bagid = envelopeBags.get(0).getId();
                             envelope.barcode = deliveryobject.getString("SealNo");
+                            envelope.CageNo = cageNo;
+                            envelope.CageSeal = cageSeal;
                             envelope.save();
                         } else {
                             EnvelopeBag envelopeBag = new EnvelopeBag();
                             envelopeBag.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                             envelopeBag.envolpeType = "Envelopes";
                             envelopeBag.bagcode = "none";
+                            envelopeBag.CageNo = cageNo;
+                            envelopeBag.CageSeal = cageSeal;
                             long id = envelopeBag.save();
                             //add here if envelope array comes
                             Envelope envelope = new Envelope();
                             envelope.bagid = id;
                             envelope.barcode = deliveryobject.getString("SealNo");
+                            envelope.CageNo = deliveryobject.getString("CageNo");
+                            envelope.CageSeal = deliveryobject.getString("CageSeal");
                             envelope.save();
                         }
                         break;
@@ -320,6 +335,8 @@ public class SyncDatabase {
                         envelopeBag2.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         envelopeBag2.envolpeType = "EnvelopeBag";
                         envelopeBag2.bagcode = deliveryobject.getString("SealNo");
+                        envelopeBag2.CageNo = cageNo;
+                        envelopeBag2.CageSeal = cageSeal;
                         envelopeBag2.save();
                         long id = envelopeBag2.save();
 
@@ -335,6 +352,8 @@ public class SyncDatabase {
                                     Envelope envelope = new Envelope();
                                     envelope.bagid = id;
                                     envelope.barcode = envelopList.get(i);
+                                    envelope.CageNo = cageNo;
+                                    envelope.CageSeal = cageSeal;
                                     envelope.save();
                                 }
                             }
@@ -343,7 +362,10 @@ public class SyncDatabase {
 
                     case "BOX":
                         // Box.updateCount(deliveryobject.getInt("TransportMasterId"),deliveryobject.getInt("ProductID"), deliveryobject.getString("Denomination"),deliveryobject.getInt("Qty"));
-                        Box.updateCountNew(deliveryobject.getInt("TransportMasterId"), deliveryobject.getInt("ProductID"), deliveryobject.getString("Denomination"), deliveryobject.getInt("Qty"), deliveryobject.getString("CoinSeries"), deliveryobject.getInt("CoinSeriesId"));
+                        Box.updateCountNew(deliveryobject.getInt("TransportMasterId"), deliveryobject.getInt("ProductID"),
+                                deliveryobject.getString("Denomination"), deliveryobject.getInt("Qty"),
+                                deliveryobject.getString("CoinSeries"), deliveryobject.getInt("CoinSeriesId"), deliveryobject.getString("CageNo"),
+                                deliveryobject.getString("CageSeal"));
                         break;
 
                     case "Coin Box":
@@ -354,22 +376,31 @@ public class SyncDatabase {
                         boxBag.ProductName = deliveryobject.getString("Denomination");
                         boxBag.CoinSeriesId = deliveryobject.getInt("CoinSeriesId");
                         boxBag.CoinSeries = deliveryobject.getString("CoinSeries");
+                        boxBag.CageNo = cageNo;
+                        boxBag.CageSeal = cageSeal;
                         boxBag.save();
                         break;
 
                     case "PALLET":
                         Job.updatePalletCount(deliveryobject.getInt("TransportMasterId"), deliveryobject.getInt("Qty"));
                         break;
-
-                    case "CAGE":
-                        Cage cage = new Cage();
-                        cage.TransportMasterId = deliveryobject.getInt("TransportMasterId");
-                        cage.CageNo = deliveryobject.getString("CageNo");
-                        cage.CageSeal = deliveryobject.getString("CageSeal");
-                        cage.save();
                 }
 
 
+            }
+
+            JSONArray cageArray = jobObject.getJSONArray("CageList");
+            for (int a = 0; a < cageArray.length(); a++) {
+                JSONObject object = cageArray.getJSONObject(a);
+                if (Cage.getByTransportMasterId(job.TransportMasterId).size() > 0) {
+                    continue;
+                }
+
+                Cage cage = new Cage();
+                cage.CageSeal = object.getString("CageSeal");
+                cage.CageNo = object.getString("CageNo");
+                cage.TransportMasterId = job.TransportMasterId;
+                cage.save();
             }
         } catch (Exception e) {
             e.printStackTrace();

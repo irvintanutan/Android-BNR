@@ -1,5 +1,6 @@
 package com.novigosolutions.certiscisco_pcsbr.zebra;
 
+import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 
 import java.util.List;
@@ -128,7 +129,32 @@ public class Template {
                     "</tr>";
         }
 
-        if(countListSize==0){
+        List<CageContent> cageContentList = print.getCageContentList();
+        int cageCountListSize = (cageContentList != null && !cageContentList.isEmpty()) ? cageContentList.size() : 0;
+        if (cageCountListSize > 0) {
+           html += "<br><br>         <tr>   <th>" + "Cage No" + "</th><th>Cage Seal</th><th>Items</th></tr>\n";
+        }
+        for (int i = 0; i < cageCountListSize; i++) {
+            html += "<tr>" +
+                    "<td>" + cageContentList.get(i).getCageNo() + "</td>" +
+                    "<td><center>" + cageContentList.get(i).getCageSeal() + "</center></td>" +
+                    "<td style=\"font-size: 20px;text-align: left;\" >";
+
+            List<Items> sealNoList = cageContentList.get(i).getSealNoList();
+            int sealNoListSize = (sealNoList != null && !sealNoList.isEmpty()) ? sealNoList.size() : 0;
+
+            for (int j = 0; j < sealNoListSize; j++) {
+                if(j > 0){
+                    html += "<br>";
+                }
+                html += sealNoList.get(j).getHead() + "<br>     (" + sealNoList.get(j).getSummary() +")";
+            }
+
+            html += "</td>" +
+                    "</tr>";
+        }
+
+        if(countListSize==0 && cageCountListSize == 0){
             html+=" <td colspan=\"3\"><br><label><center>";
             if(print.isCollection())
             {

@@ -118,10 +118,10 @@ public class APICaller {
         process(Constants.SYNC, call, callback);
     }
 
-    public void SubmitBulkCollection(ApiCallback callback, Context context, String GroupKey, String BranchCode, String PFunctionalCode) {
+    public void SubmitBulkCollection(ApiCallback callback, Context context, String GroupKey, String BranchCode, String PFunctionalCode, String actualFromTime , String actualToTime) {
         this.context = context;
-       // Branch.getCollection(GroupKey, context, BranchCode , PFunctionalCode);
-        Call<ResponseBody> call = getService().SubmitBulkCollection(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getCollection(GroupKey, context, BranchCode , PFunctionalCode));
+        //Branch.getCollection(GroupKey, context, BranchCode , PFunctionalCode, actualFromTime, actualToTime);
+        Call<ResponseBody> call = getService().SubmitBulkCollection(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getCollection(GroupKey, context, BranchCode , PFunctionalCode, actualFromTime, actualToTime));
         process(Constants.SUBMITBULKCOLLECTION, call, callback);
     }
 

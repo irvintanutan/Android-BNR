@@ -60,7 +60,7 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
     List<String> bar_code_list = new ArrayList<>();
     StringDeleteAdapter listAdapter;
     ImageView imgCageNo, imgCageSeal;
-    Button btnScanCageNo, btnScanCageSeal, cancel , confirm;
+    Button btnScanCageNo, btnScanCageSeal, cancel, confirm;
     String scanType;
     String noBarcode = "0000000000000";
 
@@ -110,7 +110,7 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
                     ((BarCodeScanActivity) context).scansoft();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(context , "Barcode Not Recognized" , Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Barcode Not Recognized", Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.btnScanCageSeal:
@@ -134,7 +134,7 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
 
     private void saveToCage() {
         if (txt_cage_seal.getText().toString().equals(noBarcode) || txt_cage_no.getText().toString().equals(noBarcode)) {
-            Toast.makeText(context , "No Barcode Scanned" , Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "No Barcode Scanned", Toast.LENGTH_LONG).show();
         } else {
 
             String cageNo = txt_cage_no.getText().toString();
@@ -146,7 +146,7 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
             cage.CageNo = cageNo;
             cage.save();
 
-            Job.saveItemsToCage(TransportMasterId , cageNo , cageSeal);
+            Job.saveItemsToCage(TransportMasterId, cageNo, cageSeal);
 
             if (mDialogResult != null) {
                 mDialogResult.onResult();
@@ -185,29 +185,44 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
 
     @Override
     public void onDataScanned(String data) {
-        if (scanType.equals("CageNo")) {
-            txt_cage_no.setText(data);
-            MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
-            try {
-                BitMatrix bitMatrix = multiFormatWriter.encode(data, BarcodeFormat.CODE_128, 150, 50);
-                BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
-                imgCageNo.setImageBitmap(bitmap);
-            } catch (WriterException e) {
-                e.printStackTrace();
-            }
-        } else {
-            txt_cage_seal.setText(data);
-            MultiFormatWriter multiFormatWriter2 = new MultiFormatWriter();
-            try {
-                BitMatrix bitMatrix = multiFormatWriter2.encode(data, BarcodeFormat.CODE_128, 150, 50);
-                BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
-                imgCageSeal.setImageBitmap(bitmap);
-            } catch (WriterException e) {
-                e.printStackTrace();
+        if (data.isEmpty()) {
+            ((CollectionActivity) context).invalidbarcodealert("Empty");
+        } else if (isThereInList(data, scanType) || Branch.isExist(data))
+            ((CollectionActivity) context).invalidbarcodealert("Duplicate");
+        else {
+            if (scanType.equals("CageNo")) {
+                txt_cage_no.setText(data);
+                MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+                try {
+                    BitMatrix bitMatrix = multiFormatWriter.encode(data, BarcodeFormat.CODE_128, 150, 50);
+                    BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+                    Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
+                    imgCageNo.setImageBitmap(bitmap);
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                txt_cage_seal.setText(data);
+                MultiFormatWriter multiFormatWriter2 = new MultiFormatWriter();
+                try {
+                    BitMatrix bitMatrix = multiFormatWriter2.encode(data, BarcodeFormat.CODE_128, 150, 50);
+                    BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+                    Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
+                    imgCageSeal.setImageBitmap(bitmap);
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
             }
         }
+    }
+
+    private boolean isThereInList(String data, String scanType) {
+        if (scanType.equals("CageNo") && data.equals(txt_cage_seal.getText().toString()))
+            return true;
+        else if (scanType.equals("CageSeal") && data.equals(txt_cage_no.getText().toString()))
+            return true;
+
+        return false;
     }
 
     @Override

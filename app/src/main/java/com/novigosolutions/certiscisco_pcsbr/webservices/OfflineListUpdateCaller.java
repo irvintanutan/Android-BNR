@@ -43,7 +43,7 @@ public class OfflineListUpdateCaller {
             Call<ResponseBody> call = null;
             if (job.IsCollectionOrder) {
                 isCollectionUpdating = true;
-                call = retrofit.create(CertisCISCOServices.class).SubmitBulkCollection(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getCollection(job.GroupKey, context, job.BranchCode, job.PFunctionalCode));
+                call = retrofit.create(CertisCISCOServices.class).SubmitBulkCollection(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getCollection(job.GroupKey, context, job.BranchCode, job.PFunctionalCode, job.ActualFromTime, job.ActualToTime));
             } else {
                 isCollectionUpdating = false;
                 call = retrofit.create(CertisCISCOServices.class).SubmitDeliveryList(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getDelivery(job.GroupKey, context, job.BranchCode, job.PFunctionalCode));

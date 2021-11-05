@@ -339,6 +339,12 @@ public class Branch extends Model implements Comparable<Branch> {
         Wagon wagon = new Select().from(Wagon.class)
                 .where("firstbarcode=? OR secondbarcode=?", ScanValue, ScanValue)
                 .executeSingle();
+
+        Cage cage = new Select().from(Cage.class)
+                .where("CageNo=? or CageSeal=?", ScanValue , ScanValue)
+                .executeSingle();
+        if (cage != null) return true;
+
         if (wagon != null) return true;
 
         BoxBag boxBag = new Select().from(BoxBag.class)
@@ -534,8 +540,8 @@ public class Branch extends Model implements Comparable<Branch> {
 //        return false;
 //    }
 
-    public static JsonObject getCollection(String GroupKey, Context context, String BranchCode, String PFunctionalCode) {
-        List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey, BranchCode, PFunctionalCode);
+    public static JsonObject getCollection(String GroupKey, Context context, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
+        List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime);
         String receiptNo = "";
         //List<Job> jobs = Job.getCollectionJobsOfPoint(PointId);
         JsonObject jsonObject = new JsonObject();
@@ -563,6 +569,8 @@ public class Branch extends Model implements Comparable<Branch> {
                 Detail.addProperty("DenoId", 0);
                 Detail.addProperty("SealNo1", bag.firstbarcode);
                 Detail.addProperty("SealNo2", bag.secondbarcode);
+                Detail.addProperty("CageNo", bag.CageNo);
+                Detail.addProperty("CageSeal", bag.CageSeal);
                 Detail.addProperty("Qty", 1);
                 Detail.addProperty("CoinSeriesId", 0);
                 Detail.add("EnvelopeSeal", null);
@@ -577,6 +585,8 @@ public class Branch extends Model implements Comparable<Branch> {
                 Detail.addProperty("DenoId", 0);
                 Detail.addProperty("SealNo1", wagon.firstbarcode);
                 Detail.addProperty("SealNo2", wagon.secondbarcode);
+                Detail.addProperty("CageNo", wagon.CageNo);
+                Detail.addProperty("CageSeal", wagon.CageSeal);
                 Detail.addProperty("Qty", 1);
                 Detail.addProperty("CoinSeriesId", 0);
                 Detail.add("EnvelopeSeal", null);
@@ -594,6 +604,8 @@ public class Branch extends Model implements Comparable<Branch> {
                         Detail.addProperty("DenoId", 0);
                         Detail.addProperty("SealNo1", envelopes.get(k).barcode);
                         Detail.addProperty("SealNo2", "");
+                        Detail.addProperty("CageNo", envelopes.get(k).CageNo);
+                        Detail.addProperty("CageSeal", envelopes.get(k).CageSeal);
                         Detail.addProperty("Qty", 1);
                         Detail.addProperty("CoinSeriesId", 0);
                         Detail.add("EnvelopeSeal", null);
@@ -609,6 +621,8 @@ public class Branch extends Model implements Comparable<Branch> {
                     Detail.addProperty("DenoId", 0);
                     Detail.addProperty("SealNo1", envelopeBag.bagcode);
                     Detail.addProperty("SealNo2", "");
+                    Detail.addProperty("CageNo", envelopeBag.CageNo);
+                    Detail.addProperty("CageSeal", envelopeBag.CageSeal);
                     Detail.addProperty("Qty", envelopes.size());
                     Detail.addProperty("CoinSeriesId", 0);
                     Detail.add("EnvelopeSeal", seals);
@@ -624,6 +638,8 @@ public class Branch extends Model implements Comparable<Branch> {
                 Detail.addProperty("DenoId", box.ProductId);
                 Detail.addProperty("SealNo1", "");
                 Detail.addProperty("SealNo2", "");
+                Detail.addProperty("CageNo", box.CageNo);
+                Detail.addProperty("CageSeal", box.CageSeal);
                 Detail.addProperty("Qty", box.count);
                 Detail.addProperty("CoinSeriesId", box.CoinSeriesId);
                 Detail.add("EnvelopeSeal", null);
@@ -638,6 +654,8 @@ public class Branch extends Model implements Comparable<Branch> {
                 Detail.addProperty("DenoId", boxBag.ProductId);
                 Detail.addProperty("SealNo1", boxBag.bagcode);
                 Detail.addProperty("SealNo2", "");
+                Detail.addProperty("CageNo", boxBag.CageNo);
+                Detail.addProperty("CageSeal", boxBag.CageSeal);
                 Detail.addProperty("Qty", 1);
                 Detail.addProperty("CoinSeriesId", boxBag.CoinSeriesId);
                 Detail.add("EnvelopeSeal", null);
@@ -725,6 +743,7 @@ public class Branch extends Model implements Comparable<Branch> {
         Bags.remove();
         Wagon.remove();
         Box.remove();
+        Cage.remove();
         BoxBag.remove();
         Currency.remove();
         Delivery.remove();

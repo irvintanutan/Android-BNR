@@ -88,7 +88,7 @@ public class Box extends Model {
         }
     }
 
-    public static void updateCountNew(int TransportMasterId, int ProductId, String productName, int count,String description,int coinseriesid) {
+    public static void updateCountNew(int TransportMasterId, int ProductId, String productName, int count,String description,int coinseriesid, String cageNo , String cageSeal) {
         Box box = new Select().from(Box.class)
                 .where("TransportMasterId=? AND ProductId=? AND CoinSeriesId=?",TransportMasterId, ProductId,coinseriesid)
                 .executeSingle();
@@ -100,12 +100,23 @@ public class Box extends Model {
             newbox.count = count;
             newbox.CoinSeries=description;
             newbox.CoinSeriesId=coinseriesid;
+            if (cageNo != null && cageSeal != null) {
+                newbox.CageNo = cageNo;
+                newbox.CageSeal = cageSeal;
+            }
             newbox.save();
         } else {
-            new Update(Box.class)
-                    .set("count=? ,CoinSeries=? ,CoinSeriesId=?", count,description,coinseriesid)
-                    .where("id=?", box.getId())
-                    .execute();
+            if (cageNo != null && cageSeal != null) {
+                new Update(Box.class)
+                        .set("count=? ,CoinSeries=? ,CoinSeriesId=?, CageNo=? , CageSeal=?", count, description, coinseriesid, cageNo, cageSeal)
+                        .where("id=?", box.getId())
+                        .execute();
+            } else {
+                new Update(Box.class)
+                        .set("count=? ,CoinSeries=? ,CoinSeriesId=?", count, description, coinseriesid)
+                        .where("id=?", box.getId())
+                        .execute();
+            }
         }
     }
 

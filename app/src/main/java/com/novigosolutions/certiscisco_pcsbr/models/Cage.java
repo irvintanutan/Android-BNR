@@ -27,15 +27,27 @@ public class Cage extends Model {
                 .execute();
     }
 
-    public static void removeByCageNoCageSeal(String cageNo , String cageSeal){
+    public static List<Cage> getAll() {
+        return new Select().from(Cage.class)
+                .execute();
+    }
+
+    public static List<Cage> cageExist(String cageNo, String cageSeal) {
+        return new Select().from(Cage.class)
+                .where("CageNo=? AND CageSeal=?", cageNo, cageSeal)
+                .execute();
+    }
+
+
+    public static void removeByCageNoCageSeal(String cageNo, String cageSeal) {
         new Delete().from(Cage.class)
-                .where("CageNo=? AND CageSeal=?", cageNo , cageSeal)
+                .where("CageNo=? AND CageSeal=?", cageNo, cageSeal)
                 .execute();
     }
 
     public static void removeSingle(long id) {
         new Delete().from(Cage.class)
-                .where("id=?",id)
+                .where("id=?", id)
                 .execute();
     }
 

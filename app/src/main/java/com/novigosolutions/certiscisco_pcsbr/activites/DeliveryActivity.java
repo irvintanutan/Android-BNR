@@ -19,6 +19,10 @@ import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.BarCodeScanActivi
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.PostponeDialog;
 import com.novigosolutions.certiscisco_pcsbr.adapters.SealedListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.UnsealedListAdapter;
+import com.novigosolutions.certiscisco_pcsbr.expandable.Cage;
+import com.novigosolutions.certiscisco_pcsbr.expandable.CageAdapter;
+import com.novigosolutions.certiscisco_pcsbr.expandable.CageListAdapter;
+import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.IOnScannerData;
@@ -26,6 +30,7 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
+import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
@@ -36,6 +41,7 @@ import com.novigosolutions.certiscisco_pcsbr.zebra.Print;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,7 +62,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
 //    int PointId;
     int TransportMasterId;
     String GroupKey;
-    private RecyclerView recyclerViewbag, recyclerViewbox;
+    private RecyclerView recyclerViewbag, recyclerViewbox, recyclerViewCage;
     private SealedListAdapter sealedListAdapter;
     private UnsealedListAdapter unsealedListAdapter;
     List<Delivery> bagList;
@@ -67,6 +73,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
     EditText editText;
     View l_manual_entry;
     Job j;
+    CageListAdapter cageListAdapter;
 
     // private EMDKWrapper emdkWrapper = null;
     @SuppressLint("NewApi")
@@ -94,6 +101,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
 
         recyclerViewbag = findViewById(R.id.recyclerviewbag);
         recyclerViewbox = findViewById(R.id.recyclerviewbox);
+        recyclerViewCage = findViewById(R.id.recyclerviewCage);
         editText = findViewById(R.id.edittext);
         btn_scan = findViewById(R.id.btn_scan);
         btn_scan.setOnClickListener(this);
@@ -119,12 +127,12 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
 //            bagList = Delivery.getPendingSealedByTransportId(Job.getSingleByOrderNo(j.DependentOrderId).TransportMasterId);
 //            boxList = Delivery.getPendingUnSealedByTransportId(Job.getSingleByOrderNo(j.DependentOrderId).TransportMasterId);
 //        }
-        List<Delivery> list = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime);
+        List<Delivery> list = Delivery.getPendingCageSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime);
         bagList = list.stream().filter( distinctByKey(p -> p.SealNo) )
                 .collect( Collectors.toList() );
 
         setSealedScannedCount();
-        boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode, actualFromTime , actualToTime);
+        boxList = Delivery.getPendingCageUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode, actualFromTime , actualToTime);
         recyclerViewbag.setLayoutManager(mLayoutManager);
         recyclerViewbag.setItemAnimator(new DefaultItemAnimator());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewbag.getContext(), DividerItemDecoration.VERTICAL);
@@ -221,6 +229,24 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         if (Preferences.getBoolean("EnableManualEntry", this) || Branch.getSingle(GroupKey).EnableManualEntry) {
             enableManualEntry();
         }
+
+        setCageListView();
+    }
+
+    public void setCageListView() {
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerViewCage.setLayoutManager(mLayoutManager);
+        recyclerViewCage.setItemAnimator(new DefaultItemAnimator());
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewCage.getContext(), DividerItemDecoration.VERTICAL);
+        recyclerViewCage.addItemDecoration(dividerItemDecoration);
+
+
+      //  Toast.makeText(getApplicationContext() , "ID : " + TransportMasterId)
+
+         List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(TransportMasterId);
+
+        cageListAdapter = new CageListAdapter(cageList);
+        recyclerViewCage.setAdapter(cageListAdapter);
     }
 
     @SuppressLint("NewApi")

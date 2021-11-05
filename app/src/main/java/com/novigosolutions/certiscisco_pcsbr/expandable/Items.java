@@ -4,12 +4,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Items implements Parcelable {
+    public Long id;
     public String head;
     public String summary;
 
-    public Items(String head, String summary) {
+    public Items(String head, String summary, Long id) {
         this.summary = summary;
         this.head = head;
+        this.id = id;
     }
 
     public Items() {
@@ -19,6 +21,14 @@ public class Items implements Parcelable {
     protected Items(Parcel in) {
         head = in.readString();
         summary = in.readString();
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId(){
+        return this.id;
     }
 
     public String getHead() {

@@ -498,7 +498,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
 
                         if (NetworkUtil.getConnectivityStatusString(this)) {
 //                        showProgressDialog("Loading...");
-                            APICaller.instance().SubmitBulkCollection(this, this, GroupKey, BranchCode, PFunctionalCode);
+                            APICaller.instance().SubmitBulkCollection(this, this, GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
                         } else {
 //                        Branch.setColOfflineStatus(GroupKey, 1);
                             Job.setOfflineSaved(TransportMasterId, 1);

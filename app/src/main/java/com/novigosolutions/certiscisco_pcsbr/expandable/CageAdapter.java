@@ -31,13 +31,13 @@ public class CageAdapter extends ExpandableRecyclerViewAdapter<CageViewHolder, I
     @Override
     public ItemsViewHolder onCreateChildViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.expandable_items, parent, false);
-        return new ItemsViewHolder(view);
+        return new ItemsViewHolder(view, parent.getContext());
     }
 
     @Override
     public void onBindChildViewHolder(ItemsViewHolder holder, int flatPosition, ExpandableGroup group, int childIndex) {
         final Items item = (Items) group.getItems().get(childIndex);
-        holder.setItemsDetails(item);
+        holder.setItemsDetails(item, mDialogResult, isCollection);
     }
 
     @Override
