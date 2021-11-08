@@ -7,11 +7,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,30 +22,24 @@ import com.novigosolutions.certiscisco_pcsbr.adapters.SealedListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.UnsealedListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.constant.ClickListener;
 import com.novigosolutions.certiscisco_pcsbr.constant.RecyclerTouchListener;
-import com.novigosolutions.certiscisco_pcsbr.expandable.CageAdapter;
 import com.novigosolutions.certiscisco_pcsbr.expandable.CageListAdapter;
-import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.IOnScannerData;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
-import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
-import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
-import com.novigosolutions.certiscisco_pcsbr.zebra.Print;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,8 +47,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -62,40 +54,44 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerData, View.OnClickListener, ApiCallback, DialogResult, NetworkChangekListener, UnsealedListAdapter.UnsealedClickCallback {
+public class CageDeliveryActivity extends BarCodeScanActivity implements IOnScannerData, View.OnClickListener, ApiCallback, DialogResult, NetworkChangekListener, UnsealedListAdapter.UnsealedClickCallback {
     TextView txt_customer_name, txt_functional_code, txt_branch_name;// txt_street_tower, txt_town_pin;
     TextView txt_branch_address, txt_order_remarks, txt_sealed_item_count, txt_unsealed_item_count;
     //    int PointId;
     int TransportMasterId;
-    String GroupKey;
-    private RecyclerView recyclerViewbag, recyclerViewbox, recyclerViewCage;
+    String GroupKey, CageNo, CageSeal;
+    private RecyclerView recyclerViewbag, recyclerViewbox;
     private SealedListAdapter sealedListAdapter;
     private UnsealedListAdapter unsealedListAdapter;
     List<Delivery> bagList;
     List<Delivery> boxList;
     String BranchCode, PFunctionalCode, actualFromTime, actualToTime;
     ImageView imgnetwork, img_manual_entry;
-    Button btn_scan, btn_submit, btn_ok, btn_postpone;
+    Button btn_scan, btn_ok, btnNext;
     EditText editText;
     View l_manual_entry;
     Job j;
-    CageListAdapter cageListAdapter;
+    LinearLayout cageNoLayout, cageSealLayout;
+    TextView cageNoText, cageSealText;
+    Cage cage;
 
     // private EMDKWrapper emdkWrapper = null;
     @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_delivery);
+        setContentView(R.layout.activity_cage_delivery);
         setuptoolbar();
 //        if (android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.contains("Motorola Solutions")) {
 //            emdkWrapper = new EMDKWrapper(this);
-//        }
+//        }    
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
 //            PointId = extras.getInt("PointId");
             TransportMasterId = extras.getInt("TransportMasterId");
             GroupKey = extras.getString("GroupKey");
+            CageSeal = extras.getString("CageSeal");
+            CageNo = extras.getString("CageNo");
         }
 
         j = Job.getSingle(TransportMasterId);
@@ -105,22 +101,27 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         actualFromTime = j.ActualFromTime;
         actualToTime = j.ActualToTime;
 
+
+        cageNoLayout = findViewById(R.id.cageNoContainer);
+        cageSealLayout = findViewById(R.id.cageSealContainer);
+        cageNoText = findViewById(R.id.cageNoText);
+        cageSealText = findViewById(R.id.cageSealText);
+
+        cageNoText.setText("Cage No :\t\t\t\t\t" + CageNo);
+        cageSealText.setText("Cage Seal :\t\t\t\t\t" + CageSeal);
+
         recyclerViewbag = findViewById(R.id.recyclerviewbag);
         recyclerViewbox = findViewById(R.id.recyclerviewbox);
-        recyclerViewCage = findViewById(R.id.recyclerviewCage);
         editText = findViewById(R.id.edittext);
         btn_scan = findViewById(R.id.btn_scan);
+        btnNext = findViewById(R.id.btn_next);
+        btnNext.setOnClickListener(this);
         btn_scan.setOnClickListener(this);
         img_manual_entry = findViewById(R.id.img_manual_entry);
         l_manual_entry = findViewById(R.id.l_manual_entry);
         img_manual_entry.setOnClickListener(this);
-        btn_submit = findViewById(R.id.btn_submit);
-        btn_submit.setOnClickListener(this);
         btn_ok = findViewById(R.id.btn_ok);
         btn_ok.setOnClickListener(this);
-
-        btn_postpone = findViewById(R.id.btn_postpone);
-        btn_postpone.setOnClickListener(this);
         txt_sealed_item_count = (TextView) findViewById(R.id.sealedItemCount);
         txt_unsealed_item_count = (TextView) findViewById(R.id.unsealedItemCount);
 
@@ -133,12 +134,12 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
 //            bagList = Delivery.getPendingSealedByTransportId(Job.getSingleByOrderNo(j.DependentOrderId).TransportMasterId);
 //            boxList = Delivery.getPendingUnSealedByTransportId(Job.getSingleByOrderNo(j.DependentOrderId).TransportMasterId);
 //        }
-        List<Delivery> list = Delivery.getPendingCageSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
+        List<Delivery> list = Delivery.getSealedCageDeliveryItems(TransportMasterId, CageNo, CageSeal);
         bagList = list.stream().filter(distinctByKey(p -> p.SealNo))
                 .collect(Collectors.toList());
 
         setSealedScannedCount();
-        boxList = Delivery.getPendingCageUnSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
+        boxList = Delivery.getUnSealedCageDeliveryItems(TransportMasterId, CageNo, CageSeal);
         recyclerViewbag.setLayoutManager(mLayoutManager);
         recyclerViewbag.setItemAnimator(new DefaultItemAnimator());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewbag.getContext(), DividerItemDecoration.VERTICAL);
@@ -154,7 +155,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         DividerItemDecoration dividerItemDecoration2 = new DividerItemDecoration(recyclerViewbox.getContext(), DividerItemDecoration.VERTICAL);
         recyclerViewbox.addItemDecoration(dividerItemDecoration2);
         unsealedListAdapter = new UnsealedListAdapter(boxList);
-        unsealedListAdapter.setUnsealedClickCallback(DeliveryActivity.this);
+        unsealedListAdapter.setUnsealedClickCallback(CageDeliveryActivity.this);
         recyclerViewbox.setAdapter(unsealedListAdapter);
         txt_customer_name = (TextView) findViewById(R.id.txt_customer_name);
         txt_functional_code = (TextView) findViewById(R.id.txt_functional_code);
@@ -237,35 +238,11 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         }
 
         setCageListView();
+        setCageBackgroundColor();
     }
 
     public void setCageListView() {
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerViewCage.setLayoutManager(mLayoutManager);
-        recyclerViewCage.setItemAnimator(new DefaultItemAnimator());
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewCage.getContext(), DividerItemDecoration.VERTICAL);
-        recyclerViewCage.addItemDecoration(dividerItemDecoration);
-        List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(TransportMasterId);
-        cageListAdapter = new CageListAdapter(cageList);
-        recyclerViewCage.setAdapter(cageListAdapter);
-        recyclerViewCage.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerViewCage, new ClickListener() {
 
-            @Override
-            public void onClick(View view, int position) {
-                Cage cage = cageList.get(position);
-                Intent intent = new Intent(DeliveryActivity.this , CageDeliveryActivity.class);
-                intent.putExtra("CageNo" , cage.CageNo);
-                intent.putExtra("CageSeal" , cage.CageSeal);
-                intent.putExtra("TransportMasterId" , TransportMasterId);
-                intent.putExtra("GroupKey", GroupKey);
-                startActivity(intent);
-                finish();
-            }
-
-            @Override
-            public void onLongClick(View view, final int position) {
-            }
-        }));
     }
 
     @SuppressLint("NewApi")
@@ -323,7 +300,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
 
     @Override
     public void onBackPressed() {
-        alert();
+        back();
     }
 
     @Override
@@ -376,6 +353,10 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
                     editText.setText("");
                 }
                 break;
+
+            case R.id.btn_next:
+                back();
+                break;
         }
     }
 
@@ -401,19 +382,40 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         if (data.isEmpty()) {
             invalidbarcodealert("Empty");
         } else {
-            if (Delivery.setScanned(GroupKey, data, BranchCode, PFunctionalCode, actualFromTime, actualToTime)) {
-                List<Delivery> templist = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
-                templist = templist.stream().filter(distinctByKey(p -> p.SealNo))
-                        .collect(Collectors.toList());
-                bagList.clear();
-                bagList.addAll(templist);
-                sealedListAdapter.notifyDataSetChanged();
-                setSealedScannedCount();
-            } else {
-                invalidbarcodealert("Invalid");
-            }
-        }
 
+            if (Cage.isCageScanned(TransportMasterId, CageNo, CageSeal)) {
+                if (Delivery.setCageItemScanned(data, TransportMasterId , CageNo, CageSeal)) {
+                    List<Delivery> templist = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
+                    templist = templist.stream().filter(distinctByKey(p -> p.SealNo))
+                            .collect(Collectors.toList());
+                    bagList.clear();
+                    bagList.addAll(templist);
+                    sealedListAdapter.notifyDataSetChanged();
+                    setSealedScannedCount();
+                } else {
+                    invalidbarcodealert("Invalid");
+                }
+            } else {
+                if (data.equals(CageNo)) {
+                    Cage.setCageNoScanned(TransportMasterId, CageNo, CageSeal);
+                } else if (data.equals(CageSeal)) {
+                    Cage.setCageSealScanned(TransportMasterId, CageNo, CageSeal);
+                } else {
+                    invalidbarcodealert("Please scan the Cage No and Cage Seal to proceed");
+                }
+            }
+
+        }
+        setCageBackgroundColor();
+    }
+
+    void back() {
+        Intent intent = new Intent(CageDeliveryActivity.this, DeliveryActivity.class);
+        intent.putExtra("TransportMasterId", TransportMasterId);
+        intent.putExtra("GroupKey", GroupKey);
+        startActivity(intent);
+        finish();
+        ;
     }
 
     private void alert() {
@@ -528,5 +530,14 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
     public void onSelect() {
         //updat the counter
         setUnsealedScannedCount();
+    }
+
+
+    private void setCageBackgroundColor() {
+        cage = Cage.getSingle(TransportMasterId, CageNo, CageSeal);
+        if (cage.IsCageNoScanned)
+            cageNoLayout.setBackgroundColor(getResources().getColor(R.color.colorGreen));
+        if (cage.IsCageSealScanned)
+            cageSealLayout.setBackgroundColor(getResources().getColor(R.color.colorGreen));
     }
 }

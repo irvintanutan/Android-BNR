@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
+import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 
@@ -18,9 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 public class CageListAdapter extends RecyclerView.Adapter<CageListAdapter.MyViewHolder> {
     List<Cage> cages;
     String colorGreen = "#43A047";
-    String colorWhite = "#FFFFFF";
+    String colorYellow = "#FFEB3B";
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder  {
         TextView txt_seal;
         LinearLayout llmain;
 
@@ -29,6 +30,7 @@ public class CageListAdapter extends RecyclerView.Adapter<CageListAdapter.MyView
             txt_seal = view.findViewById(R.id.txt_seal);
             llmain = view.findViewById(R.id.ll_main);
         }
+
     }
 
     public CageListAdapter(List<Cage> cages) {
@@ -49,12 +51,21 @@ public class CageListAdapter extends RecyclerView.Adapter<CageListAdapter.MyView
 
         holder.txt_seal.setText(cage.CageNo + " / " + cage.CageSeal);
 
+        boolean isAllScanned = true;
+        List<Delivery> deliveries = Delivery.getSealedCageDeliveryItems(cage.TransportMasterId , cage.CageNo, cage.CageSeal);
 
-//        if (deliveries.get(position).IsScanned) {
-//            holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
-//        } else {
-//            holder.llmain.setBackgroundColor(Color.parseColor(colorWhite));
-//        }
+        for (Delivery delivery : deliveries) {
+            if (!delivery.IsScanned) {
+                isAllScanned = false;
+                break;
+            }
+        }
+
+        if (cage.IsCageSealScanned == true && cage.IsCageNoScanned && isAllScanned) {
+            holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
+        } else {
+            holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));
+        }
     }
 
     @Override

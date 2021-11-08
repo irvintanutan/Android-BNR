@@ -6,6 +6,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.activeandroid.query.Update;
 
 import java.util.List;
 
@@ -20,6 +21,11 @@ public class Cage extends Model {
     @Column(name = "CageSeal")
     public String CageSeal;
 
+    @Column(name = "IsCageNoScanned")
+    public boolean IsCageNoScanned;
+
+    @Column(name = "IsCageSealScanned")
+    public boolean IsCageSealScanned;
 
     public static List<Cage> getByTransportMasterId(int TransportMasterId) {
         return new Select().from(Cage.class)
@@ -56,4 +62,34 @@ public class Cage extends Model {
                 .execute();
     }
 
+    public static boolean isCageScanned (int transportMasterId , String cageNo , String cageSeal) {
+        List<Cage> cage =  new Select().from(Cage.class)
+                .where("CageNo=? AND CageSeal=? AND TransportMasterId=? AND IsCageNoScanned=1 AND IsCageSealScanned=1", cageNo, cageSeal, transportMasterId)
+                .execute();
+
+        if (cage.isEmpty()) {
+            return false;
+        } else return true;
+    }
+
+    public static Cage getSingle(int TransportMasterId , String cageNo , String cageSeal) {
+        return new Select().from(Cage.class)
+                .where("TransportMasterId=? AND CageNo=? AND CageSeal=?", TransportMasterId, cageNo, cageSeal)
+                .executeSingle();
+
+    }
+
+    public static void setCageNoScanned(int TransportMasterId , String cageNo , String cageSeal) {
+        new Update(Cage.class)
+                .set("IsCageNoScanned=?", 1)
+                .where("TransportMasterId=? AND CageNo=? AND CageSeal=?", TransportMasterId, cageNo, cageSeal)
+                .execute();
+    }
+
+    public static void setCageSealScanned(int TransportMasterId , String cageNo , String cageSeal) {
+        new Update(Cage.class)
+                .set("IsCageSealScanned=?", 1)
+                .where("TransportMasterId=? AND CageNo=? AND CageSeal=?", TransportMasterId, cageNo, cageSeal)
+                .execute();
+    }
 }
