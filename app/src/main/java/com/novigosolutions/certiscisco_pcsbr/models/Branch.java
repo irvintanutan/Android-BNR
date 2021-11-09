@@ -670,12 +670,12 @@ public class Branch extends Model implements Comparable<Branch> {
         List<Job> deliveryjobs = Job.getFinishedPendingDeliveryJobsOfPoint(GroupKey, BranchCode, PFunctionalCode);
         for (int i = 0; i < deliveryjobs.size(); i++) {
             JsonObject Delivery = new JsonObject();
-            receiptNo = deliveryjobs.get(i).ReceiptNo;
             Delivery.addProperty("TransportMasterId", deliveryjobs.get(i).TransportMasterId);
             Delivery.addProperty("FloatDeliveryOrderId", deliveryjobs.get(i).FloatDeliveryOrderId);
             DeliveryList.add(Delivery);
             Job.UpdateTime(deliveryjobs.get(i).TransportMasterId, startTime, endTime);
             Job.UpdateReceiptNo(GroupKey, deliveryjobs.get(i).BranchCode, deliveryjobs.get(i).PDFunctionalCode, startTime , endTime, context);
+            receiptNo = Job.getSingle(deliveryjobs.get(i).TransportMasterId).ReceiptNo;
         }
         jsonObject.add("DeliveryList", DeliveryList);
         jsonObject.addProperty("ReceiptNo", receiptNo);
