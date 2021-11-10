@@ -14,6 +14,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -140,6 +141,7 @@ public class ConfirmationActivity extends AppCompatActivity implements NetworkCh
                     intent.putExtra("TransportMasterId", TransportMasterId);
                     intent.putExtra("GroupKey", GroupKey);
                 }
+                Constants.startTime = CommonMethods.getCurrentDateTime(ConfirmationActivity.this);
                 startActivity(intent);
                 finish();
             }
