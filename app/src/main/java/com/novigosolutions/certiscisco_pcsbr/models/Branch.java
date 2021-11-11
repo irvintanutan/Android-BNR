@@ -553,12 +553,12 @@ public class Branch extends Model implements Comparable<Branch> {
         for (int i = 0; i < jobs.size(); i++) {
             Job job = jobs.get(i);
             int TransportMasterId = job.TransportMasterId;
+            Job.UpdateReceiptNo(GroupKey, job.BranchCode, job.PDFunctionalCode, job.ActualFromTime, job.ActualToTime, context);
             JsonObject jobjson = new JsonObject();
-            receiptNo = job.ReceiptNo;
+            receiptNo = Job.getSingle(TransportMasterId).ReceiptNo;
             jobjson.addProperty("TransportId", TransportMasterId);
             jobjson.addProperty("CollectionId", job.CollectionOrderId);
             jobjson.addProperty("ReceiptNo", receiptNo);
-
             JsonArray Details = new JsonArray();
 
             List<Bags> bags = Bags.getByTransportMasterId(TransportMasterId);
@@ -674,7 +674,6 @@ public class Branch extends Model implements Comparable<Branch> {
             }
             jobjson.add("Details", Details);
             Job.UpdateTime(TransportMasterId, startTime , endTime);
-            Job.UpdateReceiptNo(GroupKey, job.BranchCode, job.PDFunctionalCode, startTime, endTime, context);
             CollectionHeaderList.add(jobjson);
         }
         jsonObject.add("CollectionHeaderList", CollectionHeaderList);
@@ -712,7 +711,7 @@ public class Branch extends Model implements Comparable<Branch> {
             Delivery.addProperty("FloatDeliveryOrderId", deliveryjobs.get(i).FloatDeliveryOrderId);
             DeliveryList.add(Delivery);
             Job.UpdateTime(deliveryjobs.get(i).TransportMasterId, startTime, endTime);
-            Job.UpdateReceiptNo(GroupKey, deliveryjobs.get(i).BranchCode, deliveryjobs.get(i).PDFunctionalCode, startTime , endTime, context);
+            Job.UpdateReceiptNo(GroupKey, deliveryjobs.get(i).BranchCode, deliveryjobs.get(i).PDFunctionalCode, deliveryjobs.get(i).ActualFromTime , deliveryjobs.get(i).ActualToTime, context);
             receiptNo = Job.getSingle(deliveryjobs.get(i).TransportMasterId).ReceiptNo;
         }
         jsonObject.add("DeliveryList", DeliveryList);
