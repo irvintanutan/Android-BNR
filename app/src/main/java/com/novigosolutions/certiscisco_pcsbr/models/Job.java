@@ -338,7 +338,7 @@ public class Job extends Model implements Comparable<Job> {
             jl = new Select().from(Job.class)
                     .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=? AND BranchCode=? AND PFunctionalCode=? AND ActualFromTime=? " +
                                     " AND ActualToTime=?", "COMPLETED", isCollection, isDelivered,
-                            GroupKey, BranchCode, PFunctionalCode, startTime,  endTime)
+                            GroupKey, BranchCode, PFunctionalCode, startTime, endTime)
                     .groupBy("BranchCode, PFunctionalCode, GroupKey, ActualFromTime, ActualToTime")
                     .orderBy("SequenceNo")
                     .execute();
@@ -361,7 +361,7 @@ public class Job extends Model implements Comparable<Job> {
     public static List<Job> getJobListByTypeByGroupKey(int isDelivered, int isCollection, String groupKey, String branchCode, String startTime, String endTime) {
         List<Job> jl = new Select().from(Job.class)
                 .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=? and BranchCode=? and ActualFromTime=? and ActualToTime=?",
-                        "COMPLETED", isCollection, isDelivered, groupKey, branchCode, startTime , endTime)
+                        "COMPLETED", isCollection, isDelivered, groupKey, branchCode, startTime, endTime)
                 .execute();
 
         return jl;
@@ -429,10 +429,10 @@ public class Job extends Model implements Comparable<Job> {
                 .execute();
     }
 
-    public static List<Job> getFinishedIncompleteCollectionJobsOfPoint(String GroupKey, String BranchCode, String PFunctionalCode) {
+    public static List<Job> getFinishedIncompleteCollectionJobsOfPoint(String GroupKey, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
         return new Select().from(Job.class)
-                .where("IsCollectionOrder=? AND GroupKey=? AND finished=? AND BranchCode=? AND PFunctionalCode=? AND Status NOT IN ('COMPLETED')",
-                        1, GroupKey, 1, BranchCode, PFunctionalCode)
+                .where("IsCollectionOrder=? AND GroupKey=? AND finished=? AND BranchCode=? AND PFunctionalCode=? AND ActualFromTime=? AND ActualToTime=? AND Status NOT IN ('COMPLETED')",
+                        1, GroupKey, 1, BranchCode, PFunctionalCode, actualFromTime, actualToTime)
                 .execute();
     }
 
@@ -857,7 +857,6 @@ public class Job extends Model implements Comparable<Job> {
                     .executeSingle();
         }
 
-
         if (job.ReceiptNo == null) {
             if (PFunctionalCode == null) {
                 new Update(Job.class)
@@ -873,34 +872,46 @@ public class Job extends Model implements Comparable<Job> {
         }
     }
 
+    public static void UpdateReceiptNoDelivery(String groupKey, String branchCode, String PFunctionalCode, Context context) {
+        int userId = Preferences.getInt("UserId", context);
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
+        String formattedDate = df.format(c);
+
+        Job job = null;
+
+        if (PFunctionalCode == null) {
+            job = new Select().from(Job.class)
+                    .where("GroupKey=? and BranchCode=?", groupKey, branchCode)
+                    .executeSingle();
+        } else {
+            job = new Select().from(Job.class)
+                    .where("GroupKey=? and BranchCode=? and PFunctionalCode=?", groupKey, branchCode
+                            , PFunctionalCode)
+                    .executeSingle();
+        }
+
+        if (job.ReceiptNo == null) {
+            if (PFunctionalCode == null) {
+                new Update(Job.class)
+                        .set("ReceiptNo=?", "RN" + formattedDate + userId)
+                        .where("GroupKey=? and BranchCode=?", groupKey, branchCode)
+                        .execute();
+            } else {
+                new Update(Job.class)
+                        .set("ReceiptNo=?", "RN" + formattedDate + userId)
+                        .where("GroupKey=? and BranchCode=? and PFunctionalCode=?", groupKey, branchCode, PFunctionalCode)
+                        .execute();
+            }
+        }
+    }
+
     public static void UpdateNameAndStaffID(int TransportMasterId, String name, String id) {
         new Update(Job.class)
                 .set("CName=?, StaffID=? ", name, id)
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();
     }
-
-
-//    public static void UpdateCollectionCompleted(int PointId) {
-//        new Update(Job.class)
-//                .set("Status=?", "COMPLETED")
-//                .where("BranchPointId=? AND IsCollectionOrder=?", PointId, 1)
-//                .execute();
-//    }
-
-//    public static void UpdateCollectionCompleted(String GroupKey) {
-//        new Update(Job.class)
-//                .set("Status=?", "COMPLETED")
-//                .where("GroupKey=? AND IsCollectionOrder=?", GroupKey, 1)
-//                .execute();
-//    }
-
-//    public static void UpdatDeliveryCompleted(int PointId) {
-//        new Update(Job.class)
-//                .set("Status=?", "COMPLETED")
-//                .where("IsFloatDeliveryOrder=1 AND BranchPointId=?", PointId)
-//                .execute();
-//    }
 
     public static void UpdatDeliveryCompleted(String GroupKey) {
         new Update(Job.class)
@@ -1162,11 +1173,11 @@ public class Job extends Model implements Comparable<Job> {
     }
 
     @SuppressLint("NewApi")
-    public static List<Content> getSelectedPrintContent(String groupKey, int isDelivery, String branchCode, String startTime , String endTime) {
+    public static List<Content> getSelectedPrintContent(String groupKey, int isDelivery, String branchCode, String startTime, String endTime) {
         Constants.BOX_QUANTITY = 0;
         List<Content> printContent = new ArrayList<>();
         int isCollection = isDelivery == 0 ? 1 : 0;
-        List<Job> list = Job.getJobListByTypeByGroupKey(isDelivery, isCollection, groupKey, branchCode, startTime , endTime);
+        List<Job> list = Job.getJobListByTypeByGroupKey(isDelivery, isCollection, groupKey, branchCode, startTime, endTime);
 
         int bagQty = 0, boxQty = 0, coinBagQty = 0;
         List<String> boxSealNoList = new ArrayList<>();
