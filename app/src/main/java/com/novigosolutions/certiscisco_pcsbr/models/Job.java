@@ -413,7 +413,7 @@ public class Job extends Model implements Comparable<Job> {
 
     public static List<Job> getFinishedIncompleteCollectionJobsOfPoint(String GroupKey, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
         return new Select().from(Job.class)
-                .where("IsCollectionOrder=? AND GroupKey=? AND finished=? AND BranchCode=? AND PFunctionalCode=? AND Status NOT IN ('COMPLETED') and ActualFromTime=? and ActualToTime=?",
+                .where("IsCollectionOrder=? AND GroupKey=? AND finished=? AND BranchCode=? AND PFunctionalCode=? AND ActualFromTime=? AND ActualToTime=? AND Status NOT IN ('COMPLETED')",
                         1, GroupKey, 1, BranchCode, PFunctionalCode, actualFromTime, actualToTime)
                 .execute();
     }
@@ -779,7 +779,6 @@ public class Job extends Model implements Comparable<Job> {
                     .executeSingle();
         }
 
-
         if (job.ReceiptNo == null) {
             if (PFunctionalCode == null) {
                 new Update(Job.class)
@@ -790,6 +789,40 @@ public class Job extends Model implements Comparable<Job> {
                 new Update(Job.class)
                         .set("ReceiptNo=?", "RN" + formattedDate + userId)
                         .where("GroupKey=? and BranchCode=? and PFunctionalCode=?  AND ActualFromTime=? AND ActualToTime=?", groupKey, branchCode, PFunctionalCode, startTime, endTime)
+                        .execute();
+            }
+        }
+    }
+
+    public static void UpdateReceiptNoDelivery(String groupKey, String branchCode, String PFunctionalCode, Context context) {
+        int userId = Preferences.getInt("UserId", context);
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
+        String formattedDate = df.format(c);
+
+        Job job = null;
+
+        if (PFunctionalCode == null) {
+            job = new Select().from(Job.class)
+                    .where("GroupKey=? and BranchCode=?", groupKey, branchCode)
+                    .executeSingle();
+        } else {
+            job = new Select().from(Job.class)
+                    .where("GroupKey=? and BranchCode=? and PFunctionalCode=?", groupKey, branchCode
+                            , PFunctionalCode)
+                    .executeSingle();
+        }
+
+        if (job.ReceiptNo == null) {
+            if (PFunctionalCode == null) {
+                new Update(Job.class)
+                        .set("ReceiptNo=?", "RN" + formattedDate + userId)
+                        .where("GroupKey=? and BranchCode=?", groupKey, branchCode)
+                        .execute();
+            } else {
+                new Update(Job.class)
+                        .set("ReceiptNo=?", "RN" + formattedDate + userId)
+                        .where("GroupKey=? and BranchCode=? and PFunctionalCode=?", groupKey, branchCode, PFunctionalCode)
                         .execute();
             }
         }

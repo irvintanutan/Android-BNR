@@ -542,6 +542,7 @@ public class Branch extends Model implements Comparable<Branch> {
 
     public static JsonObject getCollection(String GroupKey, Context context, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
         List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime);
+
         String receiptNo = "";
         //List<Job> jobs = Job.getCollectionJobsOfPoint(PointId);
         JsonObject jsonObject = new JsonObject();
@@ -696,7 +697,7 @@ public class Branch extends Model implements Comparable<Branch> {
         return jsonObject;
     }
 
-    public static JsonObject getDelivery(String GroupKey, Context context, String BranchCode, String PFunctionalCode) {
+    public static JsonObject getDelivery(String GroupKey, Context context, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
         JsonObject jsonObject = new JsonObject();
         JsonArray DeliveryList = new JsonArray();
         String receiptNo = "";
@@ -704,15 +705,16 @@ public class Branch extends Model implements Comparable<Branch> {
         String startTime = Constants.startTime;
         String endTime = Constants.endTime;
 
-        List<Job> deliveryjobs = Job.getFinishedPendingDeliveryJobsOfPoint(GroupKey, BranchCode, PFunctionalCode);
+        List<Job> deliveryjobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
         for (int i = 0; i < deliveryjobs.size(); i++) {
             JsonObject Delivery = new JsonObject();
+            Job job = deliveryjobs.get(i);
             Delivery.addProperty("TransportMasterId", deliveryjobs.get(i).TransportMasterId);
             Delivery.addProperty("FloatDeliveryOrderId", deliveryjobs.get(i).FloatDeliveryOrderId);
             DeliveryList.add(Delivery);
-            Job.UpdateTime(deliveryjobs.get(i).TransportMasterId, startTime, endTime);
-            Job.UpdateReceiptNo(GroupKey, deliveryjobs.get(i).BranchCode, deliveryjobs.get(i).PDFunctionalCode, deliveryjobs.get(i).ActualFromTime , deliveryjobs.get(i).ActualToTime, context);
-            receiptNo = Job.getSingle(deliveryjobs.get(i).TransportMasterId).ReceiptNo;
+            Job.UpdateTime(job.TransportMasterId, startTime, endTime);
+            Job.UpdateReceiptNoDelivery(GroupKey, job.BranchCode, job.PFunctionalCode, context);
+            receiptNo = Job.getSingle(job.TransportMasterId).ReceiptNo;
         }
         jsonObject.add("DeliveryList", DeliveryList);
         jsonObject.addProperty("ReceiptNo", receiptNo);

@@ -247,7 +247,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
             } else {
                 List<Delivery> bagList = null;
                 if (isSummary(branch, job))
-                    bagList = Delivery.getSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime);
+                    bagList = Delivery.getSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
                 else
                     bagList = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
                 if (bagList.size() > 0) {
@@ -282,9 +282,9 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
 
                 List<Delivery> boxList = null;
                 if (isSummary(branch, job))
-                    boxList = Delivery.getUnSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime ,actualToTime);
+                    boxList = Delivery.getUnSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
                 else
-                    boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime);
+                    boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
                 if (boxList.size() > 0) {
                     RecyclerView boxlistView = findViewById(R.id.boxlistview);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -517,7 +517,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
 
                         if (NetworkUtil.getConnectivityStatusString(this)) {
 //                        showProgressDialog("Loading...");
-                            APICaller.instance().SubmitDeliveryList(this, this, GroupKey, BranchCode, PFunctionalCode);
+                            APICaller.instance().SubmitDeliveryList(this, this, GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
                         } else {
 //                        Branch.setDelOfflineStatus(GroupKey, 1);
                             Job.setOfflineSaved(TransportMasterId, 1);
