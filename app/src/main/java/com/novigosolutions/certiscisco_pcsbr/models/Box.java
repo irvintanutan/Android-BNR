@@ -26,10 +26,10 @@ public class Box extends Model {
     public int count;
 
     @Column(name = "CoinSeries")
-    public String  CoinSeries;
+    public String CoinSeries;
 
     @Column(name = "CoinSeriesId")
-    public int  CoinSeriesId;
+    public int CoinSeriesId;
 
     @Column(name = "CageNo")
     public String CageNo;
@@ -51,13 +51,13 @@ public class Box extends Model {
                 .execute();
     }
 
-    public static List<Box> getByTransportMasterIdWithCage(int TransportMasterId, String cageNo , String cageSeal) {
+    public static List<Box> getByTransportMasterIdWithCage(int TransportMasterId, String cageNo, String cageSeal) {
         return new Select().from(Box.class)
-                .where("TransportMasterId=? and CageNo=? and CageSeal=?", TransportMasterId, cageNo , cageSeal)
+                .where("TransportMasterId=? and CageNo=? and CageSeal=?", TransportMasterId, cageNo, cageSeal)
                 .execute();
     }
 
-    public static List<Bags> getByTransportMasterId(int TransportMasterId , String cageNo , String cageSeal) {
+    public static List<Bags> getByTransportMasterId(int TransportMasterId, String cageNo, String cageSeal) {
         return new Select().from(Box.class)
                 .where("TransportMasterId=? AND CageNo!=? AND CageSeal!=?", TransportMasterId, cageNo, cageSeal)
                 .execute();
@@ -71,7 +71,7 @@ public class Box extends Model {
 
     public static void updateCount(int TransportMasterId, int ProductId, String productName, int count) {
         Box box = new Select().from(Box.class)
-                .where("TransportMasterId=? AND ProductId=?",TransportMasterId, ProductId)
+                .where("TransportMasterId=? AND ProductId=?", TransportMasterId, ProductId)
                 .executeSingle();
         if (box == null) {
             Box newbox = new Box();
@@ -88,9 +88,9 @@ public class Box extends Model {
         }
     }
 
-    public static void updateCountNew(int TransportMasterId, int ProductId, String productName, int count,String description,int coinseriesid, String cageNo , String cageSeal) {
+    public static void updateCountNew(int TransportMasterId, int ProductId, String productName, int count, String description, int coinseriesid, String cageNo, String cageSeal) {
         Box box = new Select().from(Box.class)
-                .where("TransportMasterId=? AND ProductId=? AND CoinSeriesId=?",TransportMasterId, ProductId,coinseriesid)
+                .where("TransportMasterId=? AND ProductId=? AND CoinSeriesId=?", TransportMasterId, ProductId, coinseriesid)
                 .executeSingle();
         if (box == null) {
             Box newbox = new Box();
@@ -98,31 +98,22 @@ public class Box extends Model {
             newbox.ProductId = ProductId;
             newbox.ProductName = productName;
             newbox.count = count;
-            newbox.CoinSeries=description;
-            newbox.CoinSeriesId=coinseriesid;
-            if (cageNo != null && cageSeal != null) {
-                newbox.CageNo = cageNo;
-                newbox.CageSeal = cageSeal;
-            }
+            newbox.CoinSeries = description;
+            newbox.CoinSeriesId = coinseriesid;
+            newbox.CageNo = cageNo;
+            newbox.CageSeal = cageSeal;
             newbox.save();
         } else {
-            if (cageNo != null && cageSeal != null) {
-                new Update(Box.class)
-                        .set("count=? ,CoinSeries=? ,CoinSeriesId=?, CageNo=? , CageSeal=?", count, description, coinseriesid, cageNo, cageSeal)
-                        .where("id=?", box.getId())
-                        .execute();
-            } else {
-                new Update(Box.class)
-                        .set("count=? ,CoinSeries=? ,CoinSeriesId=?", count, description, coinseriesid)
-                        .where("id=?", box.getId())
-                        .execute();
-            }
+            new Update(Box.class)
+                    .set("count=? ,CoinSeries=? ,CoinSeriesId=?, CageNo=? , CageSeal=?", count, description, coinseriesid, cageNo, cageSeal)
+                    .where("id=?", box.getId())
+                    .execute();
         }
     }
 
-    public static void removeByCageNoCageSeal(String cageNo , String cageSeal){
+    public static void removeByCageNoCageSeal(String cageNo, String cageSeal) {
         new Delete().from(Box.class)
-                .where("CageNo=? AND CageSeal=?", cageNo , cageSeal)
+                .where("CageNo=? AND CageSeal=?", cageNo, cageSeal)
                 .execute();
     }
 

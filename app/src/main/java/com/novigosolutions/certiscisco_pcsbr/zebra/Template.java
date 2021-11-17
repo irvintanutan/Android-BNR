@@ -129,10 +129,23 @@ public class Template {
                     "</tr>";
         }
 
+        if(countListSize==0){
+            html+=" <td colspan=\"3\"><br><label><center>";
+            if(print.isCollection())
+            {
+                html+="No Collection";
+            }else {
+                html+="No Collection";
+            }
+            html+="</center></label></td></tr>";
+        }
+
+        html += "</table>";
+        html += "<table>";
         List<CageContent> cageContentList = print.getCageContentList();
         int cageCountListSize = (cageContentList != null && !cageContentList.isEmpty()) ? cageContentList.size() : 0;
         if (cageCountListSize > 0) {
-           html += "<br><br>         <tr>   <th>" + "Cage No" + "</th><th>Cage Seal</th><th>Items</th></tr>\n";
+           html += "<br>         <tr>   <th>" + "Cage No" + "</th><th>Cage Seal</th><th>Items</th></tr>\n";
         }
         for (int i = 0; i < cageCountListSize; i++) {
             html += "<tr>" +

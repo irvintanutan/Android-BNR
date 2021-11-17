@@ -361,11 +361,11 @@ public class SyncDatabase {
                         break;
 
                     case "BOX":
+                    case "Box":
                         // Box.updateCount(deliveryobject.getInt("TransportMasterId"),deliveryobject.getInt("ProductID"), deliveryobject.getString("Denomination"),deliveryobject.getInt("Qty"));
                         Box.updateCountNew(deliveryobject.getInt("TransportMasterId"), deliveryobject.getInt("ProductID"),
                                 deliveryobject.getString("Denomination"), deliveryobject.getInt("Qty"),
-                                deliveryobject.getString("CoinSeries"), deliveryobject.getInt("CoinSeriesId"), deliveryobject.getString("CageNo"),
-                                deliveryobject.getString("CageSeal"));
+                                deliveryobject.getString("CoinSeries"), deliveryobject.getInt("CoinSeriesId"), cageNo, cageSeal);
                         break;
 
                     case "Coin Box":
