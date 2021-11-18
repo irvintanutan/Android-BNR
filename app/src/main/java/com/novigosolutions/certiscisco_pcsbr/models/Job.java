@@ -1136,6 +1136,7 @@ public class Job extends Model implements Comparable<Job> {
             Items collectionSummary = new Items();
             collectionSummary.setId(boxes.get(i).getId());
             collectionSummary.setHead("Box");
+            collectionSummary.setQty(boxes.get(i).count);
             if ((boxes.get(i).CoinSeriesId) == 0) {
                 collectionSummary.setSummary(boxes.get(i).ProductName + "(" + boxes.get(i).count + ")");
             } else {

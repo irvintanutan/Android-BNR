@@ -104,10 +104,17 @@ public class Box extends Model {
             newbox.CageSeal = cageSeal;
             newbox.save();
         } else {
-            new Update(Box.class)
-                    .set("count=? ,CoinSeries=? ,CoinSeriesId=?, CageNo=? , CageSeal=?", count, description, coinseriesid, cageNo, cageSeal)
-                    .where("id=?", box.getId())
-                    .execute();
+            if (cageNo == null) {
+                new Update(Box.class)
+                        .set("count=? ,CoinSeries=? ,CoinSeriesId=?", count, description, coinseriesid)
+                        .where("id=?", box.getId())
+                        .execute();
+            } else {
+                new Update(Box.class)
+                        .set("count=? ,CoinSeries=? ,CoinSeriesId=?, CageNo=? , CageSeal=?", count, description, coinseriesid, cageNo, cageSeal)
+                        .where("id=?", box.getId())
+                        .execute();
+            }
         }
     }
 

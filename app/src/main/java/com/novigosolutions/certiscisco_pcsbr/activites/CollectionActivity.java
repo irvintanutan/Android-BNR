@@ -29,6 +29,7 @@ import com.novigosolutions.certiscisco_pcsbr.expandable.CageAdapter;
 import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
+import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
@@ -167,7 +168,7 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
 
         for (com.novigosolutions.certiscisco_pcsbr.models.Cage c : cageList) {
             List<Items> list = Job.getCageCollectionSummary(trasportMasterId, c.CageNo , c.CageSeal);
-            String cageTitle = "CAGE (QTY : " + list.size() + ")\n" +
+            String cageTitle = "CAGE (QTY : " + cageItemCounter(list) + ")\n" +
                     "CAGENO : " + c.CageNo + "\nCAGESEAL : " + c.CageSeal;
             Cage cage = new Cage(cageTitle, list);
             cages.add(cage);
@@ -184,6 +185,18 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
 
         cageAdapter = new CageAdapter(cages, this, true);
         cageRecyclerView.setAdapter(cageAdapter);
+    }
+
+    private int cageItemCounter(List<Items> items){
+            int count = 0;
+           for (Items item : items) {
+               if (item.getHead().equals("Box")) {
+                   count+=item.getQty();
+               } else {
+                   count++;
+               }
+           }
+           return count;
     }
 
     private void openCageDialog() {

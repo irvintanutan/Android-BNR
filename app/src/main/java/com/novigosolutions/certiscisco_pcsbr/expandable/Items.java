@@ -7,15 +7,16 @@ public class Items implements Parcelable {
     public Long id;
     public String head;
     public String summary;
+    public int qty;
 
-    public Items(String head, String summary, Long id) {
+    public Items(String head, String summary, Long id, int qty) {
         this.summary = summary;
         this.head = head;
         this.id = id;
+        this.qty = qty;
     }
 
     public Items() {
-
     }
 
     protected Items(Parcel in) {
@@ -23,11 +24,19 @@ public class Items implements Parcelable {
         summary = in.readString();
     }
 
+    public int getQty() {
+        return qty;
+    }
+
+    public void setQty(int qty) {
+        this.qty = qty;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
 
-    public Long getId(){
+    public Long getId() {
         return this.id;
     }
 
