@@ -118,9 +118,10 @@ public class APICaller {
         process(Constants.SYNC, call, callback);
     }
 
-    public void SubmitBulkCollection(ApiCallback callback, Context context, String GroupKey, String BranchCode, String PFunctionalCode) {
+    public void SubmitBulkCollection(ApiCallback callback, Context context, String GroupKey, String BranchCode, String PFunctionalCode, String actualFromTime , String actualToTime) {
         this.context = context;
-        Call<ResponseBody> call = getService().SubmitBulkCollection(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getCollection(GroupKey, context, BranchCode , PFunctionalCode));
+        //Branch.getCollection(GroupKey, context, BranchCode , PFunctionalCode, actualFromTime, actualToTime);
+        Call<ResponseBody> call = getService().SubmitBulkCollection(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getCollection(GroupKey, context, BranchCode , PFunctionalCode, actualFromTime, actualToTime));
         process(Constants.SUBMITBULKCOLLECTION, call, callback);
     }
 
@@ -150,9 +151,10 @@ public class APICaller {
         process(Constants.REQUESTFORRESCHEDULE, call, callback);
     }
 
-    public void SubmitDeliveryList(ApiCallback callback, Context context, String GroupKey, String BranchCode, String PFunctionalCode) {
+    public void SubmitDeliveryList(ApiCallback callback, Context context, String GroupKey, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
         this.context = context;
-        Call<ResponseBody> call = getService().SubmitDeliveryList(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context), Branch.getDelivery(GroupKey, context, BranchCode, PFunctionalCode));
+        Call<ResponseBody> call = getService().SubmitDeliveryList(Preferences.getString("AuthToken", context), Preferences.getInt("UserId", context),
+                Branch.getDelivery(GroupKey, context, BranchCode, PFunctionalCode, actualFromTime, actualToTime));
         process(Constants.SUBMITDELIVERYLIST, call, callback);
     }
 
@@ -211,6 +213,10 @@ public class APICaller {
                                     JSONArray jsonArray = jsonObject.getJSONArray("Orders");
 
                                     SyncDatabase.instance().saveCoinSeries(obj, context);
+//                                    for (int i = 0; i < jsonArray.length(); i++) {
+//                                        JSONObject orderJSONObject = jsonArray.getJSONObject(i);
+//                                        Job.updateLatestGroupKey(orderJSONObject.getInt("TransportId"), orderJSONObject.getString("GroupKey"));
+//                                    }
                                     for (int i = 0; i < jsonArray.length(); i++) {
                                         JSONObject orderJSONObject = jsonArray.getJSONObject(i);
                                         if (orderJSONObject.getString("Status").equalsIgnoreCase("Updated") || orderJSONObject.getString("Status").equalsIgnoreCase("Deleted") || orderJSONObject.getString("Status").equalsIgnoreCase("New")) {

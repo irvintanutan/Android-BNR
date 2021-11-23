@@ -14,7 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Bag"
+            android:text="Sealed Bag"
             android:textColor="@color/colorWhite"
             android:textSize="18dp"
             android:textStyle="bold" />
@@ -145,7 +145,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bag(s)"
+                    android:text="Sealed Bag(s)"
                     android:textColor="@color/colorPrimary" />
 
                 <TextView

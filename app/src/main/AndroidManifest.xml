@@ -92,6 +92,11 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
+            android:name=".activites.CageDeliveryActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
             android:name=".activites.ConfirmationActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />

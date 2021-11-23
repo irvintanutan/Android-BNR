@@ -14,6 +14,7 @@ import com.activeandroid.query.Update;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 
 import java.util.ArrayList;
@@ -130,7 +131,11 @@ public class Branch extends Model implements Comparable<Branch> {
                 .executeSingle();
 
     }
+    public static List<Branch> getAllBranch() {
+        return new Select().from(Branch.class)
+               .execute();
 
+    }
     public static int getAllCount() {
         return new Select().from(Job.class)
                 .execute().size();
@@ -178,7 +183,8 @@ public class Branch extends Model implements Comparable<Branch> {
 
     public static List<Branch> getPendingBranches() {
         List<Branch> branches = new Select().from(Branch.class)
-                .where("GroupKey IN (select DISTINCT GroupKey from job where Status = 'PENDING' GROUP BY GroupKey)")
+                .where("GroupKey IN (select DISTINCT GroupKey from job where Status = 'PENDING')")
+                .groupBy("BranchCode")
                 .execute();
 
         for (Branch b : branches) {
@@ -329,6 +335,18 @@ public class Branch extends Model implements Comparable<Branch> {
                 .where("firstbarcode=? OR secondbarcode=?", ScanValue, ScanValue)
                 .executeSingle();
         if (bags != null) return true;
+
+        Wagon wagon = new Select().from(Wagon.class)
+                .where("firstbarcode=? OR secondbarcode=?", ScanValue, ScanValue)
+                .executeSingle();
+
+        Cage cage = new Select().from(Cage.class)
+                .where("CageNo=? or CageSeal=?", ScanValue , ScanValue)
+                .executeSingle();
+        if (cage != null) return true;
+
+        if (wagon != null) return true;
+
         BoxBag boxBag = new Select().from(BoxBag.class)
                 .where("bagcode=?", ScanValue)
                 .executeSingle();
@@ -522,25 +540,26 @@ public class Branch extends Model implements Comparable<Branch> {
 //        return false;
 //    }
 
-    public static JsonObject getCollection(String GroupKey, Context context, String BranchCode, String PFunctionalCode) {
-        List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey, BranchCode, PFunctionalCode);
+    public static JsonObject getCollection(String GroupKey, Context context, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
+        List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime);
+
         String receiptNo = "";
         //List<Job> jobs = Job.getCollectionJobsOfPoint(PointId);
         JsonObject jsonObject = new JsonObject();
         JsonArray CollectionHeaderList = new JsonArray();
 
-        String startTime = Branch.getSingle(GroupKey).JobStartTime;
-        String endTime = Branch.getSingle(GroupKey).JobEndTime;
+        String startTime = Constants.startTime;
+        String endTime = Constants.endTime;
 
         for (int i = 0; i < jobs.size(); i++) {
             Job job = jobs.get(i);
             int TransportMasterId = job.TransportMasterId;
+            Job.UpdateReceiptNo(GroupKey, job.BranchCode, job.PDFunctionalCode, job.ActualFromTime, job.ActualToTime, context);
             JsonObject jobjson = new JsonObject();
-            receiptNo = job.ReceiptNo;
+            receiptNo = Job.getSingle(TransportMasterId).ReceiptNo;
             jobjson.addProperty("TransportId", TransportMasterId);
             jobjson.addProperty("CollectionId", job.CollectionOrderId);
             jobjson.addProperty("ReceiptNo", receiptNo);
-
             JsonArray Details = new JsonArray();
 
             List<Bags> bags = Bags.getByTransportMasterId(TransportMasterId);
@@ -551,6 +570,24 @@ public class Branch extends Model implements Comparable<Branch> {
                 Detail.addProperty("DenoId", 0);
                 Detail.addProperty("SealNo1", bag.firstbarcode);
                 Detail.addProperty("SealNo2", bag.secondbarcode);
+                Detail.addProperty("CageNo", bag.CageNo);
+                Detail.addProperty("CageSeal", bag.CageSeal);
+                Detail.addProperty("Qty", 1);
+                Detail.addProperty("CoinSeriesId", 0);
+                Detail.add("EnvelopeSeal", null);
+                Details.add(Detail);
+            }
+
+            List<Wagon> wagons = Wagon.getByTransportMasterId(TransportMasterId);
+            for (int j = 0; j < wagons.size(); j++) {
+                Wagon wagon = wagons.get(j);
+                JsonObject Detail = new JsonObject();
+                Detail.addProperty("ItemType", "Wagon");
+                Detail.addProperty("DenoId", 0);
+                Detail.addProperty("SealNo1", wagon.firstbarcode);
+                Detail.addProperty("SealNo2", wagon.secondbarcode);
+                Detail.addProperty("CageNo", wagon.CageNo);
+                Detail.addProperty("CageSeal", wagon.CageSeal);
                 Detail.addProperty("Qty", 1);
                 Detail.addProperty("CoinSeriesId", 0);
                 Detail.add("EnvelopeSeal", null);
@@ -568,6 +605,8 @@ public class Branch extends Model implements Comparable<Branch> {
                         Detail.addProperty("DenoId", 0);
                         Detail.addProperty("SealNo1", envelopes.get(k).barcode);
                         Detail.addProperty("SealNo2", "");
+                        Detail.addProperty("CageNo", envelopes.get(k).CageNo);
+                        Detail.addProperty("CageSeal", envelopes.get(k).CageSeal);
                         Detail.addProperty("Qty", 1);
                         Detail.addProperty("CoinSeriesId", 0);
                         Detail.add("EnvelopeSeal", null);
@@ -583,6 +622,8 @@ public class Branch extends Model implements Comparable<Branch> {
                     Detail.addProperty("DenoId", 0);
                     Detail.addProperty("SealNo1", envelopeBag.bagcode);
                     Detail.addProperty("SealNo2", "");
+                    Detail.addProperty("CageNo", envelopeBag.CageNo);
+                    Detail.addProperty("CageSeal", envelopeBag.CageSeal);
                     Detail.addProperty("Qty", envelopes.size());
                     Detail.addProperty("CoinSeriesId", 0);
                     Detail.add("EnvelopeSeal", seals);
@@ -598,6 +639,8 @@ public class Branch extends Model implements Comparable<Branch> {
                 Detail.addProperty("DenoId", box.ProductId);
                 Detail.addProperty("SealNo1", "");
                 Detail.addProperty("SealNo2", "");
+                Detail.addProperty("CageNo", box.CageNo);
+                Detail.addProperty("CageSeal", box.CageSeal);
                 Detail.addProperty("Qty", box.count);
                 Detail.addProperty("CoinSeriesId", box.CoinSeriesId);
                 Detail.add("EnvelopeSeal", null);
@@ -612,6 +655,8 @@ public class Branch extends Model implements Comparable<Branch> {
                 Detail.addProperty("DenoId", boxBag.ProductId);
                 Detail.addProperty("SealNo1", boxBag.bagcode);
                 Detail.addProperty("SealNo2", "");
+                Detail.addProperty("CageNo", boxBag.CageNo);
+                Detail.addProperty("CageSeal", boxBag.CageSeal);
                 Detail.addProperty("Qty", 1);
                 Detail.addProperty("CoinSeriesId", boxBag.CoinSeriesId);
                 Detail.add("EnvelopeSeal", null);
@@ -635,8 +680,8 @@ public class Branch extends Model implements Comparable<Branch> {
         jsonObject.add("CollectionHeaderList", CollectionHeaderList);
         jsonObject.addProperty("ReceiptNo", receiptNo);
         jsonObject.addProperty("Sign", Branch.getSingle(GroupKey).colSignature);
-        jsonObject.addProperty("JobStartTime", Branch.getSingle(GroupKey).JobStartTime);
-        jsonObject.addProperty("JobEndTime", Branch.getSingle(GroupKey).JobEndTime);
+        jsonObject.addProperty("JobStartTime", startTime);
+        jsonObject.addProperty("JobEndTime", endTime);
         jsonObject.addProperty("UserId", Preferences.getInt("UserId", context));
         jsonObject.addProperty("StaffID", Branch.getSingle(GroupKey).StaffID);
         jsonObject.addProperty("CName", Branch.getSingle(GroupKey).CName);
@@ -652,24 +697,30 @@ public class Branch extends Model implements Comparable<Branch> {
         return jsonObject;
     }
 
-    public static JsonObject getDelivery(String GroupKey, Context context, String BranchCode, String PFunctionalCode) {
+    public static JsonObject getDelivery(String GroupKey, Context context, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
         JsonObject jsonObject = new JsonObject();
         JsonArray DeliveryList = new JsonArray();
         String receiptNo = "";
-        List<Job> deliveryjobs = Job.getFinishedPendingDeliveryJobsOfPoint(GroupKey, BranchCode, PFunctionalCode);
+
+        String startTime = Constants.startTime;
+        String endTime = Constants.endTime;
+
+        List<Job> deliveryjobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
         for (int i = 0; i < deliveryjobs.size(); i++) {
             JsonObject Delivery = new JsonObject();
-            receiptNo = deliveryjobs.get(i).ReceiptNo;
+            Job job = deliveryjobs.get(i);
             Delivery.addProperty("TransportMasterId", deliveryjobs.get(i).TransportMasterId);
             Delivery.addProperty("FloatDeliveryOrderId", deliveryjobs.get(i).FloatDeliveryOrderId);
             DeliveryList.add(Delivery);
-            Job.UpdateTime(deliveryjobs.get(i).TransportMasterId, Branch.getSingle(GroupKey).JobStartTime, Branch.getSingle(GroupKey).JobEndTime);
+            Job.UpdateTime(job.TransportMasterId, startTime, endTime);
+            Job.UpdateReceiptNoDelivery(GroupKey, job.BranchCode, job.PFunctionalCode, context);
+            receiptNo = Job.getSingle(job.TransportMasterId).ReceiptNo;
         }
         jsonObject.add("DeliveryList", DeliveryList);
         jsonObject.addProperty("ReceiptNo", receiptNo);
         jsonObject.addProperty("Sign", Branch.getSingle(GroupKey).delSignature);
-        jsonObject.addProperty("JobStartTime", Branch.getSingle(GroupKey).JobStartTime);
-        jsonObject.addProperty("JobEndTime", Branch.getSingle(GroupKey).JobEndTime);
+        jsonObject.addProperty("JobStartTime", startTime);
+        jsonObject.addProperty("JobEndTime", endTime);
         jsonObject.addProperty("UserId", Preferences.getInt("UserId", context));
         jsonObject.addProperty("StaffID", Branch.getSingle(GroupKey).StaffID);
         jsonObject.addProperty("CName", Branch.getSingle(GroupKey).CName);
@@ -691,7 +742,9 @@ public class Branch extends Model implements Comparable<Branch> {
         remove();
         Job.remove();
         Bags.remove();
+        Wagon.remove();
         Box.remove();
+        Cage.remove();
         BoxBag.remove();
         Currency.remove();
         Delivery.remove();

@@ -188,7 +188,7 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
                 if (ids.size() > 0) {
                     for (int i = 0; i < ids.size(); i++) {
                       //  Box.updateCount(TransportMasterId, ids.get(i), currancyNames.get(i), counts.get(i));
-                        Box.updateCountNew(TransportMasterId, ids.get(i), currancyNames.get(i), counts.get(i),coinseriesDescription.get(i),coinseriesIds.get(i));
+                        Box.updateCountNew(TransportMasterId, ids.get(i), currancyNames.get(i), counts.get(i),coinseriesDescription.get(i),coinseriesIds.get(i), null , null);
                     }
 
                     if (mDialogResult != null) {

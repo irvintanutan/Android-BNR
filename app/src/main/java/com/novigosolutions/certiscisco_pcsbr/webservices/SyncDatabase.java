@@ -20,12 +20,14 @@ import com.novigosolutions.certiscisco_pcsbr.models.Bags;
 import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.BoxBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
+import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.CoinSeries;
 import com.novigosolutions.certiscisco_pcsbr.models.Currency;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
 import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
+import com.novigosolutions.certiscisco_pcsbr.models.Wagon;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 
 import org.json.JSONArray;
@@ -58,7 +60,7 @@ public class SyncDatabase {
                 JSONArray jobs = jobsJSONObject.getJSONArray("Jobs");
                 for (int j = 0; j < jobs.length(); j++) {
                     JSONObject jobObject = jobs.getJSONObject(j);
-                    jobObject.put("GroupKey",b.GroupKey);
+                    jobObject.put("GroupKey", b.GroupKey);
                     saveJob(jobObject, jobsJSONObject.getInt("PointId"));
 
                 }
@@ -79,18 +81,16 @@ public class SyncDatabase {
                 JSONObject orderJSONObject = data.getJSONObject(i);
                 if (orderJSONObject.getString("Status").equalsIgnoreCase("Updated")) {
                     JSONObject jobObject = orderJSONObject.getJSONObject("OrderInfo");
-                    int branchpointid=Job.getSingle(jobObject.getInt("TransportMasterId")).BranchPointId;
-                    String groupKey=Job.getSingle(jobObject.getInt("TransportMasterId")).GroupKey;
-                    if(jobObject.getString("Status").equals("COMPLETED")) {
-                       Job.UpdateStatus(jobObject.getInt("TransportMasterId"));
-                        Job.UpdateVersion(jobObject.getInt("TransportMasterId"),jobObject.getString("VersionNo"));
-                        Job.UpdateTime(jobObject.getInt("TransportMasterId"),jobObject.getString("ActualFromTime"),jobObject.getString("ActualToTime"));
-                    }
-                    else
-                    {
+                    int branchpointid = Job.getSingle(jobObject.getInt("TransportMasterId")).BranchPointId;
+                    String groupKey = Job.getSingle(jobObject.getInt("TransportMasterId")).GroupKey;
+                    if (jobObject.getString("Status").equals("COMPLETED")) {
+                        Job.UpdateStatus(jobObject.getInt("TransportMasterId"));
+                        Job.UpdateVersion(jobObject.getInt("TransportMasterId"), jobObject.getString("VersionNo"));
+                        //Job.UpdateTime(jobObject.getInt("TransportMasterId"),jobObject.getString("ActualFromTime"),jobObject.getString("ActualToTime"));
+                    } else {
                         Job.removeSingleJob(jobObject.getInt("TransportMasterId"));
-                        jobObject.put("GroupKey",groupKey);
-                        saveJob(jobObject,branchpointid);
+                        jobObject.put("GroupKey", groupKey);
+                        saveJob(jobObject, branchpointid);
                         if (!updatedPoints.contains(Branch.getSingle(groupKey).FunctionalCode))
                             updatedPoints.add(Branch.getSingle(groupKey).FunctionalCode);
                     }
@@ -117,7 +117,7 @@ public class SyncDatabase {
                     JSONArray jobs = jobsJSONObject.getJSONArray("Jobs");
                     for (int j = 0; j < jobs.length(); j++) {
                         JSONObject jobObject = jobs.getJSONObject(j);
-                        jobObject.put("GroupKey",GroupKey);
+                        jobObject.put("GroupKey", GroupKey);
                         Job.removeSingleJob(jobObject.getInt("TransportMasterId"));
                         saveJob(jobObject, PointId);
                     }
@@ -251,8 +251,8 @@ public class SyncDatabase {
             job.BranchPointId = PointId;
             if (job.Status == null || job.Status.isEmpty()) job.Status = "PENDING";
             job.save();
-            String groupKey=job.GroupKey;
-            int customerid=Branch.getSingle(groupKey).CustomerId;
+            String groupKey = job.GroupKey;
+            int customerid = Branch.getSingle(groupKey).CustomerId;
             if (jobObject.optJSONArray("ProductCurrency") != null) {
                 JSONArray jsonArray = jobObject.getJSONArray("ProductCurrency");
                 if (jsonArray.length() > 0) {
@@ -276,36 +276,56 @@ public class SyncDatabase {
                 Delivery delivery = gson.fromJson(deliveryobject.toString(), Delivery.class);
                 delivery.save();
 
-                String ItemType=deliveryobject.getString("ItemType");
-                switch (ItemType)
-                {
+                String cageNo = deliveryobject.getString("CageNo").isEmpty() || deliveryobject.getString("CageNo") == null ?
+                        null : deliveryobject.getString("CageNo");
+                String cageSeal = deliveryobject.getString("CageSeal").isEmpty() || deliveryobject.getString("CageSeal") == null ?
+                        null : deliveryobject.getString("CageSeal");
+
+                String ItemType = deliveryobject.getString("ItemType");
+                switch (ItemType) {
                     case "BAG":
                         Bags bag = new Bags();
                         bag.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         bag.firstbarcode = deliveryobject.getString("SealNo");
-                        bag.secondbarcode ="";
+                        bag.secondbarcode = "";
+                        bag.CageNo = cageNo;
+                        bag.CageSeal = cageSeal;
                         bag.save();
                         break;
 
+                    case "Wagon":
+                        Wagon wagon = new Wagon();
+                        wagon.TransportMasterId = deliveryobject.getInt("TransportMasterId");
+                        wagon.firstbarcode = deliveryobject.getString("SealNo");
+                        wagon.secondbarcode = "";
+                        wagon.CageNo = cageNo;
+                        wagon.CageSeal = cageSeal;
+                        wagon.save();
+                        break;
+
                     case "Envelopes":
-                        List<EnvelopeBag> envelopeBags=EnvelopeBag.getEnvelopesByTransportMasterId(deliveryobject.getInt("TransportMasterId"));
-                        if(envelopeBags.size()>0) {
+                        List<EnvelopeBag> envelopeBags = EnvelopeBag.getEnvelopesByTransportMasterId(deliveryobject.getInt("TransportMasterId"));
+                        if (envelopeBags.size() > 0) {
                             Envelope envelope = new Envelope();
                             envelope.bagid = envelopeBags.get(0).getId();
                             envelope.barcode = deliveryobject.getString("SealNo");
+                            envelope.CageNo = cageNo;
+                            envelope.CageSeal = cageSeal;
                             envelope.save();
-                        }
-                        else
-                        {
+                        } else {
                             EnvelopeBag envelopeBag = new EnvelopeBag();
                             envelopeBag.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                             envelopeBag.envolpeType = "Envelopes";
                             envelopeBag.bagcode = "none";
+                            envelopeBag.CageNo = cageNo;
+                            envelopeBag.CageSeal = cageSeal;
                             long id = envelopeBag.save();
                             //add here if envelope array comes
                             Envelope envelope = new Envelope();
                             envelope.bagid = id;
                             envelope.barcode = deliveryobject.getString("SealNo");
+                            envelope.CageNo = deliveryobject.getString("CageNo");
+                            envelope.CageSeal = deliveryobject.getString("CageSeal");
                             envelope.save();
                         }
                         break;
@@ -314,14 +334,16 @@ public class SyncDatabase {
                         EnvelopeBag envelopeBag2 = new EnvelopeBag();
                         envelopeBag2.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         envelopeBag2.envolpeType = "EnvelopeBag";
-                        envelopeBag2.bagcode =deliveryobject.getString("SealNo");
+                        envelopeBag2.bagcode = deliveryobject.getString("SealNo");
+                        envelopeBag2.CageNo = cageNo;
+                        envelopeBag2.CageSeal = cageSeal;
                         envelopeBag2.save();
-                        long id=envelopeBag2.save();
+                        long id = envelopeBag2.save();
 
-                        String envInBag=deliveryobject.getString("EnvelopeInBag");
-                        if(TextUtils.isEmpty(envInBag) || envInBag==null){
+                        String envInBag = deliveryobject.getString("EnvelopeInBag");
+                        if (TextUtils.isEmpty(envInBag) || envInBag == null) {
 
-                        }else {
+                        } else {
                             List<String> envelopList = new ArrayList<String>(Arrays.asList(envInBag.split(",")));
                             if (envelopList.isEmpty() || envelopList == null) {
 
@@ -330,6 +352,8 @@ public class SyncDatabase {
                                     Envelope envelope = new Envelope();
                                     envelope.bagid = id;
                                     envelope.barcode = envelopList.get(i);
+                                    envelope.CageNo = cageNo;
+                                    envelope.CageSeal = cageSeal;
                                     envelope.save();
                                 }
                             }
@@ -337,8 +361,11 @@ public class SyncDatabase {
                         break;
 
                     case "BOX":
-                       // Box.updateCount(deliveryobject.getInt("TransportMasterId"),deliveryobject.getInt("ProductID"), deliveryobject.getString("Denomination"),deliveryobject.getInt("Qty"));
-                        Box.updateCountNew(deliveryobject.getInt("TransportMasterId"),deliveryobject.getInt("ProductID"), deliveryobject.getString("Denomination"),deliveryobject.getInt("Qty"),deliveryobject.getString("CoinSeries"),deliveryobject.getInt("CoinSeriesId"));
+                    case "Box":
+                        // Box.updateCount(deliveryobject.getInt("TransportMasterId"),deliveryobject.getInt("ProductID"), deliveryobject.getString("Denomination"),deliveryobject.getInt("Qty"));
+                        Box.updateCountNew(deliveryobject.getInt("TransportMasterId"), deliveryobject.getInt("ProductID"),
+                                deliveryobject.getString("Denomination"), deliveryobject.getInt("Qty"),
+                                deliveryobject.getString("CoinSeries"), deliveryobject.getInt("CoinSeriesId"), cageNo, cageSeal);
                         break;
 
                     case "Coin Box":
@@ -347,25 +374,40 @@ public class SyncDatabase {
                         boxBag.bagcode = deliveryobject.getString("SealNo");
                         boxBag.ProductId = deliveryobject.getInt("ProductID");
                         boxBag.ProductName = deliveryobject.getString("Denomination");
-                        boxBag.CoinSeriesId=deliveryobject.getInt("CoinSeriesId");
-                        boxBag.CoinSeries=deliveryobject.getString("CoinSeries");
+                        boxBag.CoinSeriesId = deliveryobject.getInt("CoinSeriesId");
+                        boxBag.CoinSeries = deliveryobject.getString("CoinSeries");
+                        boxBag.CageNo = cageNo;
+                        boxBag.CageSeal = cageSeal;
                         boxBag.save();
                         break;
 
                     case "PALLET":
                         Job.updatePalletCount(deliveryobject.getInt("TransportMasterId"), deliveryobject.getInt("Qty"));
                         break;
-
                 }
 
 
+            }
+
+            JSONArray cageArray = jobObject.getJSONArray("CageList");
+            for (int a = 0; a < cageArray.length(); a++) {
+                JSONObject object = cageArray.getJSONObject(a);
+                if (Cage.getByTransportMasterId(job.TransportMasterId).size() > 0) {
+                    continue;
+                }
+
+                Cage cage = new Cage();
+                cage.CageSeal = object.getString("CageSeal");
+                cage.CageNo = object.getString("CageNo");
+                cage.TransportMasterId = job.TransportMasterId;
+                cage.save();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void saveCoinSeries(JSONObject jsonObject,Context context){
+    public void saveCoinSeries(JSONObject jsonObject, Context context) {
         try {
             if (jsonObject.getJSONArray("CoinSeriesListing") != null) {
                 JSONArray jsonArray = jsonObject.getJSONArray("CoinSeriesListing");
@@ -376,18 +418,18 @@ public class SyncDatabase {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         CoinSeries coinSeries = new CoinSeries();
                         JSONObject series = jsonArray.getJSONObject(i);
-                      //  List<CoinSeries> coinSeriescount = CoinSeries.getSingleCionSeries(series.getInt("Id"));
-                      //  if (coinSeriescount.size() == 0) {
-                            coinSeries.CoinSeriesId = series.getInt("Id");
-                            coinSeries.DataAbbreviation = series.getString("DataAbbreviation");
-                            coinSeries.DataDescription = series.getString("DataDescription");
-                            coinSeries.save();
-                      //  }
+                        //  List<CoinSeries> coinSeriescount = CoinSeries.getSingleCionSeries(series.getInt("Id"));
+                        //  if (coinSeriescount.size() == 0) {
+                        coinSeries.CoinSeriesId = series.getInt("Id");
+                        coinSeries.DataAbbreviation = series.getString("DataAbbreviation");
+                        coinSeries.DataDescription = series.getString("DataDescription");
+                        coinSeries.save();
+                        //  }
                     }
-                   /// Toast.makeText(context, "Coin Series Synced", Toast.LENGTH_LONG).show();
+                    /// Toast.makeText(context, "Coin Series Synced", Toast.LENGTH_LONG).show();
                 }
             }
-        }catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         //.getJSONObject("Data");

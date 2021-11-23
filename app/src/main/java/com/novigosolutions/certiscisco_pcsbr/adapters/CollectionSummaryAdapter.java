@@ -16,6 +16,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.BoxBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
 import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
+import com.novigosolutions.certiscisco_pcsbr.models.Wagon;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class CollectionSummaryAdapter extends RecyclerView.Adapter<CollectionSum
     public CollectionSummaryAdapter(List<Summary> collectionSummaries, Boolean isSummaryScreen, Context context) {
         this.collectionSummaries = collectionSummaries;
         this.isSummaryScreen = isSummaryScreen;
-        this.context=context;
+        this.context = context;
     }
 
     @Override
@@ -88,7 +89,7 @@ public class CollectionSummaryAdapter extends RecyclerView.Adapter<CollectionSum
     }
 
     private void delete(int pos) {
-        if (collectionSummaries.get(pos).Collection_type.equals("Bag")) {
+        if (collectionSummaries.get(pos).Collection_type.equals("Sealed Bag")) {
             Bags.removeSingle(collectionSummaries.get(pos).id);
             collectionSummaries.remove(pos);
             notifyDataSetChanged();
@@ -111,6 +112,10 @@ public class CollectionSummaryAdapter extends RecyclerView.Adapter<CollectionSum
             notifyDataSetChanged();
         } else if (collectionSummaries.get(pos).Collection_type.equals("CoinBox")) {
             BoxBag.removeSingle(collectionSummaries.get(pos).id);
+            collectionSummaries.remove(pos);
+            notifyDataSetChanged();
+        } else if (collectionSummaries.get(pos).Collection_type.equals("Wagon")) {
+            Wagon.removeSingle(collectionSummaries.get(pos).id);
             collectionSummaries.remove(pos);
             notifyDataSetChanged();
         }

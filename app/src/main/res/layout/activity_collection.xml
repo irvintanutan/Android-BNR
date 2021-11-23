@@ -158,19 +158,40 @@
                 </RelativeLayout>
 
                 <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:background="@drawable/blue_border"
-                    android:descendantFocusability="blocksDescendants"
-                    android:minHeight="150dp">
-
+                    android:minHeight="@dimen/_150sdp"
+                    android:descendantFocusability="blocksDescendants" >
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recyclerview"
+                        android:id="@+id/cageRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:id="@+id/recyclerview"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content" />-->
                 </LinearLayout>
+            <LinearLayout
+                android:layout_marginTop="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:orientation="horizontal">
 
+                <Button
+                    android:id="@+id/btn_assign_to_cage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginRight="3dp"
+                    android:textColor="@color/colorWhite"
+                    android:background="@color/cage"
+                    android:textStyle="bold"
+                    android:text="ASSIGN TO CAGE"/>
+
+            </LinearLayout>
                 <LinearLayout
                     android:layout_marginTop="12dp"
                     android:layout_width="match_parent"

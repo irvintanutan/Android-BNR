@@ -16,6 +16,9 @@ import android.widget.Toast;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.CollectionSummaryAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.StringAdapter;
+import com.novigosolutions.certiscisco_pcsbr.expandable.Cage;
+import com.novigosolutions.certiscisco_pcsbr.expandable.CageAdapter;
+import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
@@ -65,6 +68,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
     static int total_item_counter;
     Boolean isSummaryScreen;
     Boolean isOffline = false;
+    int cageCount = 0;
 
     @SuppressLint("NewApi")
     @Override
@@ -161,7 +165,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             ll_lists = findViewById(R.id.ll_lists);
             List<Job> jobs = new ArrayList<>();
             if (isSummary(branch, job))
-                jobs = Job.getCollectionJobsOfPoint(GroupKey, BranchCode ,PFunctionalCode, "COMPLETED");
+                jobs = Job.getCollectionJobsOfPoint(GroupKey, BranchCode ,PFunctionalCode, "COMPLETED", actualFromTime, actualToTime);
                 // jobs.add(Job.getSingle(TransportMasterId));
             else
 //                jobs = Job.getIncompleteCollectionJobsOfPoint(GroupKey);
@@ -178,6 +182,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                     TextView txt_branch_code = titleList.findViewById(R.id.txt_branch_code);
 
                     //nidheesh ** start
+                    TextView txt_cage_count = titleList.findViewById(R.id.txt_cage_count);
                     TextView txt_col_box_count = titleList.findViewById(R.id.txt_col_bag_count);  // nidheesh
                     TextView txt_envs_count = titleList.findViewById(R.id.txt_col_env_count);
                     //nidheesh ** end
@@ -197,13 +202,19 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                         txt_message.setText("No Collection");
                         recyclerView.setVisibility(View.GONE);
                     } else {
-                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-                        recyclerView.setLayoutManager(mLayoutManager);
-                        recyclerView.setItemAnimator(new DefaultItemAnimator());
-                        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
-                        recyclerView.addItemDecoration(dividerItemDecoration);
-                        CollectionSummaryAdapter mAdapter = new CollectionSummaryAdapter(collectionSummaries, true, this);
-                        recyclerView.setAdapter(mAdapter);
+
+                        setCageListView(jobs.get(i).TransportMasterId, titleList);
+                        if (cageCount > 0) {
+                            txt_cage_count.setVisibility(View.VISIBLE);
+                            txt_cage_count.setText("Cage Count : " + cageCount);
+                        }
+//                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+//                        recyclerView.setLayoutManager(mLayoutManager);
+//                        recyclerView.setItemAnimator(new DefaultItemAnimator());
+//                        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
+//                        recyclerView.addItemDecoration(dividerItemDecoration);
+//                        CollectionSummaryAdapter mAdapter = new CollectionSummaryAdapter(collectionSummaries, true, this);
+//                        recyclerView.setAdapter(mAdapter);
                     }
                     ll_lists.addView(titleList);
                     itemCounter(collectionSummaries);
@@ -241,7 +252,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             } else {
                 List<Delivery> bagList = null;
                 if (isSummary(branch, job)) bagList = Delivery.getSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode, job.ActualFromTime , job.ActualToTime);
-                else bagList = Delivery.getPendingSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode);
+                else bagList = Delivery.getPendingSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode, job.ActualFromTime, job.ActualToTime);
                 if (bagList.size() > 0) {
 
                     bagList =  bagList.stream().filter( distinctByKey(p -> p.SealNo) )
@@ -275,7 +286,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
 
                 List<Delivery> boxList = null;
                 if (isSummary(branch, job)) boxList = Delivery.getUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode, actualFromTime, actualToTime);
-                else boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode);
+                else boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode, actualFromTime, actualToTime);
                 if (boxList.size() > 0) {
                     RecyclerView boxlistView = findViewById(R.id.boxlistview);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -315,6 +326,51 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                 //    txt_del_count.setText((bagList.size()+boxList.size())+" items");
             }
         }
+    }
+
+    public void setCageListView(int transportMasterId, View view) {
+        RecyclerView cageRecyclerView =  view.findViewById(R.id.recyclerview);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        cageRecyclerView.setLayoutManager(mLayoutManager);
+        cageRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(cageRecyclerView.getContext(), DividerItemDecoration.VERTICAL);
+        cageRecyclerView.addItemDecoration(dividerItemDecoration);
+
+
+        List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(transportMasterId);
+        List<Cage> cages = new ArrayList<>();
+        cageCount = cageList.size();
+        for (com.novigosolutions.certiscisco_pcsbr.models.Cage c : cageList) {
+            List<Items> list = Job.getCageCollectionSummary(transportMasterId, c.CageNo , c.CageSeal);
+            String cageTitle = "CAGE (QTY : " + cageItemCounter(list) + ")\n" +
+                    "CAGENO : " + c.CageNo + "\nCAGESEAL : " + c.CageSeal;
+            Cage cage = new Cage(cageTitle, list);
+            cages.add(cage);
+        }
+
+        List<Summary> collectionSummaries = Job.getCollectionSummaryWithoutCage(transportMasterId);
+        for (Summary summary : collectionSummaries) {
+            String id = String.valueOf(summary.id);
+            String head = summary.Head;
+            String detail = summary.Message;
+            Cage cage = new Cage(id + "\n" + head + "\n" + detail, new ArrayList<>());
+            cages.add(cage);
+        }
+
+        CageAdapter cageAdapter = new CageAdapter(cages, null, false);
+        cageRecyclerView.setAdapter(cageAdapter);
+    }
+
+    private int cageItemCounter(List<Items> items){
+        int count = 0;
+        for (Items item : items) {
+            if (item.getHead().equals("Box")) {
+                count+=item.getQty();
+            } else {
+                count++;
+            }
+        }
+        return count;
     }
 
     private boolean isSummary(Branch branch, Job job) {

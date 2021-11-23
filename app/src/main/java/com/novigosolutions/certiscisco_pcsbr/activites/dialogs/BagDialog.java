@@ -217,7 +217,6 @@ public class BagDialog extends Dialog implements View.OnClickListener, IOnScanne
                         if (requestId != null && requestId.length() > 0) {
                             APICaller.instance().getrequestStatus(this, context, requestId);
                         } else {
-
                             APICaller.instance().requestForEdit(this, context, "COLLECTION", Job.getSingle(TransportMasterId).GroupKey);
                         }
                     } else {

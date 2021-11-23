@@ -6,6 +6,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.activeandroid.query.Update;
 
 import java.util.List;
 
@@ -28,6 +29,41 @@ public class BoxBag extends Model {
 
     @Column(name = "CoinSeriesId")
     public int  CoinSeriesId;
+
+    @Column(name = "CageNo")
+    public String CageNo;
+
+    @Column(name = "CageSeal")
+    public String CageSeal;
+
+    public static void setCageNoCageSeal(int TransportMasterId, String cageNo, String cageSeal) {
+        new Update(BoxBag.class)
+                .set("CageNo=? , CageSeal=?", cageNo, cageSeal)
+                .where("TransportMasterId=? and CageNo IS NULL and CageSeal IS NULL", TransportMasterId)
+                .execute();
+    }
+    public static List<BoxBag> getByTransportMasterIdWithOutCage(int TransportMasterId) {
+        return new Select().from(BoxBag.class)
+                .where("TransportMasterId=? and CageNo IS NULL and CageSeal IS NULL", TransportMasterId)
+                .execute();
+    }
+
+    public static List<BoxBag> getByTransportMasterIdWithCage(int TransportMasterId, String cageNo , String cageSeal) {
+        return new Select().from(BoxBag.class)
+                .where("TransportMasterId=? and CageNo=? and CageSeal=?", TransportMasterId, cageNo , cageSeal)
+                .execute();
+    }
+    public static List<BoxBag> getByTransportMasterId(int TransportMasterId , String cageNo , String cageSeal) {
+        return new Select().from(BoxBag.class)
+                .where("TransportMasterId=? AND CageNo!=? AND CageSeal!=?", TransportMasterId, cageNo, cageSeal)
+                .execute();
+    }
+
+    public static void removeByCageNoCageSeal(String cageNo , String cageSeal){
+        new Delete().from(BoxBag.class)
+                .where("CageNo=? AND CageSeal=?", cageNo , cageSeal)
+                .execute();
+    }
 
     public static BoxBag getById(long id) {
         return new Select().from(BoxBag.class)

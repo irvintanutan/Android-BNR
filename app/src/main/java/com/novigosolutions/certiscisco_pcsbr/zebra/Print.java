@@ -24,6 +24,7 @@ public class Print {
     private String customerLocation;
 
     private List<Content> contentList;
+    private List<CageContent> cageContentList;
 
     //Transaction officer Signature
     private String certisTransactionOfficer;
@@ -240,5 +241,14 @@ public class Print {
 
     public void setCName(String CName) {
         this.CName = CName;
+    }
+
+
+    public List<CageContent> getCageContentList() {
+        return cageContentList;
+    }
+
+    public void setCageContentList(List<CageContent> cageContentList) {
+        this.cageContentList = cageContentList;
     }
 }

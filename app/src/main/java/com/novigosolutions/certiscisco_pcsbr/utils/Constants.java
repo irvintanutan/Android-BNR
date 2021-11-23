@@ -36,4 +36,8 @@ public class Constants {
 
     public static String SCREEN = "";
     public static boolean isCollection = false;
+
+    public static String startTime = "";
+
+    public static String endTime = "";
 }

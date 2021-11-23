@@ -7,6 +7,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.BoxBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Break;
+import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.ChatMessage;
 import com.novigosolutions.certiscisco_pcsbr.models.CoinSeries;
 import com.novigosolutions.certiscisco_pcsbr.models.Currency;
@@ -15,6 +16,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
 import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
+import com.novigosolutions.certiscisco_pcsbr.models.Wagon;
 
 public class DatabaseContentProvider extends ContentProvider {
 
@@ -34,6 +36,8 @@ public class DatabaseContentProvider extends ContentProvider {
         builder.addModelClass(Break.class);
         builder.addModelClass(Reschedule.class);
         builder.addModelClass(CoinSeries.class);
+        builder.addModelClass(Wagon.class);
+        builder.addModelClass(Cage.class);
         return builder.create();
     }
 }

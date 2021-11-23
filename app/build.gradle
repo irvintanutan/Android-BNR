@@ -8,8 +8,8 @@ android {
         applicationId "com.novigosolutions.certiscisco_pcsbr"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 31
-        versionName "10.2.19"
+        versionCode 38
+        versionName "10.3.3"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         renderscriptTargetApi 19
         renderscriptSupportModeEnabled true
@@ -89,6 +89,11 @@ dependencies {
 
     api 'com.intuit.ssp:ssp-android:1.0.5'
     api 'com.intuit.sdp:sdp-android:1.0.5'
+
+    api 'com.google.zxing:core:3.2.1'
+    api 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
+
+    api 'com.thoughtbot:expandablecheckrecyclerview:1.4'
 
 }
 

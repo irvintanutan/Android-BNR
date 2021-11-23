@@ -72,6 +72,8 @@ public class GroupGridAdapter extends RecyclerView.Adapter<GroupGridAdapter.MyVi
 
         String BranchCode = js.get(0).BranchCode;
         String PFunctionalCode = js.get(0).PFunctionalCode;
+        String ActualFromTime = js.get(0).ActualFromTime;
+        String ActualToTime = js.get(0).ActualToTime;
 
         if (singleJob) {
             if (!TextUtils.isEmpty(j.SequenceNo) && !j.SequenceNo.equalsIgnoreCase("null"))
@@ -109,7 +111,8 @@ public class GroupGridAdapter extends RecyclerView.Adapter<GroupGridAdapter.MyVi
                 holder.llmain.setBackgroundResource(R.drawable.brown_border);
             } else if (Job.getPendingJobsOfPoint(branches.get(position).GroupKey).size() == 0) {
                 holder.llmain.setBackgroundResource(R.drawable.green_border);
-            } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey, BranchCode, PFunctionalCode).size() > 0 && !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey, BranchCode , PFunctionalCode)) {
+            } else if (Job.getPendingDeliveryJobsOfPoint(branches.get(position).GroupKey, BranchCode, PFunctionalCode, ActualFromTime, ActualToTime).size() > 0 &&
+                    !Delivery.hasPendingDeliveryItems(branches.get(position).GroupKey, BranchCode , PFunctionalCode, ActualFromTime, ActualToTime)) {
                 holder.llmain.setBackgroundResource(R.drawable.yellow_border);
             } else if (singleJob && j.IsFloatDeliveryOrder && TextUtils.isEmpty(j.DependentOrderId) && Job.checkPendingDependentCollections(j.DependentOrderId).size() > 0) {
                 holder.llmain.setBackgroundResource(R.drawable.yellow_border);

@@ -12,17 +12,24 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.BagDialog;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.BarCodeScanActivity;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.BoxDialog;
+import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.CageDialog;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.CoinBoxDialog;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.EnvelopeDialog;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.PalletDialog;
+import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.WagonDialog;
 import com.novigosolutions.certiscisco_pcsbr.adapters.CollectionSummaryAdapter;
+import com.novigosolutions.certiscisco_pcsbr.expandable.Cage;
+import com.novigosolutions.certiscisco_pcsbr.expandable.CageAdapter;
+import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
+import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
@@ -31,6 +38,7 @@ import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.appcompat.widget.Toolbar;
@@ -43,13 +51,14 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
     Spinner spinner;
     int trasportMasterId;
     TextView from_customer_name, from_functional_code, from_street_tower, from_town_pin, to_customer_name, to_functional_code, to_street_tower, to_town_pin;
-    Button btn_go, btn_next,btnCancel;
-    RecyclerView recyclerView;
+    Button btn_go, btn_next, btnCancel, btn_cage;
+    RecyclerView recyclerView, cageRecyclerView;
     private CollectionSummaryAdapter mAdapter;
     List<Summary> collectionSummaries;
     ImageView imgnetwork;
     int customerID;
     String GroupKey;
+    private CageAdapter cageAdapter;
     //private EMDKWrapper0 emdkWrapper = null;
 
     @Override
@@ -58,9 +67,6 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
         setContentView(R.layout.activity_collection);
         setuptoolbar();
 
-//        if (android.os.Build.MANUFACTURER.contains("Zebra Technologies") || android.os.Build.MANUFACTURER.contains("Motorola Solutions")) {
-//            emdkWrapper = new EMDKWrapper(this);
-//        }
         spinner = findViewById(R.id.spn_collection_type);
 
         from_customer_name = findViewById(R.id.from_customer_name);
@@ -75,7 +81,9 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
 
         btn_go = findViewById(R.id.btn_go);
         btn_next = findViewById(R.id.btn_next);
+        btn_cage = findViewById(R.id.btn_assign_to_cage);
         recyclerView = findViewById(R.id.recyclerview);
+        cageRecyclerView = findViewById(R.id.cageRecyclerView);
         btnCancel = findViewById(R.id.btn_cancel);
 
         Bundle extras = getIntent().getExtras();
@@ -88,18 +96,18 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
-        recyclerView.addItemDecoration(dividerItemDecoration);
-        collectionSummaries = Job.getCollectionSummary(trasportMasterId);
-        mAdapter = new CollectionSummaryAdapter(collectionSummaries, false, this);
-        recyclerView.setAdapter(mAdapter);
+//        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+//        recyclerView.setLayoutManager(mLayoutManager);
+//        recyclerView.setItemAnimator(new DefaultItemAnimator());
+//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
+//        recyclerView.addItemDecoration(dividerItemDecoration);
+//        collectionSummaries = Job.getCollectionSummaryWithoutCage(trasportMasterId);
+//        mAdapter = new CollectionSummaryAdapter(collectionSummaries, false, this);
+//        recyclerView.setAdapter(mAdapter);
 
         Job job = Job.getSingle(trasportMasterId);
         Branch branch = Branch.getSingle(job.GroupKey);
-        customerID=branch.CustomerId;
+        customerID = branch.CustomerId;
 
         from_customer_name.setText(branch.CustomerName);
         from_functional_code.setText(branch.FunctionalCode);
@@ -131,25 +139,70 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
         }
         to_town_pin.setText(ttown_pin);
 
-        btn_go.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openDialoge();
-            }
-        });
-        btn_next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
+        btn_go.setOnClickListener(v -> openDialoge());
+
+        btn_cage.setOnClickListener(view -> {
+            if (collectionSummaries.isEmpty()) {
+                Toast.makeText(getApplicationContext(), "No Items for Adding to Cage", Toast.LENGTH_LONG).show();
+            } else
+                openCageDialog();
         });
 
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alert();
-            }
-        });
+        btn_next.setOnClickListener(v -> onBackPressed());
+
+        btnCancel.setOnClickListener(view -> alert());
+
+        setCageListView();
+    }
+
+    public void setCageListView() {
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        cageRecyclerView.setLayoutManager(mLayoutManager);
+        cageRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(cageRecyclerView.getContext(), DividerItemDecoration.VERTICAL);
+        cageRecyclerView.addItemDecoration(dividerItemDecoration);
+
+
+        List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(trasportMasterId);
+        List<Cage> cages = new ArrayList<>();
+
+        for (com.novigosolutions.certiscisco_pcsbr.models.Cage c : cageList) {
+            List<Items> list = Job.getCageCollectionSummary(trasportMasterId, c.CageNo , c.CageSeal);
+            String cageTitle = "CAGE (QTY : " + cageItemCounter(list) + ")\n" +
+                    "CAGENO : " + c.CageNo + "\nCAGESEAL : " + c.CageSeal;
+            Cage cage = new Cage(cageTitle, list);
+            cages.add(cage);
+        }
+
+        collectionSummaries = Job.getCollectionSummaryWithoutCage(trasportMasterId);
+        for (Summary summary : collectionSummaries) {
+            String id = String.valueOf(summary.id);
+            String head = summary.Head;
+            String detail = summary.Message;
+            Cage cage = new Cage(id + "\n" + head + "\n" + detail, new ArrayList<>());
+            cages.add(cage);
+        }
+
+        cageAdapter = new CageAdapter(cages, this, true);
+        cageRecyclerView.setAdapter(cageAdapter);
+    }
+
+    private int cageItemCounter(List<Items> items){
+            int count = 0;
+           for (Items item : items) {
+               if (item.getHead().equals("Box")) {
+                   count+=item.getQty();
+               } else {
+                   count++;
+               }
+           }
+           return count;
+    }
+
+    private void openCageDialog() {
+        CageDialog bagDialog = new CageDialog(CollectionActivity.this, trasportMasterId, this);
+        bagDialog.setCancelable(false);
+        bagDialog.show();
     }
 
     private void setuptoolbar() {
@@ -181,7 +234,7 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
 
     private void openDialoge() {
         String collection_type = spinner.getSelectedItem().toString();
-        if (collection_type.equals("Bag")) {
+        if (collection_type.equals("Sealed Bag")) {
             BagDialog bagDialog = new BagDialog(CollectionActivity.this, trasportMasterId, this);
             bagDialog.setCancelable(false);
             bagDialog.show();
@@ -194,7 +247,7 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
             envelopeDialog.setCancelable(false);
             envelopeDialog.show();
         } else if (collection_type.equals("Box")) {
-            BoxDialog boxDialog = new BoxDialog(CollectionActivity.this, trasportMasterId, this,customerID);
+            BoxDialog boxDialog = new BoxDialog(CollectionActivity.this, trasportMasterId, this, customerID);
             boxDialog.setCancelable(false);
             boxDialog.show();
         } else if (collection_type.equals("Pallet")) {
@@ -202,28 +255,21 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
             palletDialog.setCancelable(false);
             palletDialog.show();
         } else if (collection_type.equals("Coin Bag")) {
-            Log.e("openeing","coin bag");
-            CoinBoxDialog coinBoxDialog = new CoinBoxDialog(CollectionActivity.this, trasportMasterId, this,customerID);
+            Log.e("openeing", "coin bag");
+            CoinBoxDialog coinBoxDialog = new CoinBoxDialog(CollectionActivity.this, trasportMasterId, this, customerID);
             coinBoxDialog.setCancelable(false);
             coinBoxDialog.show();
-            Window window=coinBoxDialog.getWindow();
+            Window window = coinBoxDialog.getWindow();
             window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        } else if (collection_type.equals("Wagon")) {
+            WagonDialog wagonDialog = new WagonDialog(CollectionActivity.this, trasportMasterId, this);
+            wagonDialog.setCancelable(false);
+            wagonDialog.show();
         }
     }
 
     private void refresh() {
         List<Summary> tempList = Job.getCollectionSummary(trasportMasterId);
-//        List<CollectionSummary> oldList = new ArrayList<>();
-//        oldList.addAll(collectionSummaries);
-//        collectionSummaries.clear();
-//        for (int i = 0; i < oldList.size(); i++) {
-//            if (tempList.contains(oldList.get(i)))
-//                collectionSummaries.add(oldList.get(i));
-//        }
-//        for (int i = 0; i < tempList.size(); i++) {
-//            if (!collectionSummaries.contains(tempList.get(i)))
-//                collectionSummaries.add(tempList.get(i));
-//        }
         collectionSummaries.clear();
         collectionSummaries.addAll(tempList);
         mAdapter.notifyDataSetChanged();
@@ -231,7 +277,8 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
 
     @Override
     public void onResult() {
-        refresh();
+        //refresh();
+        setCageListView();
     }
 
     @Override
@@ -266,14 +313,4 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
         });
         alertDialog.show();
     }
-
-//    public void scan(ScanDataPass scanDataPass) {
-//        try {
-//            if (emdkWrapper != null)
-//                emdkWrapper.scansoft(scanDataPass);
-//            else Toast.makeText(this, "Scanner not supported", Toast.LENGTH_SHORT).show();
-//        } catch (ScannerException e) {
-//            e.printStackTrace();
-//        }
-//    }
 }

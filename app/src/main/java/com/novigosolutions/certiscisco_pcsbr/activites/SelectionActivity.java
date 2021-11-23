@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,10 +47,18 @@ public class SelectionActivity extends AppCompatActivity {
 
         setuptoolbar();
 
-        try {
-            Job.UpdateDateFormats();
-        } catch (ParseException e) {
-            e.printStackTrace();
+//        try {
+//            Job.UpdateDateFormats();
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+
+        List<Job> jobs = Job.getAllJobs();
+
+        for (Job job  : jobs)  {
+            //if (job.OrderNo.equals("")) {
+                Log.e("TESTING " , job.OrderNo + " "  + job.ActualFromTime);
+           // }
         }
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);

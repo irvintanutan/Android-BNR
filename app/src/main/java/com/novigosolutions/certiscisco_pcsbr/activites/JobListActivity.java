@@ -33,6 +33,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
@@ -136,6 +137,8 @@ public class JobListActivity extends BaseActivity implements RecyclerViewClickLi
 
         List<Job> jobsList = Job.getDeliveryJobsOfPoint(GroupKey, Branchcode , PFunctionalCode, actualFromTime ,actualToTime);
         branch.updateJobStartTime(CommonMethods.getCurrentDateTime(this));
+        Constants.startTime = CommonMethods.getCurrentDateTime(this);
+
         Intent intent = null;
         if (job.Status.equals("COMPLETED") || (jobtype == 1 && job.isOfflineSaved) || (jobtype == 2 && (job.isOfflineSaved || Reschedule.isOfflineRescheduled(GroupKey))) || (jobtype == 3 && job.isOfflineSaved &&  Reschedule.isOfflineRescheduled(GroupKey))) {
             intent = new Intent(JobListActivity.this, SummaryActivity.class);
@@ -143,7 +146,7 @@ public class JobListActivity extends BaseActivity implements RecyclerViewClickLi
             intent.putExtra("GroupKey", GroupKey);
             intent.putExtra("summaryType", jobtype);
             intent.putExtra("isSummary",true);
-        } else if (jobtype == 1 || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey, Branchcode , PFunctionalCode).size() == 0 || branch.isDelOffline))) {
+        } else if (jobtype == 1 || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey, Branchcode , PFunctionalCode, actualFromTime, actualToTime).size() == 0 || branch.isDelOffline))) {
             Job.updateJobStartTime(job.TransportMasterId,CommonMethods.getCurrentDateTime(this));
             intent = new Intent(JobListActivity.this, ConfirmationActivity.class);
             intent.putExtra("TransportMasterId", TransportMasterId);
