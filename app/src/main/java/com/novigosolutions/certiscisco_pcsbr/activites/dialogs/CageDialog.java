@@ -155,7 +155,7 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
     }
 
     private void saveToCage() {
-        if (txt_cage_seal.getText().toString().equals(noBarcode) || txt_cage_no.getText().toString().equals(noBarcode)) {
+        if (txt_cage_seal.getText().toString().isEmpty() || txt_cage_no.getText().toString().isEmpty()) {
             Toast.makeText(context, "No Barcode Scanned", Toast.LENGTH_LONG).show();
         } else {
 
