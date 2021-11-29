@@ -53,7 +53,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class CageDialog extends Dialog implements View.OnClickListener, IOnScannerData, ApiCallback {
 
     Context context;
-    TextView txt_count, txt_cage_no, txt_cage_seal;
+    EditText txt_cage_no, txt_cage_seal;
     int TransportMasterId;
     DialogResult mDialogResult;
     ImageView img_manual_entry;
@@ -83,9 +83,8 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
 
     private void initialize() {
         img_manual_entry = findViewById(R.id.img_manual_entry);
-        imgCageNo = findViewById(R.id.imgCageNo);
-        imgCageSeal = findViewById(R.id.imgCageSeal);
         txt_cage_no = findViewById(R.id.barcodeTextCageNo);
+        txt_cage_no.clearFocus();
         txt_cage_seal = findViewById(R.id.barcodeTextCageSeal);
         btnScanCageNo = findViewById(R.id.btnScanCageNo);
         btnScanCageSeal = findViewById(R.id.btnScanCageSeal);
@@ -96,8 +95,14 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
         confirm.setOnClickListener(this);
         btnScanCageSeal.setOnClickListener(this);
         btnScanCageNo.setOnClickListener(this);
+        img_manual_entry.setOnClickListener(this);
 
         ((BarCodeScanActivity) context).registerScannerEvent(this);
+    }
+
+    private void openManualEntry() {
+        txt_cage_no.setEnabled(true);
+        txt_cage_seal.setEnabled(true);
     }
 
 
@@ -129,11 +134,28 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
             case R.id.confirm:
                 saveToCage();
                 break;
+            case R.id.img_manual_entry:
+                if (Preferences.getBoolean("EnableManualEntry", context) || Job.getSingle(TransportMasterId).EnableManualEntry) {
+                    openManualEntry();
+                } else {
+                    if (NetworkUtil.getConnectivityStatusString(context)) {
+                        ((CollectionActivity) context).showProgressDialog("Loading...");
+                        String requestId = Job.getSingle(TransportMasterId).requestId;
+                        if (requestId != null && requestId.length() > 0) {
+                            APICaller.instance().getrequestStatus(this, context, requestId);
+                        } else {
+                            APICaller.instance().requestForEdit(this, context, "COLLECTION", Job.getSingle(TransportMasterId).GroupKey);
+                        }
+                    } else {
+                        ((CollectionActivity) context).raiseInternetSnakbar();
+                    }
+                }
+                break;
         }
     }
 
     private void saveToCage() {
-        if (txt_cage_seal.getText().toString().equals(noBarcode) || txt_cage_no.getText().toString().equals(noBarcode)) {
+        if (txt_cage_seal.getText().toString().isEmpty() || txt_cage_no.getText().toString().isEmpty()) {
             Toast.makeText(context, "No Barcode Scanned", Toast.LENGTH_LONG).show();
         } else {
 
@@ -158,28 +180,9 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
 
 
     private void initializeBarcode() {
-        String noBarcode = "0000000000000";
-        txt_cage_no.setText(noBarcode);
-        MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
-        try {
-            BitMatrix bitMatrix = multiFormatWriter.encode(noBarcode, BarcodeFormat.CODABAR, 150, 50);
-            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
-            imgCageNo.setImageBitmap(bitmap);
-        } catch (WriterException e) {
-            e.printStackTrace();
-        }
-
-        txt_cage_seal.setText(noBarcode);
-        MultiFormatWriter multiFormatWriter2 = new MultiFormatWriter();
-        try {
-            BitMatrix bitMatrix = multiFormatWriter2.encode(noBarcode, BarcodeFormat.CODABAR, 150, 50);
-            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
-            imgCageSeal.setImageBitmap(bitmap);
-        } catch (WriterException e) {
-            e.printStackTrace();
-        }
+//        String noBarcode = "0000000000000";
+//        txt_cage_no.setText(noBarcode);
+//        txt_cage_seal.setText(noBarcode);
     }
 
 
@@ -192,26 +195,8 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
         else {
             if (scanType.equals("CageNo")) {
                 txt_cage_no.setText(data);
-                MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
-                try {
-                    BitMatrix bitMatrix = multiFormatWriter.encode(data, BarcodeFormat.CODE_128, 150, 50);
-                    BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                    Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
-                    imgCageNo.setImageBitmap(bitmap);
-                } catch (WriterException e) {
-                    e.printStackTrace();
-                }
             } else {
                 txt_cage_seal.setText(data);
-                MultiFormatWriter multiFormatWriter2 = new MultiFormatWriter();
-                try {
-                    BitMatrix bitMatrix = multiFormatWriter2.encode(data, BarcodeFormat.CODE_128, 150, 50);
-                    BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                    Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
-                    imgCageSeal.setImageBitmap(bitmap);
-                } catch (WriterException e) {
-                    e.printStackTrace();
-                }
             }
         }
     }
@@ -227,6 +212,33 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
 
     @Override
     public void onResult(int api_code, int result_code, String result_data) {
+        try {
+            Log.e("result_data", result_data);
+            ((CollectionActivity) context).hideProgressDialog();
+            if (result_code == 200) {
+                if (api_code == Constants.GETREQUESTSTATUS) {
+                    if (result_data.replaceAll("\\W", "").equalsIgnoreCase("CONFIRMED")) {
+                        Job.EnableManualEntry(TransportMasterId);
+                        openManualEntry();
+                    } else if (result_data.replaceAll("\\W", "").equalsIgnoreCase("REJECTED")) {
+                        Job.UpdateRequestId(TransportMasterId, "");
+                        Toast.makeText(context, "Request is rejected", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(context, "Request is pending", Toast.LENGTH_SHORT).show();
+                    }
+                } else if (api_code == Constants.REQUESTFOREDIT) {
+                    JSONObject obj = new JSONObject(result_data);
+                    if (obj.getString("Result").equals("Success")) {
+                        Job.UpdateRequestId(TransportMasterId, obj.getString("Data"));
+                        Toast.makeText(context, "Requested", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            } else {
+                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 }
