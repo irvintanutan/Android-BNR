@@ -69,6 +69,18 @@ public class Box extends Model {
                 .execute();
     }
 
+    public static List<Box> getBoxByTransportMasterIdWithCage(int TransportMasterId, String cageNo, String cageSeal) {
+        return new Select().from(Box.class)
+                .where("TransportMasterId=?", TransportMasterId)
+                .execute();
+    }
+
+    public static List<Box> getBoxByTransportMasterIdWithoutCage(int TransportMasterId) {
+        return new Select().from(Box.class)
+                .where("TransportMasterId=? AND CageNo IS NULL AND CageSeal IS NULL", TransportMasterId)
+                .execute();
+    }
+
     public static void updateCount(int TransportMasterId, int ProductId, String productName, int count) {
         Box box = new Select().from(Box.class)
                 .where("TransportMasterId=? AND ProductId=?", TransportMasterId, ProductId)
@@ -88,9 +100,22 @@ public class Box extends Model {
         }
     }
 
+    public static void saveBoxItems(int TransportMasterId, int ProductId, String productName, int count, String description, int coinseriesid, String cageNo, String cageSeal) {
+        Box newbox = new Box();
+        newbox.TransportMasterId = TransportMasterId;
+        newbox.ProductId = ProductId;
+        newbox.ProductName = productName;
+        newbox.count = count;
+        newbox.CoinSeries = description;
+        newbox.CoinSeriesId = coinseriesid;
+        newbox.CageNo = cageNo;
+        newbox.CageSeal = cageSeal;
+        newbox.save();
+    }
+
     public static void updateCountNew(int TransportMasterId, int ProductId, String productName, int count, String description, int coinseriesid, String cageNo, String cageSeal) {
         Box box = new Select().from(Box.class)
-                .where("TransportMasterId=? AND ProductId=? AND CoinSeriesId=?", TransportMasterId, ProductId, coinseriesid)
+                .where("TransportMasterId=? AND ProductId=? AND CoinSeriesId=? AND CageNo IS NULL AND CageSeal IS NULL", TransportMasterId, ProductId, coinseriesid)
                 .executeSingle();
         if (box == null) {
             Box newbox = new Box();

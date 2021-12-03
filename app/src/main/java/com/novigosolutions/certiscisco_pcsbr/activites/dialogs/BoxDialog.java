@@ -20,7 +20,6 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.CoinSeries;
 import com.novigosolutions.certiscisco_pcsbr.models.Currency;
-import com.novigosolutions.certiscisco_pcsbr.models.Job;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +82,7 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
         btn_add.setOnClickListener(this);
         btn_done.setOnClickListener(this);
         btn_cancel.setOnClickListener(this);
-        List<Box> boxes = Box.getBoxByTransportMasterId(TransportMasterId);
+        List<Box> boxes = Box.getBoxByTransportMasterIdWithoutCage(TransportMasterId);
         if (boxes != null) {
             for (int i = 0; i < boxes.size(); i++) {
                 Box box = boxes.get(i);

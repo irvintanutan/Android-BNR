@@ -2,7 +2,6 @@ package com.novigosolutions.certiscisco_pcsbr.models;
 
 
 import android.annotation.SuppressLint;
-import android.content.ClipData;
 import android.content.Context;
 import android.util.Log;
 
@@ -12,7 +11,6 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.activeandroid.query.Update;
-import com.activeandroid.util.SQLiteUtils;
 import com.google.gson.JsonObject;
 import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
@@ -25,8 +23,6 @@ import com.novigosolutions.certiscisco_pcsbr.zebra.Denomination;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -37,7 +33,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.novigosolutions.certiscisco_pcsbr.models.Delivery.getPendingSealedByPointId;
 

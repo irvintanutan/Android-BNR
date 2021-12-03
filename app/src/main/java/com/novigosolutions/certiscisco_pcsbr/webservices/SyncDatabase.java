@@ -363,7 +363,7 @@ public class SyncDatabase {
                     case "BOX":
                     case "Box":
                         // Box.updateCount(deliveryobject.getInt("TransportMasterId"),deliveryobject.getInt("ProductID"), deliveryobject.getString("Denomination"),deliveryobject.getInt("Qty"));
-                        Box.updateCountNew(deliveryobject.getInt("TransportMasterId"), deliveryobject.getInt("ProductID"),
+                        Box.saveBoxItems(deliveryobject.getInt("TransportMasterId"), deliveryobject.getInt("ProductID"),
                                 deliveryobject.getString("Denomination"), deliveryobject.getInt("Qty"),
                                 deliveryobject.getString("CoinSeries"), deliveryobject.getInt("CoinSeriesId"), cageNo, cageSeal);
                         break;
@@ -392,9 +392,9 @@ public class SyncDatabase {
             JSONArray cageArray = jobObject.getJSONArray("CageList");
             for (int a = 0; a < cageArray.length(); a++) {
                 JSONObject object = cageArray.getJSONObject(a);
-                if (Cage.getByTransportMasterId(job.TransportMasterId).size() > 0) {
-                    continue;
-                }
+//                if (Cage.getByTransportMasterId(job.TransportMasterId).size() > 0) {
+//                    continue;
+//                }
 
                 Cage cage = new Cage();
                 cage.CageSeal = object.getString("CageSeal");
