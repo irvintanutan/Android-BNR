@@ -13,11 +13,9 @@ import com.activeandroid.query.Select;
 import com.activeandroid.query.Update;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

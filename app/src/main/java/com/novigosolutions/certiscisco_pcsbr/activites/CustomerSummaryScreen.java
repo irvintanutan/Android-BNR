@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
-import com.novigosolutions.certiscisco_pcsbr.adapters.CollectionSummaryAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.StringAdapter;
 import com.novigosolutions.certiscisco_pcsbr.expandable.Cage;
 import com.novigosolutions.certiscisco_pcsbr.expandable.CageAdapter;
