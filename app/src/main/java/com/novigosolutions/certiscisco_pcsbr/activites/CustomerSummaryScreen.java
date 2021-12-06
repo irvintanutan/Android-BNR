@@ -340,7 +340,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
         cageCount = cageList.size();
         for (com.novigosolutions.certiscisco_pcsbr.models.Cage c : cageList) {
             List<Items> list = Job.getCageCollectionSummary(transportMasterId, c.CageNo , c.CageSeal);
-            String cageTitle = "CAGE (QTY : " + cageItemCounter(list) + ")\n" +
+            String cageTitle = "CAGE (ITEMS IN CAGE : " + cageItemCounter(list) + ")\n" +
                     "CAGENO : " + c.CageNo + "\nCAGESEAL : " + c.CageSeal;
             Cage cage = new Cage(cageTitle, list);
             cages.add(cage);
