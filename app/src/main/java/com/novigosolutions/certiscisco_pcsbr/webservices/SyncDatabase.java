@@ -287,7 +287,7 @@ public class SyncDatabase {
                         Bags bag = new Bags();
                         bag.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         bag.firstbarcode = deliveryobject.getString("SealNo");
-                        bag.secondbarcode = "";
+                        bag.secondbarcode = deliveryobject.getString("SealNo2");;
                         bag.CageNo = cageNo;
                         bag.CageSeal = cageSeal;
                         bag.save();
@@ -297,7 +297,7 @@ public class SyncDatabase {
                         Wagon wagon = new Wagon();
                         wagon.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         wagon.firstbarcode = deliveryobject.getString("SealNo");
-                        wagon.secondbarcode = "";
+                        wagon.secondbarcode = deliveryobject.getString("SealNo2");;
                         wagon.CageNo = cageNo;
                         wagon.CageSeal = cageSeal;
                         wagon.save();

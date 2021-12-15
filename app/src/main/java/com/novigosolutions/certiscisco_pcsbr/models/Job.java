@@ -1478,6 +1478,7 @@ public class Job extends Model implements Comparable<Job> {
         Constants.BOX_QUANTITY += boxQty;
         Constants.BOX_QUANTITY += coinBagQty;
         Constants.BOX_QUANTITY += bagQty;
+        Constants.BOX_QUANTITY +=wagonQty;
         return printContent;
     }
 

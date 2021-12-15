@@ -566,6 +566,8 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
     public void onResult(int api_code, int result_code, String result_data) {
         try {
             button_submit.setEnabled(true);
+            Log.e("RESULT_DATA" , result_data);
+
             if (result_code == 200) {
                 JSONObject obj = new JSONObject(result_data);
                 if (obj.getString("Result").equals("Success")) {
