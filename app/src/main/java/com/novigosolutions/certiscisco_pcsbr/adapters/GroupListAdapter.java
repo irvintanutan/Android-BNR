@@ -128,6 +128,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
                 else
                     holder.txt_pos.setText("");
                 holder.txt_break_time.setText(j.ClientBreak);
+                holder.txt_break_time.setText(j.ClientBreak);
                 if (jobtype == 1) {
                     holder.txt_branch_name.setText("Pick Up : " + PickUpPoint);// + " (" + j.FunctionalCode + ")");
                 } else if (jobtype == 2) {

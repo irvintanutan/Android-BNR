@@ -318,6 +318,16 @@ public class Job extends Model implements Comparable<Job> {
         return jl;
     }
 
+    public static List<Job> getPendingJobList() {
+        List<Job> jl = new Select().from(Job.class)
+                .where("status=?", "PENDING")
+                .groupBy("GroupKey")
+                .orderBy("SequenceNo")
+                .execute();
+
+        return jl;
+    }
+
     public static List<Job> getJobListByType(int isDelivered, int isCollection, String GroupKey, String BranchCode, String PFunctionalCode, String startTime, String endTime) {
         List<Job> jl;
 
@@ -346,7 +356,8 @@ public class Job extends Model implements Comparable<Job> {
 
     public static List<Job> getAllJobListByType() {
         List<Job> jl = new Select().from(Job.class)
-                .groupBy("BranchCode, Status, PFunctionalCode, ActualFromTime, ActualToTime")
+                .groupBy("GroupKey, BranchCode, Status, PFunctionalCode, ActualFromTime, ActualToTime")
+                .orderBy("SequenceNo")
                 .execute();
 
         return jl;

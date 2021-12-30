@@ -90,8 +90,8 @@ public class SelectedJobListAdapter extends RecyclerView.Adapter<SelectedJobList
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Job job = jobs.get(position);
         Branch b = Branch.getSingle(job.GroupKey);
-        if (!TextUtils.isEmpty(job.SequenceNo) && !job.SequenceNo.equalsIgnoreCase("null"))
-            holder.txt_pos.setText(job.SequenceNo);
+        //if (!TextUtils.isEmpty(job.SequenceNo) && !job.SequenceNo.equalsIgnoreCase("null"))
+        holder.txt_pos.setText(job.SequenceNo);
         holder.txt_customer_name.setText(job.CustomerName);
         if (job.IsFloatDeliveryOrder) {
 

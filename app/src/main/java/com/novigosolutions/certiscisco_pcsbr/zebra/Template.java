@@ -1,5 +1,6 @@
 package com.novigosolutions.certiscisco_pcsbr.zebra;
 
+import com.novigosolutions.certiscisco_pcsbr.BuildConfig;
 import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 
@@ -80,12 +81,16 @@ public class Template {
                 "        <br><br>\n" +
                 "        <b><u>Description of secured package(s)</u></b>\n" +
                 "        <br><br>\n" +
-                "        <table>\n" +
-                "         <tr>   <th>" + getLabel3(print.isCollection()) + "</th><th>Quantity</th><th>Seal No/Deno</th></tr>\n";
+                "        <table>\n";
 
         List<Content> contents = print.getContentList();
         int countListSize = (contents != null && !contents.isEmpty()) ? contents.size() : 0;
+        List<CageContent> cageContentList = print.getCageContentList();
+        int cageCountListSize = (cageContentList != null && !cageContentList.isEmpty()) ? cageContentList.size() : 0;
 
+        if(countListSize==0 && cageCountListSize == 0 ) {
+            html += "         <tr>   <th>" + getLabel3(print.isCollection()) + "</th><th>Quantity</th><th>Seal No/Deno</th></tr>\n";
+        }
         for (int i = 0; i < countListSize; i++) {
             html += "<tr>" +
                     "<td>" + contents.get(i).getDescription() + "</td>" +
@@ -129,7 +134,7 @@ public class Template {
                     "</tr>";
         }
 
-        if(countListSize==0){
+        if(countListSize==0 && cageCountListSize == 0 ){
             html+=" <td colspan=\"3\"><br><label><center>";
             if(print.isCollection())
             {
@@ -142,8 +147,6 @@ public class Template {
 
         html += "</table>";
         html += "<table>";
-        List<CageContent> cageContentList = print.getCageContentList();
-        int cageCountListSize = (cageContentList != null && !cageContentList.isEmpty()) ? cageContentList.size() : 0;
         if (cageCountListSize > 0) {
            html += "<br>         <tr>   <th>" + "Cage No" + "</th><th>Cage Seal</th><th>Items</th></tr>\n";
         }
@@ -166,7 +169,6 @@ public class Template {
             html += "</td>" +
                     "</tr>";
         }
-
         if(countListSize==0 && cageCountListSize == 0){
             html+=" <td colspan=\"3\"><br><label><center>";
             if(print.isCollection())
@@ -197,6 +199,7 @@ public class Template {
                 "        \n" +
                 "        <hr style='border: 1px dashed black;' />\n" +
                 "        <p style=\"text-align: center; width: 100%;\" >" + print.getFooter() + "</p>\n" +
+                "        <p style=\"text-align: center; width: 100%;\" >" + BuildConfig.VERSION_NAME + "</p>\n" +
                 "    </body>" +
                 "</html>";
 
