@@ -88,7 +88,7 @@ public class Template {
         List<CageContent> cageContentList = print.getCageContentList();
         int cageCountListSize = (cageContentList != null && !cageContentList.isEmpty()) ? cageContentList.size() : 0;
 
-        if(countListSize==0 && cageCountListSize == 0 ) {
+        if(countListSize != 0 || (countListSize == 0 && cageCountListSize == 0)) {
             html += "         <tr>   <th>" + getLabel3(print.isCollection()) + "</th><th>Quantity</th><th>Seal No/Deno</th></tr>\n";
         }
         for (int i = 0; i < countListSize; i++) {
@@ -147,7 +147,7 @@ public class Template {
 
         html += "</table>";
         html += "<table>";
-        if (cageCountListSize > 0) {
+        if (cageCountListSize > 0 || (countListSize == 0 && cageCountListSize == 0)) {
            html += "<br>         <tr>   <th>" + "Cage No" + "</th><th>Cage Seal</th><th>Items</th></tr>\n";
         }
         for (int i = 0; i < cageCountListSize; i++) {
