@@ -136,11 +136,13 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
                         intent.putExtra("isCollection", 1);
                         intent.putExtra("isDelivered", 0);
                         intent.putExtra("status", "ALL");
+                        Constants.BackDestination = "ALL";
                         Constants.isAll = true;
                         break;
                     case 1:
                         intent = new Intent(HomeActivity.this, GroupJobActivity.class);
                         intent.putExtra("status", "PENDING");
+                        Constants.BackDestination = "PENDING";
                         Constants.isAll = false;
                         break;
                     case 2:

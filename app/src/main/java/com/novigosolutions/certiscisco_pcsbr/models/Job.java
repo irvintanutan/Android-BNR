@@ -21,6 +21,7 @@ import com.novigosolutions.certiscisco_pcsbr.zebra.Content;
 import com.novigosolutions.certiscisco_pcsbr.zebra.Denomination;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -788,12 +789,12 @@ public class Job extends Model implements Comparable<Job> {
         if (job.ReceiptNo == null) {
             if (PFunctionalCode == null) {
                 new Update(Job.class)
-                        .set("ReceiptNo=?", "RN" + formattedDate + userId)
+                        .set("ReceiptNo=?", "RN" + formattedDate + String.format("%04d", userId))
                         .where("GroupKey=? and BranchCode=? AND ActualFromTime=? AND ActualToTime=?", groupKey, branchCode, startTime, endTime)
                         .execute();
             } else {
                 new Update(Job.class)
-                        .set("ReceiptNo=?", "RN" + formattedDate + userId)
+                        .set("ReceiptNo=?", "RN" + formattedDate + String.format("%04d", userId))
                         .where("GroupKey=? and BranchCode=? and PFunctionalCode=?  AND ActualFromTime=? AND ActualToTime=?", groupKey, branchCode, PFunctionalCode, startTime, endTime)
                         .execute();
             }

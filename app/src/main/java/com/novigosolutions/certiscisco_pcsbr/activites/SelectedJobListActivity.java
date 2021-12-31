@@ -202,6 +202,7 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
         }
         if (intent != null) {
             startActivity(intent);
+            finish();
         }
     }
 

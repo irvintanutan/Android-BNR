@@ -65,11 +65,11 @@ public class CollectionDetailActivity extends BaseActivity implements RecyclerVi
         }
         Branch branch = Branch.getSingle(GroupKey);
         Job job = Job.getSingle(TransportMasterId);
-        TransportMasterId = Job.getHigherTransportMasterId(GroupKey, job.BranchCode , job.PFunctionalCode , "PENDING", job.PDFunctionalCode, job.ActualFromTime , job.ActualToTime);
+        TransportMasterId = Job.getHigherTransportMasterId(GroupKey, job.BranchCode, job.PFunctionalCode, "PENDING", job.PDFunctionalCode, job.ActualFromTime, job.ActualToTime);
 
         txt_customer_name.setText(branch.CustomerName);
 //        txt_functional_code.setText(Job.getAllOrderNos(branch.PointId));
-        txt_functional_code.setText(Job.getAllOrderNos(GroupKey, job.BranchCode , job.PFunctionalCode , "PENDING", job.PDFunctionalCode, job.ActualFromTime , job.ActualToTime));
+        txt_functional_code.setText(Job.getAllOrderNos(GroupKey, job.BranchCode, job.PFunctionalCode, "PENDING", job.PDFunctionalCode, job.ActualFromTime, job.ActualToTime));
         txt_branch_name.setText(branch.BranchCode);
         if (!TextUtils.isEmpty(Job.getSingle(TransportMasterId).OrderRemarks)) {
             txt_order_remarks.setVisibility(View.VISIBLE);
@@ -196,6 +196,22 @@ public class CollectionDetailActivity extends BaseActivity implements RecyclerVi
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 Job.clearBranchCollecion(GroupKey);
+                Intent intent = null;
+                if (Constants.BackDestination.equals("ALL")) {
+                    intent = new Intent(CollectionDetailActivity.this, SelectedJobListActivity.class);
+                    intent.putExtra("isCollection", 1);
+                    intent.putExtra("isDelivered", 0);
+                    intent.putExtra("status", "ALL");
+                    Constants.BackDestination = "ALL";
+                    Constants.isAll = true;
+                } else if (Constants.BackDestination.equals("PENDING")) {
+                    intent = new Intent(CollectionDetailActivity.this, GroupJobActivity.class);
+                    intent.putExtra("status", "PENDING");
+                    Constants.BackDestination = "PENDING";
+                    Constants.isAll = false;
+                }
+
+                if (intent != null) startActivity(intent);
                 finish();
             }
         });
