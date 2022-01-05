@@ -1093,7 +1093,7 @@ public class Job extends Model implements Comparable<Job> {
             collectionSummary.setId(bags.get(i).getId());
             collectionSummary.setHead("Sealed Bag");
             String message = bags.get(i).firstbarcode;
-            if (!bags.get(i).secondbarcode.isEmpty())
+            if (!bags.get(i).secondbarcode.isEmpty() && bags.get(i).secondbarcode != null && !bags.get(i).secondbarcode.equalsIgnoreCase("null"))
                 message += ", " + bags.get(i).secondbarcode;
             collectionSummary.setSummary(message);
             items.add(collectionSummary);
@@ -1105,7 +1105,7 @@ public class Job extends Model implements Comparable<Job> {
             collectionSummary.setId(wagons.get(a).getId());
             collectionSummary.setHead("Wagon");
             String message = wagons.get(a).firstbarcode;
-            if (!wagons.get(a).secondbarcode.isEmpty())
+            if (!wagons.get(a).secondbarcode.isEmpty() && wagons.get(a).secondbarcode != null && !wagons.get(a).secondbarcode.equalsIgnoreCase("null"))
                 message += ", " + wagons.get(a).secondbarcode;
             collectionSummary.setSummary(message);
             items.add(collectionSummary);
@@ -1145,9 +1145,9 @@ public class Job extends Model implements Comparable<Job> {
             collectionSummary.setHead("Box");
             collectionSummary.setQty(boxes.get(i).count);
             if ((boxes.get(i).CoinSeriesId) == 0) {
-                collectionSummary.setSummary(boxes.get(i).ProductName + "(" + boxes.get(i).count + ")");
+                collectionSummary.setSummary(boxes.get(i).ProductName + "*" + boxes.get(i).count);
             } else {
-                collectionSummary.setSummary(boxes.get(i).ProductName + "(" + boxes.get(i).count + ")" + "(" + boxes.get(i).CoinSeries + ")");
+                collectionSummary.setSummary(boxes.get(i).ProductName + "(" + boxes.get(i).CoinSeries + ")*" + boxes.get(i).count);
             }
             items.add(collectionSummary);
         }
