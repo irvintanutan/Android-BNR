@@ -447,6 +447,15 @@ public class Job extends Model implements Comparable<Job> {
                 .execute();
     }
 
+    public static List<Job> getDeliveryJobsOfPoint(String GroupKey) {
+        List<Job> result;
+            result = new Select().from(Job.class)
+                    .where("IsFloatDeliveryOrder=? AND GroupKey=?",
+                            1, GroupKey)
+                    .execute();
+
+        return result;
+    }
 
     public static List<Job> getDeliveryJobsOfPoint(String GroupKey, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
         List<Job> result;

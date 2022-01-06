@@ -175,7 +175,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
             boolean yellow = false;
             if (!singleJob && (jobtype == 2 || jobtype == 3)) {
                 Log.d("TAG", "onBindViewHolder: ");
-                List<Job> jl = Job.getDeliveryJobsOfPoint(branches.get(position).GroupKey, BranchCode , PFunctionalCode, actualFromTime , actualToTime);
+                List<Job> jl = Job.getDeliveryJobsOfPoint(branches.get(position).GroupKey);
                 for (Job jb : jl) {
                     if (TextUtils.isEmpty(jb.DependentOrderId)
                             && Job.checkPendingDependentCollections(jb.DependentOrderId).size() > 0) {
