@@ -21,7 +21,7 @@ public class CageListAdapter extends RecyclerView.Adapter<CageListAdapter.MyView
     String colorGreen = "#43A047";
     String colorYellow = "#FFEB3B";
 
-    public class MyViewHolder extends RecyclerView.ViewHolder  {
+    public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView txt_seal;
         LinearLayout llmain;
 
@@ -52,7 +52,7 @@ public class CageListAdapter extends RecyclerView.Adapter<CageListAdapter.MyView
         holder.txt_seal.setText(cage.CageNo + " / " + cage.CageSeal);
 
         boolean isAllScanned = true;
-        List<Delivery> deliveries = Delivery.getSealedCageDeliveryItems(cage.TransportMasterId , cage.CageNo, cage.CageSeal);
+        List<Delivery> deliveries = Delivery.getSealedCageDeliveryItems(cage.TransportMasterId, cage.CageNo, cage.CageSeal);
 
         for (Delivery delivery : deliveries) {
             if (!delivery.IsScanned) {
@@ -61,7 +61,16 @@ public class CageListAdapter extends RecyclerView.Adapter<CageListAdapter.MyView
             }
         }
 
-        if (cage.IsCageSealScanned == true && cage.IsCageNoScanned && isAllScanned) {
+        deliveries.clear();
+        deliveries = Delivery.getUnSealedCageDeliveryItems(cage.TransportMasterId, cage.CageNo, cage.CageSeal);
+        for (Delivery delivery : deliveries) {
+            if (!delivery.IsScanned) {
+                isAllScanned = false;
+                break;
+            }
+        }
+
+        if (cage.IsCageSealScanned && cage.IsCageNoScanned && isAllScanned) {
             holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
         } else {
             holder.llmain.setBackgroundColor(Color.parseColor(colorYellow));

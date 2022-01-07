@@ -36,6 +36,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.novigosolutions.certiscisco_pcsbr.models.Delivery.getPendingSealedByPointId;
+import static com.novigosolutions.certiscisco_pcsbr.models.Delivery.getUnSealedByPointId;
 
 @Table(name = "job")
 public class Job extends Model implements Comparable<Job> {
@@ -568,6 +569,36 @@ public class Job extends Model implements Comparable<Job> {
         if (ordernos.length() > 0)
             ordernos = ordernos.substring(0, ordernos.length() - 1);
         return ordernos;
+    }
+
+    public static String [] getAllOrderNosId(String groupKey, String BranchCode, String PFunctionalCode, String status, String PDFunctionalCode
+            , String actualFromTime, String actualToTime) {
+        PFunctionalCode = PFunctionalCode != null ? PFunctionalCode : "";
+        PDFunctionalCode = PDFunctionalCode != null ? PDFunctionalCode : "";
+        List<Job> jobs;
+        if ("ALL".equals(status)) {
+            jobs = new Select().from(Job.class)
+                    .where("GroupKey=? AND BranchCode=? and (PFunctionalCode=? or PDFunctionalCode=?) and ActualFromTime=? and ActualToTime=?", groupKey, BranchCode
+                            , PFunctionalCode, PDFunctionalCode, actualFromTime, actualToTime)
+                    .execute();
+        } else {
+            if (PFunctionalCode.isEmpty() && PDFunctionalCode.isEmpty()) {
+                jobs = new Select().from(Job.class)
+                        .where("GroupKey=? AND BranchCode=? AND status=? and ActualFromTime=? and ActualToTime=?", groupKey, BranchCode, status, actualFromTime, actualToTime)
+                        .execute();
+            } else {
+                jobs = new Select().from(Job.class)
+                        .where("GroupKey=? AND BranchCode=? and  (PFunctionalCode=? or PDFunctionalCode=?) AND status=? and ActualFromTime=? and ActualToTime=?", groupKey
+                                , BranchCode, PFunctionalCode, PDFunctionalCode, status, actualFromTime, actualToTime)
+                        .execute();
+            }
+        }
+        String [] orderlist = new String[jobs.size()];
+        for (int i = 0; i < jobs.size(); i++) {
+                orderlist[i] = Integer.toString(jobs.get(i).TransportMasterId);
+        }
+
+        return orderlist;
     }
 
     public static int getHigherTransportMasterId(String groupKey, String BranchCode, String PFunctionalCode, String status, String PDFunctionalCode
@@ -1710,6 +1741,16 @@ public class Job extends Model implements Comparable<Job> {
             PFunctionalCode, String startTime, String endTime) {
         boolean isAllScanned = true;
         List<Delivery> deliveries = getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode, startTime, endTime);
+        for (int i = 0; i < deliveries.size(); i++) {
+            boolean result = deliveries.get(i).IsScanned;
+            if (!result) {
+                isAllScanned = false;
+                break;
+            }
+        }
+
+        deliveries.clear();
+        deliveries = getUnSealedByPointId(GroupKey, BranchCode, PFunctionalCode, startTime, endTime);
         for (int i = 0; i < deliveries.size(); i++) {
             boolean result = deliveries.get(i).IsScanned;
             if (!result) {

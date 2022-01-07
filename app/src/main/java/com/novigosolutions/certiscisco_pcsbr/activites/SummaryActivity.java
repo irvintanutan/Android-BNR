@@ -336,7 +336,8 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
         cageRecyclerView.addItemDecoration(dividerItemDecoration);
 
 
-        List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(transportMasterId);
+        List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(
+                Job.getAllOrderNosId(GroupKey, BranchCode, PFunctionalCode, "PENDING", PFunctionalCode, actualFromTime, actualToTime));
         List<Cage> cages = new ArrayList<>();
         cageCount = cageList.size();
         for (com.novigosolutions.certiscisco_pcsbr.models.Cage c : cageList) {

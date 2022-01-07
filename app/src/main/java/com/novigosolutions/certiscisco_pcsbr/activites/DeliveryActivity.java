@@ -245,7 +245,9 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         recyclerViewCage.setItemAnimator(new DefaultItemAnimator());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewCage.getContext(), DividerItemDecoration.VERTICAL);
         recyclerViewCage.addItemDecoration(dividerItemDecoration);
-        List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(TransportMasterId);
+        List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(
+                Job.getAllOrderNosId(GroupKey, BranchCode, PFunctionalCode, "PENDING", PFunctionalCode, actualFromTime, actualToTime)
+        );
         cageListAdapter = new CageListAdapter(cageList);
         recyclerViewCage.setAdapter(cageListAdapter);
         recyclerViewCage.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerViewCage, new ClickListener() {
@@ -256,7 +258,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
                 Intent intent = new Intent(DeliveryActivity.this , CageDeliveryActivity.class);
                 intent.putExtra("CageNo" , cage.CageNo);
                 intent.putExtra("CageSeal" , cage.CageSeal);
-                intent.putExtra("TransportMasterId" , TransportMasterId);
+                intent.putExtra("TransportMasterId" , cage.TransportMasterId);
                 intent.putExtra("GroupKey", GroupKey);
                 startActivity(intent);
                 finish();

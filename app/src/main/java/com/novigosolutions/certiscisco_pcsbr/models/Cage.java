@@ -1,6 +1,8 @@
 package com.novigosolutions.certiscisco_pcsbr.models;
 
 
+import android.text.TextUtils;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -30,6 +32,15 @@ public class Cage extends Model {
     public static List<Cage> getByTransportMasterId(int TransportMasterId) {
         return new Select().from(Cage.class)
                 .where("TransportMasterId=?", TransportMasterId)
+                .execute();
+    }
+
+    public static List<Cage> getByTransportMasterId(String [] TransportMasterId) {
+
+        String placeholders = TextUtils.join(",", TransportMasterId);
+
+        return new Select().from(Cage.class)
+                .where("TransportMasterId IN (" + placeholders +")")
                 .execute();
     }
 
