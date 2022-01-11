@@ -1594,7 +1594,7 @@ public class Job extends Model implements Comparable<Job> {
             if (!bags.isEmpty()) {
                 for (int i = 0; i < bags.size(); i++) {
                     String message = bags.get(i).firstbarcode;
-                    if (!bags.get(i).secondbarcode.isEmpty())
+                    if (!bags.get(i).secondbarcode.isEmpty() && bags.get(i).secondbarcode != null && !bags.get(i).secondbarcode.equalsIgnoreCase("null"))
                         message += ", " + bags.get(i).secondbarcode;
 
                     if (checker.size() > 0) {
