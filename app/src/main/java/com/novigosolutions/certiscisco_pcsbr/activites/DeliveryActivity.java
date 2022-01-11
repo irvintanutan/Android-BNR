@@ -426,6 +426,22 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 Delivery.clearBranchDelivery(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
+                Intent intent = null;
+                if (Constants.BackDestination.equals("ALL")) {
+                    intent = new Intent(DeliveryActivity.this, SelectedJobListActivity.class);
+                    intent.putExtra("isCollection", 1);
+                    intent.putExtra("isDelivered", 0);
+                    intent.putExtra("status", "ALL");
+                    Constants.BackDestination = "ALL";
+                    Constants.isAll = true;
+                } else if (Constants.BackDestination.equals("PENDING")) {
+                    intent = new Intent(DeliveryActivity.this, GroupJobActivity.class);
+                    intent.putExtra("status", "PENDING");
+                    Constants.BackDestination = "PENDING";
+                    Constants.isAll = false;
+                }
+
+                if (intent != null) startActivity(intent);
                 finish();
             }
         });
