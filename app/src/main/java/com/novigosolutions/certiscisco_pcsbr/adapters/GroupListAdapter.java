@@ -180,9 +180,10 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.MyVi
                     if (TextUtils.isEmpty(jb.DependentOrderId)
                             && Job.checkPendingDependentCollections(jb.DependentOrderId).size() > 0) {
                         yellow = true;
-                        break;
                     } else if (!Delivery.hasPendingDeliveryItems(jb.TransportMasterId)) {
                         yellow = true;
+                    } else {
+                        yellow = false;
                         break;
                     }
                 }
