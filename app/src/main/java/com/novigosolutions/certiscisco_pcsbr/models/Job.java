@@ -450,10 +450,10 @@ public class Job extends Model implements Comparable<Job> {
 
     public static List<Job> getDeliveryJobsOfPoint(String GroupKey) {
         List<Job> result;
-            result = new Select().from(Job.class)
-                    .where("IsFloatDeliveryOrder=? AND GroupKey=?",
-                            1, GroupKey)
-                    .execute();
+        result = new Select().from(Job.class)
+                .where("IsFloatDeliveryOrder=? AND GroupKey=?",
+                        1, GroupKey)
+                .execute();
 
         return result;
     }
@@ -571,7 +571,7 @@ public class Job extends Model implements Comparable<Job> {
         return ordernos;
     }
 
-    public static String [] getAllOrderNosId(String groupKey, String BranchCode, String PFunctionalCode, String status, String PDFunctionalCode
+    public static String[] getAllOrderNosId(String groupKey, String BranchCode, String PFunctionalCode, String status, String PDFunctionalCode
             , String actualFromTime, String actualToTime) {
         PFunctionalCode = PFunctionalCode != null ? PFunctionalCode : "";
         PDFunctionalCode = PDFunctionalCode != null ? PDFunctionalCode : "";
@@ -593,9 +593,9 @@ public class Job extends Model implements Comparable<Job> {
                         .execute();
             }
         }
-        String [] orderlist = new String[jobs.size()];
+        String[] orderlist = new String[jobs.size()];
         for (int i = 0; i < jobs.size(); i++) {
-                orderlist[i] = Integer.toString(jobs.get(i).TransportMasterId);
+            orderlist[i] = Integer.toString(jobs.get(i).TransportMasterId);
         }
 
         return orderlist;
@@ -812,7 +812,7 @@ public class Job extends Model implements Comparable<Job> {
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
         String formattedDate = df.format(c);
-
+        String formattedUserId = String.format("%04d", userId);
         Job job = null;
 
         if (PFunctionalCode == null) {
@@ -829,12 +829,12 @@ public class Job extends Model implements Comparable<Job> {
         if (job.ReceiptNo == null) {
             if (PFunctionalCode == null) {
                 new Update(Job.class)
-                        .set("ReceiptNo=?", "RN" + formattedDate + String.format("%04d", userId))
+                        .set("ReceiptNo=?", "RN" + formattedDate + formattedUserId)
                         .where("GroupKey=? and BranchCode=? AND ActualFromTime=? AND ActualToTime=?", groupKey, branchCode, startTime, endTime)
                         .execute();
             } else {
                 new Update(Job.class)
-                        .set("ReceiptNo=?", "RN" + formattedDate + String.format("%04d", userId))
+                        .set("ReceiptNo=?", "RN" + formattedDate + formattedUserId)
                         .where("GroupKey=? and BranchCode=? and PFunctionalCode=?  AND ActualFromTime=? AND ActualToTime=?", groupKey, branchCode, PFunctionalCode, startTime, endTime)
                         .execute();
             }
@@ -1125,9 +1125,126 @@ public class Job extends Model implements Comparable<Job> {
         return collection_summary;
     }
 
+    private static boolean checkIfItemsExists(String barcode, List<Items> items) {
+        boolean indicator = false;
+
+        for (Items item : items) {
+            if (item.getSummary().equalsIgnoreCase(barcode)) {
+                return true;
+            }
+        }
+
+        return indicator;
+    }
+
+    public static List<Items> getCageCollectionSummary(int TransportMasterId, String cageNo, String cageSeal, List<Items> items) {
+
+        List<Bags> bags = Bags.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
+        for (int i = 0; i < bags.size(); i++) {
+
+            Items collectionSummary = new Items();
+            collectionSummary.setId(bags.get(i).getId());
+            collectionSummary.setHead("Sealed Bag");
+            String message = bags.get(i).firstbarcode;
+            if (!bags.get(i).secondbarcode.isEmpty() && bags.get(i).secondbarcode != null && !bags.get(i).secondbarcode.equalsIgnoreCase("null"))
+                message += ", " + bags.get(i).secondbarcode;
+            collectionSummary.setSummary(message);
+
+            if (!checkIfItemsExists(message, items))
+                items.add(collectionSummary);
+        }
+
+        List<Wagon> wagons = Wagon.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
+        for (int a = 0; a < wagons.size(); a++) {
+            Items collectionSummary = new Items();
+            collectionSummary.setId(wagons.get(a).getId());
+            collectionSummary.setHead("Wagon");
+            String message = wagons.get(a).firstbarcode;
+            if (!wagons.get(a).secondbarcode.isEmpty() && wagons.get(a).secondbarcode != null && !wagons.get(a).secondbarcode.equalsIgnoreCase("null"))
+                message += ", " + wagons.get(a).secondbarcode;
+            collectionSummary.setSummary(message);
+            if (!checkIfItemsExists(message, items))
+                items.add(collectionSummary);
+        }
+
+        List<EnvelopeBag> envelopebags = EnvelopeBag.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
+        for (int i = 0; i < envelopebags.size(); i++) {
+            List<Envelope> envelopes = Envelope.getByTransportMasterIdWithCage(envelopebags.get(i).getId(), cageNo, cageSeal);
+            if (envelopebags.get(i).envolpeType.equals("Envelopes")) {
+                for (int j = 0; j < envelopes.size(); j++) {
+                    Items collectionSummary = new Items();
+                    collectionSummary.setId(envelopes.get(j).getId());
+                    collectionSummary.setHead("Envelope");
+                    collectionSummary.setSummary(envelopes.get(j).barcode);
+                    if (!checkIfItemsExists(envelopes.get(j).barcode, items))
+                        items.add(collectionSummary);
+                }
+            } else {
+                StringBuilder message = new StringBuilder();
+                for (int j = 0; j < envelopes.size(); j++) {
+                    message.append(envelopes.get(j).barcode);
+                    message.append(", ");
+                }
+                if (message.length() > 0)
+                    message.delete(message.length() - 2, message.length());
+                Items collectionSummary = new Items();
+                collectionSummary.setId(envelopebags.get(i).getId());
+                collectionSummary.setHead("Envelope(s) In Bag (" + envelopebags.get(i).bagcode + ")");
+                collectionSummary.setSummary(message.toString());
+                if (!checkIfItemsExists(message.toString(), items))
+                    items.add(collectionSummary);
+            }
+        }
+
+        List<Box> boxes = Box.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
+        for (int i = 0; i < boxes.size(); i++) {
+            Items collectionSummary = new Items();
+            collectionSummary.setId(boxes.get(i).getId());
+            collectionSummary.setHead("Box");
+            collectionSummary.setQty(boxes.get(i).count);
+            String message = "";
+            if ((boxes.get(i).CoinSeriesId) == 0) {
+                message = boxes.get(i).ProductName + "*" + boxes.get(i).count;
+            } else {
+                message = boxes.get(i).ProductName + "(" + boxes.get(i).CoinSeries + ")*" + boxes.get(i).count;
+            }
+            collectionSummary.setSummary(message);
+            if (!checkIfItemsExists(message, items))
+                items.add(collectionSummary);
+        }
+
+        List<BoxBag> boxBags = BoxBag.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
+        for (int i = 0; i < boxBags.size(); i++) {
+            Items collectionSummary = new Items();
+            collectionSummary.setId(boxBags.get(i).getId());
+            collectionSummary.setHead("Coin Bag(" + boxBags.get(i).bagcode + ")");
+//            collectionSummary.Message = boxBags.get(i).ProductName;
+            String message = "";
+            if (boxBags.get(i).CoinSeriesId == 0)
+                message = boxBags.get(i).ProductName;
+            else
+                message = boxBags.get(i).ProductName + "(" + boxBags.get(i).CoinSeries + ")";
+            collectionSummary.setSummary(message);
+
+            if (!checkIfItemsExists(message, items))
+                items.add(collectionSummary);
+        }
+
+        int palletCount = getSingle(TransportMasterId).palletCount;
+        if (palletCount > 0) {
+            Items collectionSummary = new Items();
+            collectionSummary.setId(Long.parseLong(String.valueOf(TransportMasterId)));
+            collectionSummary.setHead("Pallet");
+            collectionSummary.setSummary(String.valueOf(palletCount));
+        }
+
+        return items;
+    }
+
+
     public static List<Items> getCageCollectionSummary(int TransportMasterId, String cageNo, String cageSeal) {
         List<Items> items = new ArrayList<>();
-        List<Bags> bags = Bags.getByTransportMasterIdWithCage(TransportMasterId, cageNo , cageSeal);
+        List<Bags> bags = Bags.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
         for (int i = 0; i < bags.size(); i++) {
             Items collectionSummary = new Items();
             collectionSummary.setId(bags.get(i).getId());
@@ -1139,7 +1256,7 @@ public class Job extends Model implements Comparable<Job> {
             items.add(collectionSummary);
         }
 
-        List<Wagon> wagons = Wagon.getByTransportMasterIdWithCage(TransportMasterId, cageNo , cageSeal);
+        List<Wagon> wagons = Wagon.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
         for (int a = 0; a < wagons.size(); a++) {
             Items collectionSummary = new Items();
             collectionSummary.setId(wagons.get(a).getId());
@@ -1178,7 +1295,7 @@ public class Job extends Model implements Comparable<Job> {
             }
         }
 
-        List<Box> boxes = Box.getByTransportMasterIdWithCage(TransportMasterId, cageNo , cageSeal);
+        List<Box> boxes = Box.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
         for (int i = 0; i < boxes.size(); i++) {
             Items collectionSummary = new Items();
             collectionSummary.setId(boxes.get(i).getId());
@@ -1530,7 +1647,7 @@ public class Job extends Model implements Comparable<Job> {
         Constants.BOX_QUANTITY += boxQty;
         Constants.BOX_QUANTITY += coinBagQty;
         Constants.BOX_QUANTITY += bagQty;
-        Constants.BOX_QUANTITY +=wagonQty;
+        Constants.BOX_QUANTITY += wagonQty;
         return printContent;
     }
 
@@ -1726,15 +1843,39 @@ public class Job extends Model implements Comparable<Job> {
             List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(job.TransportMasterId);
 
             for (com.novigosolutions.certiscisco_pcsbr.models.Cage c : cageList) {
-                CageContent cageContent = new CageContent();
-                cageContent.setCageNo(c.CageNo);
-                cageContent.setCageSeal(c.CageSeal);
-                cageContent.setSealNoList(Job.getCageCollectionSummary(job.TransportMasterId, c.CageNo , c.CageSeal));
-                printContent.add(cageContent);
+
+                int index = checkIfCageExists(c.CageNo, c.CageSeal, printContent);
+                if (index != -1) {
+
+                    CageContent cageContent = printContent.get(index);
+                    List<Items> items = cageContent.getSealNoList();
+                    cageContent.setSealNoList(Job.getCageCollectionSummary(job.TransportMasterId, c.CageNo, c.CageSeal, items));
+                    printContent.set(index, cageContent);
+
+                } else {
+
+                    CageContent cageContent = new CageContent();
+                    cageContent.setCageNo(c.CageNo);
+                    cageContent.setCageSeal(c.CageSeal);
+                    cageContent.setSealNoList(Job.getCageCollectionSummary(job.TransportMasterId, c.CageNo, c.CageSeal));
+                    printContent.add(cageContent);
+                }
             }
         }
 
         return printContent;
+    }
+
+    private static int checkIfCageExists(String cageNo, String cageSeal, List<CageContent> cageContents) {
+        int index = -1;
+        for (int a = 0; a < cageContents.size(); a++) {
+            CageContent cageContent = cageContents.get(a);
+
+            if (cageContent.getCageSeal().equalsIgnoreCase(cageSeal) && cageContent.getCageNo().equalsIgnoreCase(cageNo)) {
+                return a;
+            }
+        }
+        return index;
     }
 
     public static boolean isAllDeliveryScanned(String GroupKey, String BranchCode, String

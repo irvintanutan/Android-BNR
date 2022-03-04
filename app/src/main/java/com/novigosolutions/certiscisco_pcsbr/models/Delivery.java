@@ -320,16 +320,14 @@ public class Delivery extends Model {
                     .execute();
 
             new Update(Cage.class)
-                    .set("IsCageNoScanned=? AND IsCageSealScanned", 0, 0)
+                    .set("IsCageNoScanned=?, IsCageSealScanned=?", 0, 0)
                     .where("TransportMasterId=?", deliveryjobs.get(i).TransportMasterId)
                     .execute();
         }
 
-    }
-
+    } 
     public static void remove() {
         new Delete().from(Delivery.class)
                 .execute();
     }
-
 }
