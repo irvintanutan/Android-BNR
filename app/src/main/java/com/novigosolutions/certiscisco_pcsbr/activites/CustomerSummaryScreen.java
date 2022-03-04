@@ -327,7 +327,7 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
     }
 
     public void setCageListView(int transportMasterId, View view) {
-        RecyclerView cageRecyclerView =  view.findViewById(R.id.recyclerview);
+        RecyclerView cageRecyclerView = view.findViewById(R.id.recyclerview);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         cageRecyclerView.setLayoutManager(mLayoutManager);
         cageRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -335,12 +335,13 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
         cageRecyclerView.addItemDecoration(dividerItemDecoration);
 
 
-        List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(transportMasterId);
+        List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(
+                Job.getAllOrderNosId(GroupKey, BranchCode, PFunctionalCode, "PENDING", PFunctionalCode, actualFromTime, actualToTime));
         List<Cage> cages = new ArrayList<>();
         cageCount = cageList.size();
         for (com.novigosolutions.certiscisco_pcsbr.models.Cage c : cageList) {
-            List<Items> list = Job.getCageCollectionSummary(transportMasterId, c.CageNo , c.CageSeal);
-            String cageTitle = "CAGE (QTY : " + cageItemCounter(list) + ")\n" +
+            List<Items> list = Job.getCageCollectionSummary(transportMasterId, c.CageNo, c.CageSeal);
+            String cageTitle = "CAGE (ITEMS IN CAGE : " + cageItemCounter(list) + ")\n" +
                     "CAGENO : " + c.CageNo + "\nCAGESEAL : " + c.CageSeal;
             Cage cage = new Cage(cageTitle, list);
             cages.add(cage);
@@ -359,11 +360,11 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
         cageRecyclerView.setAdapter(cageAdapter);
     }
 
-    private int cageItemCounter(List<Items> items){
+    private int cageItemCounter(List<Items> items) {
         int count = 0;
         for (Items item : items) {
             if (item.getHead().equals("Box")) {
-                count+=item.getQty();
+                count += item.getQty();
             } else {
                 count++;
             }
@@ -566,6 +567,8 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
     public void onResult(int api_code, int result_code, String result_data) {
         try {
             button_submit.setEnabled(true);
+            Log.e("RESULT_DATA", result_data);
+
             if (result_code == 200) {
                 JSONObject obj = new JSONObject(result_data);
                 if (obj.getString("Result").equals("Success")) {

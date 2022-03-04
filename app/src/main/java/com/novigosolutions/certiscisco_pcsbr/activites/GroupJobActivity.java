@@ -167,9 +167,10 @@ public class GroupJobActivity extends BaseActivity implements RecyclerViewClickL
             for(Job jo:jobsList){
                 if (!TextUtils.isEmpty(jo.DependentOrderId) && Job.checkPendingDependentCollections(jo.DependentOrderId).size()>0) {
                     tmp = 1;
-                    break;
                 } else if(!Delivery.hasPendingDeliveryItems(jo.TransportMasterId)){
                     tmp = 2;
+                } else {
+                    tmp =0;
                     break;
                 }
             }

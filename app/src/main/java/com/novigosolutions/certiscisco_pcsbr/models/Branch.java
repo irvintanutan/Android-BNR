@@ -182,7 +182,6 @@ public class Branch extends Model implements Comparable<Branch> {
     public static List<Branch> getPendingBranches() {
         List<Branch> branches = new Select().from(Branch.class)
                 .where("GroupKey IN (select DISTINCT GroupKey from job where Status = 'PENDING')")
-                .groupBy("BranchCode")
                 .execute();
 
         for (Branch b : branches) {

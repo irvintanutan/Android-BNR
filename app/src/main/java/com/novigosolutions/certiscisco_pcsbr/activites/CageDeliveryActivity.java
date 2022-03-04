@@ -125,42 +125,12 @@ public class CageDeliveryActivity extends BarCodeScanActivity implements IOnScan
         txt_sealed_item_count = (TextView) findViewById(R.id.sealedItemCount);
         txt_unsealed_item_count = (TextView) findViewById(R.id.unsealedItemCount);
 
+        if (Cage.isCageScanned(TransportMasterId, CageNo, CageSeal)) {
+            setCageListView();
+        }
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-//        if(Delivery.hasPendingDeliveryItems(j.TransportMasterId)) {
-//            bagList = Delivery.getPendingSealedByTransportId(TransportMasterId);
-//            boxList = Delivery.getPendingUnSealedByTransportId(TransportMasterId);
-//        }else if(!TextUtils.isEmpty(j.DependentOrderId)){
-//            bagList = Delivery.getPendingSealedByTransportId(Job.getSingleByOrderNo(j.DependentOrderId).TransportMasterId);
-//            boxList = Delivery.getPendingUnSealedByTransportId(Job.getSingleByOrderNo(j.DependentOrderId).TransportMasterId);
-//        }
-        List<Delivery> list = Delivery.getSealedCageDeliveryItems(TransportMasterId, CageNo, CageSeal);
-        bagList = list.stream().filter(distinctByKey(p -> p.SealNo))
-                .collect(Collectors.toList());
-
-        setSealedScannedCount();
-        boxList = Delivery.getUnSealedCageDeliveryItems(TransportMasterId, CageNo, CageSeal);
-        recyclerViewbag.setLayoutManager(mLayoutManager);
-        recyclerViewbag.setItemAnimator(new DefaultItemAnimator());
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewbag.getContext(), DividerItemDecoration.VERTICAL);
-        recyclerViewbag.addItemDecoration(dividerItemDecoration);
-        sealedListAdapter = new SealedListAdapter(bagList);
-        recyclerViewbag.setAdapter(sealedListAdapter);
-
-
-        RecyclerView.LayoutManager mLayoutManager2 = new LinearLayoutManager(getApplicationContext());
-        setUnsealedScannedCount();
-        recyclerViewbox.setLayoutManager(mLayoutManager2);
-        recyclerViewbox.setItemAnimator(new DefaultItemAnimator());
-        DividerItemDecoration dividerItemDecoration2 = new DividerItemDecoration(recyclerViewbox.getContext(), DividerItemDecoration.VERTICAL);
-        recyclerViewbox.addItemDecoration(dividerItemDecoration2);
-        unsealedListAdapter = new UnsealedListAdapter(boxList);
-        unsealedListAdapter.setUnsealedClickCallback(CageDeliveryActivity.this);
-        recyclerViewbox.setAdapter(unsealedListAdapter);
         txt_customer_name = (TextView) findViewById(R.id.txt_customer_name);
         txt_functional_code = (TextView) findViewById(R.id.txt_functional_code);
-//        txt_street_tower = (TextView) findViewById(R.id.txt_street_tower);
-//        txt_town_pin = (TextView) findViewById(R.id.txt_town_pin);
         txt_branch_name = (TextView) findViewById(R.id.txt_txt_branch_name);
         txt_branch_address = (TextView) findViewById(R.id.txt_txt_branch_address);
         Branch branch = Branch.getSingle(GroupKey);
@@ -194,7 +164,6 @@ public class CageDeliveryActivity extends BarCodeScanActivity implements IOnScan
         if (jjl.size() > 1) {
             String rem = null;
             for (Job jj : jjl) {
-//                if(!TextUtils.isEmpty(jj.OrderRemarks)){
                 if (rem == null) {
                     if (!TextUtils.isEmpty(jj.OrderRemarks))
                         rem = jj.OrderRemarks;
@@ -207,7 +176,6 @@ public class CageDeliveryActivity extends BarCodeScanActivity implements IOnScan
                         }
                     }
                 }
-//                }
             }
             if (!TextUtils.isEmpty(rem)) {
                 txt_order_remarks.setVisibility(View.VISIBLE);
@@ -219,30 +187,40 @@ public class CageDeliveryActivity extends BarCodeScanActivity implements IOnScan
         } else {
             txt_order_remarks.setVisibility(View.GONE);
         }
-//        String street_tower = branch.StreetName;
-//        if (!branch.Tower.isEmpty()) {
-//            if (street_tower.isEmpty()) street_tower = branch.Tower;
-//            else street_tower = street_tower + ", " + branch.Tower;
-//        }
-//        txt_street_tower.setText(street_tower);
-//        String town_pin = branch.Town;
-//        if (!branch.PinCode.isEmpty()) {
-//            if (town_pin.isEmpty()) town_pin = branch.PinCode;
-//            else town_pin = town_pin + ", " + branch.PinCode;
-//        }
-//        txt_town_pin.setText(town_pin);
-
 
         if (Preferences.getBoolean("EnableManualEntry", this) || Branch.getSingle(GroupKey).EnableManualEntry) {
             enableManualEntry();
         }
 
-        setCageListView();
         setCageBackgroundColor();
     }
 
+    @SuppressLint("NewApi")
     public void setCageListView() {
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        List<Delivery> list = Delivery.getSealedCageDeliveryItems(TransportMasterId, CageNo, CageSeal);
+        bagList = list.stream().filter(distinctByKey(p -> p.SealNo))
+                .collect(Collectors.toList());
 
+        setSealedScannedCount();
+        boxList = Delivery.getUnSealedCageDeliveryItems(TransportMasterId, CageNo, CageSeal);
+        recyclerViewbag.setLayoutManager(mLayoutManager);
+        recyclerViewbag.setItemAnimator(new DefaultItemAnimator());
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewbag.getContext(), DividerItemDecoration.VERTICAL);
+        recyclerViewbag.addItemDecoration(dividerItemDecoration);
+        sealedListAdapter = new SealedListAdapter(bagList);
+        recyclerViewbag.setAdapter(sealedListAdapter);
+
+
+        RecyclerView.LayoutManager mLayoutManager2 = new LinearLayoutManager(getApplicationContext());
+        setUnsealedScannedCount();
+        recyclerViewbox.setLayoutManager(mLayoutManager2);
+        recyclerViewbox.setItemAnimator(new DefaultItemAnimator());
+        DividerItemDecoration dividerItemDecoration2 = new DividerItemDecoration(recyclerViewbox.getContext(), DividerItemDecoration.VERTICAL);
+        recyclerViewbox.addItemDecoration(dividerItemDecoration2);
+        unsealedListAdapter = new UnsealedListAdapter(boxList);
+        unsealedListAdapter.setUnsealedClickCallback(CageDeliveryActivity.this);
+        recyclerViewbox.setAdapter(unsealedListAdapter);
     }
 
     @SuppressLint("NewApi")
@@ -382,7 +360,6 @@ public class CageDeliveryActivity extends BarCodeScanActivity implements IOnScan
         if (data.isEmpty()) {
             invalidbarcodealert("Empty");
         } else {
-
             if (Cage.isCageScanned(TransportMasterId, CageNo, CageSeal)) {
                 if (Delivery.setCageItemScanned(data, TransportMasterId , CageNo, CageSeal)) {
                     List<Delivery> templist = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
@@ -402,6 +379,10 @@ public class CageDeliveryActivity extends BarCodeScanActivity implements IOnScan
                     Cage.setCageSealScanned(TransportMasterId, CageNo, CageSeal);
                 } else {
                     invalidbarcodealert("Please scan the Cage No and Cage Seal to proceed");
+                }
+
+                if (Cage.isCageScanned(TransportMasterId, CageNo, CageSeal)) {
+                    setCageListView();
                 }
             }
 
@@ -514,21 +495,13 @@ public class CageDeliveryActivity extends BarCodeScanActivity implements IOnScan
     public void onResult() {
         Branch branch = Branch.getSingle(GroupKey);
         if (branch.isRescheduled) {
-//            Job.setDelivered(TransportMasterId);
             Job.setDelivered(GroupKey, BranchCode, PFunctionalCode, Constants.startTime, Constants.endTime);
-//            if (Job.getIncompleteCollectionJobsOfPoint(GroupKey).size()>0) {
-//                Intent intent = new Intent(this, CollectionDetailActivity.class);
-////                intent.putExtra("PointId", PointId);
-//                intent.putExtra("GroupKey", GroupKey);
-//                startActivity(intent);
-//            }
             finish();
         }
     }
 
     @Override
     public void onSelect() {
-        //updat the counter
         setUnsealedScannedCount();
     }
 

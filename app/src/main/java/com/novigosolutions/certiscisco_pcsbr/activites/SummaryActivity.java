@@ -59,7 +59,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
     Button button_submit;
     View bll;
     String BranchCode;
-    String PFunctionalCode, actualFromTime, actualToTime;
+    String PFunctionalCode, actualFromTime, actualToTime, status;
     LinearLayout ll_lists, ll_delivery;
     Button btn_ok, btn_print, btnCancel;
     int TransportMasterId;
@@ -112,6 +112,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
         actualFromTime = job.ActualFromTime;
         actualToTime = job.ActualToTime;
         isOffline = job.isOfflineSaved;
+        status = job.Status;
         if (isSummary(branch, job)) {
             bll = findViewById(R.id.bll);
             bll.setVisibility(View.GONE);
@@ -336,12 +337,13 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
         cageRecyclerView.addItemDecoration(dividerItemDecoration);
 
 
-        List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(transportMasterId);
+        List<com.novigosolutions.certiscisco_pcsbr.models.Cage> cageList = com.novigosolutions.certiscisco_pcsbr.models.Cage.getByTransportMasterId(
+                Job.getAllOrderNosId(GroupKey, BranchCode, PFunctionalCode, status, PFunctionalCode, actualFromTime, actualToTime));
         List<Cage> cages = new ArrayList<>();
         cageCount = cageList.size();
         for (com.novigosolutions.certiscisco_pcsbr.models.Cage c : cageList) {
             List<Items> list = Job.getCageCollectionSummary(transportMasterId, c.CageNo , c.CageSeal);
-            String cageTitle = "CAGE (QTY : " + cageItemCounter(list) + ")\n" +
+            String cageTitle = "CAGE (ITEMS IN CAGE : " + cageItemCounter(list) + ")\n" +
                     "CAGENO : " + c.CageNo + "\nCAGESEAL : " + c.CageSeal;
             Cage cage = new Cage(cageTitle, list);
             cages.add(cage);

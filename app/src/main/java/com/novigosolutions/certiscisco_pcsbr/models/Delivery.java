@@ -26,11 +26,17 @@ public class Delivery extends Model {
     @Column(name = "ItemType")
     public String ItemType;
 
+    @Column(name = "EnvelopeInBag")
+    public String EnvelopeInBag;
+
     @Column(name = "IsBox")
     public boolean IsBox;
 
     @Column(name = "SealNo")
     public String SealNo;
+
+    @Column(name = "SealNo2")
+    public String SealNo2;
 
     @Column(name = "Denomination")
     public String Denomination;
@@ -56,6 +62,16 @@ public class Delivery extends Model {
     @Column(name = "CageSeal")
     public String CageSeal;
 
+    @Column(name = "ReferenceNo")
+    public String ReferenceNo;
+
+    @Column(name = "VCSBreakCageToItem")
+    public boolean VCSBreakCageToItem;
+
+    public static List<Delivery> getAllDeliveries() {
+        return new Select().from(Delivery.class)
+                .execute();
+    }
 
     public static List<Delivery> getByTransportMasterId(int TransportMasterId) {
         return new Select().from(Delivery.class)
@@ -71,7 +87,7 @@ public class Delivery extends Model {
 
     public static List<Delivery> getUnSealedByTransportMasterId(int TransportMasterId) {
         return new Select().from(Delivery.class)
-                .where("TransportMasterId=? AND ItemType IN ('BOX','PALLET')", TransportMasterId)
+                .where("TransportMasterId=? AND ItemType IN ('BOX' , 'Box','PALLET')", TransportMasterId)
                 .execute();
     }
 
@@ -89,15 +105,6 @@ public class Delivery extends Model {
                 .execute();
     }
 
-//    public static List<Delivery> getSealedByPointId(int PointId) {
-//        List<Job> jobs = Job.getDeliveryJobsOfPoint(PointId);
-//        List<Delivery> deliveries = new ArrayList<>();
-//        for (int i = 0; i < jobs.size(); i++) {
-//            deliveries.addAll(getSealedByByTransportMasterId(jobs.get(i).TransportMasterId));
-//        }
-//        return deliveries;
-//    }
-
     public static List<Delivery> getSealedByPointId(String GroupKey, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
         List<Job> jobs = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
         List<Delivery> deliveries = new ArrayList<>();
@@ -107,15 +114,6 @@ public class Delivery extends Model {
         return deliveries;
     }
 
-//    public static List<Delivery> getUnSealedByPointId(int PointId) {
-//        List<Job> jobs = Job.getDeliveryJobsOfPoint(PointId);
-//        List<Delivery> deliveries = new ArrayList<>();
-//        for (int i = 0; i < jobs.size(); i++) {
-//            deliveries.addAll(getUnSealedByTransportMasterId(jobs.get(i).TransportMasterId));
-//        }
-//        return deliveries;
-//    }
-
     public static List<Delivery> getUnSealedByPointId(String GroupKey, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
         List<Job> jobs = Job.getDeliveryJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
         List<Delivery> deliveries = new ArrayList<>();
@@ -124,15 +122,6 @@ public class Delivery extends Model {
         }
         return deliveries;
     }
-
-//    public static List<Delivery> getPendingSealedByPointId(int PointId) {
-//        List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(PointId);
-//        List<Delivery> deliveries = new ArrayList<>();
-//        for (int i = 0; i < jobs.size(); i++) {
-//            deliveries.addAll(getSealedByByTransportMasterId(jobs.get(i).TransportMasterId));
-//        }
-//        return deliveries;
-//    }
 
     public static List<Delivery> getPendingSealedByPointId(String GroupKey, String BranchCode, String PFunctionalCode, String startTime, String endTime) {
         List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, startTime, endTime);
@@ -221,6 +210,7 @@ public class Delivery extends Model {
 
     public static List<Delivery> getPendingUnSealedByTransportId(int TransportMasterId) {
 //        List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey);
+        List<Delivery> list = Delivery.getAllDeliveries();
         List<Delivery> deliveries = new ArrayList<>();
 //        for (int i = 0; i < jobs.size(); i++) {
         deliveries.addAll(getUnSealedByTransportMasterId(TransportMasterId));
@@ -328,12 +318,16 @@ public class Delivery extends Model {
                     .set("IsScanned=?", 0)
                     .where("TransportMasterId=?", deliveryjobs.get(i).TransportMasterId)
                     .execute();
-        }
-    }
 
+            new Update(Cage.class)
+                    .set("IsCageNoScanned=?, IsCageSealScanned=?", 0, 0)
+                    .where("TransportMasterId=?", deliveryjobs.get(i).TransportMasterId)
+                    .execute();
+        }
+
+    } 
     public static void remove() {
         new Delete().from(Delivery.class)
                 .execute();
     }
-
 }
