@@ -1468,7 +1468,7 @@ public class Job extends Model implements Comparable<Job> {
     }
 
     @SuppressLint("NewApi")
-    public static List<Content> getSelectedPrintContentCounter(String groupKey, int isDelivery, String
+    public static int getSelectedPrintContentCounter(String groupKey, int isDelivery, String
             branchCode, String startTime, String endTime) {
         Constants.BOX_QUANTITY = 0;
         List<Content> printContent = new ArrayList<>();
@@ -1603,7 +1603,7 @@ public class Job extends Model implements Comparable<Job> {
                     printContent.add(envelopContent);
                 }
                 if (enveInBagQty > 0) {
-                    envelopInBagContent.setDescription("Envelope In Bag");
+                    envelopInBagContent.setDescription("ENVELOP IN BAG");
                     envelopInBagContent.setQty(enveInBagQty);
                     Constants.BOX_QUANTITY += enveInBagQty;
                     envelopInBagContent.setDenominationList(envelopDenomination);
@@ -1648,7 +1648,7 @@ public class Job extends Model implements Comparable<Job> {
         Constants.BOX_QUANTITY += coinBagQty;
         Constants.BOX_QUANTITY += bagQty;
         Constants.BOX_QUANTITY += wagonQty;
-        return printContent;
+        return Constants.BOX_QUANTITY;
     }
 
     @SuppressLint("NewApi")

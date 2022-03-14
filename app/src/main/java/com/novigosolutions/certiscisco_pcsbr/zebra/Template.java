@@ -182,7 +182,7 @@ public class Template {
 
         html += "</table>";
 
-        html += "        <br><label><b>Total Quantity : " + Constants.BOX_QUANTITY + "</b></label><br>";
+        html += "        <br><label><b>Total Quantity : " + print.getQuantity() + "</b></label><br>";
 
         html += "        <br><label><b>" + getLabel1(print.isCollection()) + "</b></label>\n" +
                 "        <br><label>Certis Transaction Officer (TO) : " + print.getCertisTransactionOfficer() + " </label>\n" +

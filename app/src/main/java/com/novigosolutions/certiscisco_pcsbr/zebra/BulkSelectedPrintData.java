@@ -12,6 +12,7 @@ import com.novigosolutions.certiscisco_pcsbr.activites.PrintSelectedJobActivity;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 
 import java.util.ArrayList;
@@ -146,7 +147,7 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
                     print.setCustomerLocation(job.StreetName + " " + job.Tower + " " + job.Town + " " + job.PinCode);
                     //print.setBranchName(branch.BranchName);
                 }
-                Job.getSelectedPrintContentCounter(job.GroupKey, isDelivery, job.BranchCode, job.ActualFromTime, job.ActualToTime);
+                print.setQuantity(Job.getSelectedPrintContentCounter(job.GroupKey, isDelivery, job.BranchCode, job.ActualFromTime, job.ActualToTime));
                 print.setContentList(Job.getSelectedPrintContent(job.GroupKey, isDelivery, job.BranchCode, job.ActualFromTime, job.ActualToTime));
                 print.setCageContentList(Job.getCageSelectedPrintContent(job.GroupKey, isDelivery, job.BranchCode, job.ActualFromTime, job.ActualToTime));
 

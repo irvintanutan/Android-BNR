@@ -284,6 +284,7 @@ public class SyncDatabase {
                 String ItemType = deliveryobject.getString("ItemType");
                 switch (ItemType) {
                     case "BAG":
+                    case "Bag":
                         Bags bag = new Bags();
                         bag.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         bag.firstbarcode = deliveryobject.getString("SealNo");
@@ -294,6 +295,7 @@ public class SyncDatabase {
                         break;
 
                     case "Wagon":
+                    case "WAGON":
                         Wagon wagon = new Wagon();
                         wagon.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         wagon.firstbarcode = deliveryobject.getString("SealNo");
@@ -304,6 +306,7 @@ public class SyncDatabase {
                         break;
 
                     case "Envelopes":
+                    case "ENVELOPES":
                         List<EnvelopeBag> envelopeBags = EnvelopeBag.getEnvelopesByTransportMasterId(deliveryobject.getInt("TransportMasterId"));
                         if (envelopeBags.size() > 0) {
                             Envelope envelope = new Envelope();
@@ -331,6 +334,7 @@ public class SyncDatabase {
                         break;
 
                     case "Envelope In Bag":
+                    case "ENVELOPE IN BAG":
                         EnvelopeBag envelopeBag2 = new EnvelopeBag();
                         envelopeBag2.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         envelopeBag2.envolpeType = "EnvelopeBag";
@@ -369,6 +373,7 @@ public class SyncDatabase {
                         break;
 
                     case "Coin Box":
+                    case "COIN BOX":
                         BoxBag boxBag = new BoxBag();
                         boxBag.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         boxBag.bagcode = deliveryobject.getString("SealNo");
@@ -382,6 +387,7 @@ public class SyncDatabase {
                         break;
 
                     case "PALLET":
+                    case "Pallet":
                         Job.updatePalletCount(deliveryobject.getInt("TransportMasterId"), deliveryobject.getInt("Qty"));
                         break;
                 }

@@ -190,7 +190,7 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
     public void onDataScanned(String data) {
         if (data.isEmpty()) {
             ((CollectionActivity) context).invalidbarcodealert("Empty");
-        } else if (isThereInList(data, scanType) || Branch.isExist(data))
+        } else if (isThereInList(data, scanType) || Branch.isExist(data) && scanType.equalsIgnoreCase("CageSeal"))
             ((CollectionActivity) context).invalidbarcodealert("Duplicate");
         else {
             if (scanType.equals("CageNo")) {

@@ -41,6 +41,8 @@ public class Print {
 
     private boolean isCollection;
 
+    private int quantity;
+
     private String footer;
 
     public String getLogo() {
@@ -250,5 +252,13 @@ public class Print {
 
     public void setCageContentList(List<CageContent> cageContentList) {
         this.cageContentList = cageContentList;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }
