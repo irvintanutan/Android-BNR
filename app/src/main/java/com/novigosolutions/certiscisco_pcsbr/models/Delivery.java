@@ -29,6 +29,9 @@ public class Delivery extends Model {
     @Column(name = "EnvelopeInBag")
     public String EnvelopeInBag;
 
+    @Column(name = "ConsignmentInBag")
+    public String ConsignmentInBag;
+
     @Column(name = "IsBox")
     public boolean IsBox;
 
@@ -81,7 +84,7 @@ public class Delivery extends Model {
 
     public static List<Delivery> getSealedByByTransportMasterId(int TransportMasterId) {
         return new Select().from(Delivery.class)
-                .where("TransportMasterId=? AND ItemType IN ('BAG','Envelope In Bag','Envelopes','Coin Box')", TransportMasterId)
+                .where("TransportMasterId=? AND ItemType IN ('BAG','Envelope In Bag','Envelopes','Coin Box', 'Consignment in Bag')", TransportMasterId)
                 .execute();
     }
 
@@ -93,7 +96,7 @@ public class Delivery extends Model {
 
     public static List<Delivery> getSealedNonCageByTransportMasterId(int TransportMasterId) {
         return new Select().from(Delivery.class)
-                .where("TransportMasterId=? AND ItemType IN ('BAG','Envelope In Bag','Envelopes','Coin Box') AND " +
+                .where("TransportMasterId=? AND ItemType IN ('BAG','Envelope In Bag','Envelopes','Coin Box', 'Consignment in Bag') AND " +
                         "(CageNo IS NULL OR CageNo == '') AND (CageSeal IS NULL OR CageSeal == '')", TransportMasterId)
                 .execute();
     }
@@ -143,7 +146,7 @@ public class Delivery extends Model {
 
     public static List<Delivery> getSealedCageDeliveryItems(int TransportMasterId, String cageNo, String cageSeal) {
         return new Select().from(Delivery.class)
-                .where("TransportMasterId=? AND CageNo=? AND CageSeal=? AND ItemType IN ('BAG','Envelope In Bag','Envelopes','Coin Box')",
+                .where("TransportMasterId=? AND CageNo=? AND CageSeal=? AND ItemType IN ('BAG','Envelope In Bag','Envelopes','Coin Box', 'Consignment in Bag')",
                         TransportMasterId, cageNo, cageSeal)
                 .execute();
     }

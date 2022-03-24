@@ -22,6 +22,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.BoxBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.CoinSeries;
+import com.novigosolutions.certiscisco_pcsbr.models.ConsignmentBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Currency;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
@@ -356,6 +357,37 @@ public class SyncDatabase {
                                     Envelope envelope = new Envelope();
                                     envelope.bagid = id;
                                     envelope.barcode = envelopList.get(i);
+                                    envelope.CageNo = cageNo;
+                                    envelope.CageSeal = cageSeal;
+                                    envelope.save();
+                                }
+                            }
+                        }
+                        break;
+
+                    case "Consignment In Bag":
+                    case "CONSIGNMENT IN BAG":
+                        ConsignmentBag envelopeBag3 = new ConsignmentBag();
+                        envelopeBag3.TransportMasterId = deliveryobject.getInt("TransportMasterId");
+                        envelopeBag3.consignmentType = "ConsignmentBag";
+                        envelopeBag3.bagcode = deliveryobject.getString("SealNo");
+                        envelopeBag3.CageNo = cageNo;
+                        envelopeBag3.CageSeal = cageSeal;
+                        envelopeBag3.save();
+                        long consignmentInBagId = envelopeBag3.save();
+
+                        String consignmentInBag = deliveryobject.getString("ConsignmentInBag");
+                        if (TextUtils.isEmpty(consignmentInBag) || consignmentInBag == null) {
+
+                        } else {
+                            List<String> consignmentList = new ArrayList<String>(Arrays.asList(consignmentInBag.split(",")));
+                            if (consignmentList.isEmpty() || consignmentList == null) {
+
+                            } else {
+                                for (int i = 0; i < consignmentList.size(); i++) {
+                                    Envelope envelope = new Envelope();
+                                    envelope.bagid = consignmentInBagId;
+                                    envelope.barcode = consignmentList.get(i);
                                     envelope.CageNo = cageNo;
                                     envelope.CageSeal = cageSeal;
                                     envelope.save();
