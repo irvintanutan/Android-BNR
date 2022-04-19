@@ -10,6 +10,8 @@ import com.novigosolutions.certiscisco_pcsbr.models.Break;
 import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.ChatMessage;
 import com.novigosolutions.certiscisco_pcsbr.models.CoinSeries;
+import com.novigosolutions.certiscisco_pcsbr.models.Consignment;
+import com.novigosolutions.certiscisco_pcsbr.models.ConsignmentBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Currency;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
@@ -37,6 +39,8 @@ public class DatabaseContentProvider extends ContentProvider {
         builder.addModelClass(Reschedule.class);
         builder.addModelClass(CoinSeries.class);
         builder.addModelClass(Wagon.class);
+        builder.addModelClass(Consignment.class);
+        builder.addModelClass(ConsignmentBag.class);
         builder.addModelClass(Cage.class);
         return builder.create();
     }

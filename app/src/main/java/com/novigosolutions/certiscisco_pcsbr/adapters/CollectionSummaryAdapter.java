@@ -13,6 +13,8 @@ import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.models.Bags;
 import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.BoxBag;
+import com.novigosolutions.certiscisco_pcsbr.models.Consignment;
+import com.novigosolutions.certiscisco_pcsbr.models.ConsignmentBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
 import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
@@ -100,6 +102,11 @@ public class CollectionSummaryAdapter extends RecyclerView.Adapter<CollectionSum
         } else if (collectionSummaries.get(pos).Collection_type.equals("EnvelopeBag")) {
             Envelope.removeByBagid(EnvelopeBag.getById(collectionSummaries.get(pos).id).getId());
             EnvelopeBag.removeSingle(collectionSummaries.get(pos).id);
+            collectionSummaries.remove(pos);
+            notifyDataSetChanged();
+        } else if (collectionSummaries.get(pos).Collection_type.equals("ConsignmentBag")) {
+            Consignment.removeByBagid(ConsignmentBag.getById(collectionSummaries.get(pos).id).getId());
+            ConsignmentBag.removeSingle(collectionSummaries.get(pos).id);
             collectionSummaries.remove(pos);
             notifyDataSetChanged();
         } else if (collectionSummaries.get(pos).Collection_type.equals("Box")) {

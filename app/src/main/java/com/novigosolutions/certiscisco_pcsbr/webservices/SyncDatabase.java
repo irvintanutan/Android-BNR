@@ -22,6 +22,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.BoxBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.CoinSeries;
+import com.novigosolutions.certiscisco_pcsbr.models.Consignment;
 import com.novigosolutions.certiscisco_pcsbr.models.ConsignmentBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Currency;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
@@ -380,17 +381,17 @@ public class SyncDatabase {
                         if (TextUtils.isEmpty(consignmentInBag) || consignmentInBag == null) {
 
                         } else {
-                            List<String> consignmentList = new ArrayList<String>(Arrays.asList(consignmentInBag.split(",")));
+                            List<String> consignmentList = new ArrayList<String>(Arrays.asList(consignmentInBag.split(":")));
                             if (consignmentList.isEmpty() || consignmentList == null) {
 
                             } else {
                                 for (int i = 0; i < consignmentList.size(); i++) {
-                                    Envelope envelope = new Envelope();
-                                    envelope.bagid = consignmentInBagId;
-                                    envelope.barcode = consignmentList.get(i);
-                                    envelope.CageNo = cageNo;
-                                    envelope.CageSeal = cageSeal;
-                                    envelope.save();
+                                    Consignment consignment = new Consignment();
+                                    consignment.bagid = consignmentInBagId;
+                                    consignment.barcode = consignmentList.get(i);
+                                    consignment.CageNo = cageNo;
+                                    consignment.CageSeal = cageSeal;
+                                    consignment.save();
                                 }
                             }
                         }

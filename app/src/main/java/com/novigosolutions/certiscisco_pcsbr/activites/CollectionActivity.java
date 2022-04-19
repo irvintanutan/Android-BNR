@@ -167,7 +167,7 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
         List<Cage> cages = new ArrayList<>();
 
         for (com.novigosolutions.certiscisco_pcsbr.models.Cage c : cageList) {
-            List<Items> list = Job.getCageCollectionSummary(trasportMasterId, c.CageNo , c.CageSeal);
+            List<Items> list = Job.getCageCollectionSummary(trasportMasterId, c.CageNo, c.CageSeal);
             String cageTitle = "CAGE (ITEMS IN CAGE : " + cageItemCounter(list) + ")\n" +
                     "CAGENO : " + c.CageNo + "\nCAGESEAL : " + c.CageSeal;
             Cage cage = new Cage(cageTitle, list);
@@ -187,16 +187,16 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
         cageRecyclerView.setAdapter(cageAdapter);
     }
 
-    private int cageItemCounter(List<Items> items){
-            int count = 0;
-           for (Items item : items) {
-               if (item.getHead().equals("Box")) {
-                   count+=item.getQty();
-               } else {
-                   count++;
-               }
-           }
-           return count;
+    private int cageItemCounter(List<Items> items) {
+        int count = 0;
+        for (Items item : items) {
+            if (item.getHead().equals("Box")) {
+                count += item.getQty();
+            } else {
+                count++;
+            }
+        }
+        return count;
     }
 
     private void openCageDialog() {
@@ -244,6 +244,10 @@ public class CollectionActivity extends BarCodeScanActivity implements DialogRes
             envelopeDialog.show();
         } else if (collection_type.equals("Envelope(s) In Bag")) {
             EnvelopeDialog envelopeDialog = new EnvelopeDialog(CollectionActivity.this, trasportMasterId, this, "EnvelopeBag");
+            envelopeDialog.setCancelable(false);
+            envelopeDialog.show();
+        } else if (collection_type.equals("Consignment(s) In Bag")) {
+            EnvelopeDialog envelopeDialog = new EnvelopeDialog(CollectionActivity.this, trasportMasterId, this, "ConsignmentBag");
             envelopeDialog.setCancelable(false);
             envelopeDialog.show();
         } else if (collection_type.equals("Box")) {

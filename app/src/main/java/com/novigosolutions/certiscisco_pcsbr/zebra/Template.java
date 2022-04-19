@@ -95,7 +95,7 @@ public class Template {
             html += "<tr>" +
                     "<td>" + contents.get(i).getDescription() + "</td>" +
                     "<td><center>" + contents.get(i).getQty() + "</center></td>" +
-                    "<td style=\"font-size: 26px;text-align: center;\" >";
+                    "<td style=\"font-size: 21px;text-align: center;\" >";
 
             List<String> sealNoList = contents.get(i).getSealNoList();
             int sealNoListSize = (sealNoList != null && !sealNoList.isEmpty()) ? sealNoList.size() : 0;
@@ -111,6 +111,9 @@ public class Template {
             int denomListSize = (denominationList != null && !denominationList.isEmpty()) ? denominationList.size() : 0;
 
             for (int k = 0; k < denomListSize; k++) {
+                String type = denominationList.get(k).getType();
+                String qtyText = type.equals("EnvelopInBag") ? "Env" : "Consignment";
+                String noText = type.equals("EnvelopInBag") ? "Envelopes" : "Consignment";
                 if(k>0){
                     html+= "<br>";
                 }
@@ -119,8 +122,8 @@ public class Template {
 
                 html +=  denominationList.get(k).getBagName() +
                         "<br> Seal No : " + denominationList.get(k).getSealNo() +
-                        "<br>Env Qty : " + envelopListSize +
-                        "<br>Envelopes No :<br> ";
+                        "<br>" + qtyText + " Qty : " + envelopListSize +
+                        "<br>" + noText + " No :<br> ";
 
                 for (int l = 0; l < envelopListSize; l++) {
                     if (l>0){
@@ -128,6 +131,8 @@ public class Template {
                     }
                     html += envelopsList.get(l);
                 }
+
+                html+= "<br>";
             }
 
             html += "</td>" +

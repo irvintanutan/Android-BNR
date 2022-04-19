@@ -16,6 +16,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Bags;
 import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.BoxBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Cage;
+import com.novigosolutions.certiscisco_pcsbr.models.ConsignmentBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
 import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
@@ -125,6 +126,7 @@ public class CageViewHolder extends GroupViewHolder implements View.OnClickListe
         BoxBag.removeByCageNoCageSeal(cageNo, cageSeal);
         Envelope.removeByCageNoCageSeal(cageNo, cageSeal);
         EnvelopeBag.removeByCageNoCageSeal(cageNo, cageSeal);
+        ConsignmentBag.removeByCageNoCageSeal(cageNo, cageSeal);
         Wagon.removeByCageNoCageSeal(cageNo, cageSeal);
     }
 
@@ -134,8 +136,10 @@ public class CageViewHolder extends GroupViewHolder implements View.OnClickListe
             Bags.removeSingle(id);
         } else if (itemType.equals("Envelopes")) {
             Envelope.removeSingle(id);
-        } else if (itemType.equals("EnvelopeBag")) {
+        } else if (itemType.contains("Envelope(s)")) {
             EnvelopeBag.removeSingle(id);
+        } else if (itemType.contains("Consignment(s)")) {
+            ConsignmentBag.removeSingle(id);
         } else if (itemType.equals("Box")) {
             Box.removeSingle(id);
         } else if (itemType.equals("Pallet")) {

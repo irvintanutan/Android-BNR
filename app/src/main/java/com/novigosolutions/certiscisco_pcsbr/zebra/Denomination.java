@@ -7,6 +7,7 @@ public class Denomination {
     private String bagName;
     private String sealNo;
     private List<String> envelopsList;
+    private String type;
 
     public String getBagName() {
         return bagName;
@@ -30,5 +31,13 @@ public class Denomination {
 
     public void setEnvelopsList(List<String> envelopsList) {
         this.envelopsList = envelopsList;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

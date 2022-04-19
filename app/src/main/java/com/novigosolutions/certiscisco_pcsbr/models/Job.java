@@ -137,6 +137,9 @@ public class Job extends Model implements Comparable<Job> {
     @Column(name = "CanCollectWagon")
     public boolean CanCollectWagon;
 
+    @Column(name = "CanCollectConsignmentInBag")
+    public boolean CanCollectConsignmentInBag;
+
     @Column(name = "EnableManualEntry") //these for collection
     public boolean EnableManualEntry;
 
@@ -908,6 +911,7 @@ public class Job extends Model implements Comparable<Job> {
         if (job.CanCollectPallet) collection_types.add("Pallet");
         if (job.CanCollectCoinBox) collection_types.add("Coin Bag");
         if (job.CanCollectWagon) collection_types.add("Wagon");
+        if (job.CanCollectConsignmentInBag) collection_types.add("Consignment(s) In Bag");
 
 
         return collection_types;
@@ -916,13 +920,20 @@ public class Job extends Model implements Comparable<Job> {
     public static void saveItemsToCage(int TransportMasterId, String cageNo, String cageSeal) {
         Bags.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
         Box.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
-        EnvelopeBag.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
 
+        EnvelopeBag.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
         List<EnvelopeBag> envelopebags = EnvelopeBag.getByTransportMasterId(TransportMasterId);
         for (int a = 0; a < envelopebags.size(); a++) {
             if (envelopebags.get(a).envolpeType.equals("Envelopes"))
                 Envelope.setCageNoCageSeal(envelopebags.get(a).getId(), cageNo, cageSeal);
         }
+
+        ConsignmentBag.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
+        List<ConsignmentBag> consignmentBags = ConsignmentBag.getByTransportMasterId(TransportMasterId);
+        for (int a = 0; a < consignmentBags.size(); a++) {
+                Consignment.setCageNoCageSeal(consignmentBags.get(a).getId(), cageNo, cageSeal);
+        }
+
         BoxBag.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
         Wagon.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
     }
@@ -982,6 +993,25 @@ public class Job extends Model implements Comparable<Job> {
                 collectionSummary.Message = message.toString();
                 collection_summary.add(collectionSummary);
             }
+        }
+
+        List<ConsignmentBag> consignmentBags = ConsignmentBag.getByTransportMasterIdWithOutCage(TransportMasterId);
+        for (int i = 0; i < consignmentBags.size(); i++) {
+            List<Consignment> consignments = Consignment.getByTransportMasterIdWithOutCage(consignmentBags.get(i).getId());
+
+            StringBuilder message = new StringBuilder();
+            for (int j = 0; j < consignments.size(); j++) {
+                message.append(consignments.get(j).barcode);
+                message.append(" : ");
+            }
+            if (message.length() > 0)
+                message.delete(message.length() - 2, message.length());
+            Summary collectionSummary = new Summary();
+            collectionSummary.Collection_type = "ConsignmentBag";
+            collectionSummary.id = consignmentBags.get(i).getId();
+            collectionSummary.Head = "Consignment(s) In Bag (" + consignmentBags.get(i).bagcode + ")";
+            collectionSummary.Message = message.toString();
+            collection_summary.add(collectionSummary);
         }
 
         List<Box> boxes = Box.getByTransportMasterIdWithOutCage(TransportMasterId);
@@ -1081,6 +1111,25 @@ public class Job extends Model implements Comparable<Job> {
                 collectionSummary.Message = message.toString();
                 collection_summary.add(collectionSummary);
             }
+        }
+
+        List<ConsignmentBag> consignmentBags = ConsignmentBag.getByTransportMasterId(TransportMasterId);
+        for (int i = 0; i < consignmentBags.size(); i++) {
+            List<Consignment> consignments = Consignment.getByTransportMasterIdWithOutCage(consignmentBags.get(i).getId());
+
+            StringBuilder message = new StringBuilder();
+            for (int j = 0; j < consignments.size(); j++) {
+                message.append(consignments.get(j).barcode);
+                message.append(" : ");
+            }
+            if (message.length() > 0)
+                message.delete(message.length() - 2, message.length());
+            Summary collectionSummary = new Summary();
+            collectionSummary.Collection_type = "ConsignmentBag";
+            collectionSummary.id = consignmentBags.get(i).getId();
+            collectionSummary.Head = "Consignment(s) In Bag (" + consignmentBags.get(i).bagcode + ")";
+            collectionSummary.Message = message.toString();
+            collection_summary.add(collectionSummary);
         }
 
         List<Box> boxes = Box.getBoxByTransportMasterId(TransportMasterId);
@@ -1196,6 +1245,25 @@ public class Job extends Model implements Comparable<Job> {
             }
         }
 
+        List<ConsignmentBag> consignmentBags = ConsignmentBag.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
+        for (int i = 0; i < consignmentBags.size(); i++) {
+            List<Consignment> consignments = Consignment.getByTransportMasterIdWithCage(consignmentBags.get(i).getId(), cageNo, cageSeal);
+
+            StringBuilder message = new StringBuilder();
+            for (int j = 0; j < consignments.size(); j++) {
+                message.append(consignments.get(j).barcode);
+                message.append(" : ");
+            }
+            if (message.length() > 0)
+                message.delete(message.length() - 2, message.length());
+            Items collectionSummary = new Items();
+            collectionSummary.setId(consignmentBags.get(i).getId());
+            collectionSummary.setHead("Consignment(s) In Bag (" + consignmentBags.get(i).bagcode + ")");
+            collectionSummary.setSummary(message.toString());
+            if (!checkIfItemsExists(message.toString(), items))
+                items.add(collectionSummary);
+        }
+
         List<Box> boxes = Box.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
         for (int i = 0; i < boxes.size(); i++) {
             Items collectionSummary = new Items();
@@ -1293,6 +1361,24 @@ public class Job extends Model implements Comparable<Job> {
                 collectionSummary.setSummary(message.toString());
                 items.add(collectionSummary);
             }
+        }
+
+        List<ConsignmentBag> consignmentBags = ConsignmentBag.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
+        for (int i = 0; i < consignmentBags.size(); i++) {
+            List<Consignment> consignments = Consignment.getByTransportMasterIdWithCage(consignmentBags.get(i).getId(), cageNo, cageSeal);
+
+            StringBuilder message = new StringBuilder();
+            for (int j = 0; j < consignments.size(); j++) {
+                message.append(consignments.get(j).barcode);
+                message.append(" : ");
+            }
+            if (message.length() > 0)
+                message.delete(message.length() - 2, message.length());
+            Items collectionSummary = new Items();
+            collectionSummary.setId(consignmentBags.get(i).getId());
+            collectionSummary.setHead("Consignment(s) In Bag (" + consignmentBags.get(i).bagcode + ")");
+            collectionSummary.setSummary(message.toString());
+            items.add(collectionSummary);
         }
 
         List<Box> boxes = Box.getByTransportMasterIdWithCage(TransportMasterId, cageNo, cageSeal);
@@ -1437,6 +1523,7 @@ public class Job extends Model implements Comparable<Job> {
                     envelopDeno.setBagName("Bag " + enveInBagQty);
                     envelopDeno.setSealNo(envelopeBag.bagcode);
                     envelopDeno.setEnvelopsList(envelopList);
+                    envelopDeno.setType("EnvelopInBag");
                     envelopDenomination.add(envelopDeno);
 
                 }
@@ -1591,6 +1678,7 @@ public class Job extends Model implements Comparable<Job> {
                         envelopDeno.setBagName("Sealed Bag " + enveInBagQty);
                         envelopDeno.setSealNo(envelopeBag.bagcode);
                         envelopDeno.setEnvelopsList(envelopList);
+                        envelopDeno.setType("EnvelopInBag");
                         envelopDenomination.add(envelopDeno);
 
                     }
@@ -1608,6 +1696,58 @@ public class Job extends Model implements Comparable<Job> {
                     Constants.BOX_QUANTITY += enveInBagQty;
                     envelopInBagContent.setDenominationList(envelopDenomination);
                     printContent.add(envelopInBagContent);
+                }
+
+            }
+
+            List<ConsignmentBag> consignmentBags = ConsignmentBag.getByTransportMasterId(transportMasterId);
+            if (!consignmentBags.isEmpty()) {
+                Content consignmentContent = new Content();
+                Content consignmentInBagContent = new Content();
+                List<String> consignmentSealNoList = new ArrayList<>();
+                List<Denomination> consignmentDenomination = new ArrayList<>();
+                int consignmentQty = 0;
+                int consignmentInBagQty = 0;
+
+
+                for (int j = 0; j < consignmentBags.size(); j++) {
+                    ConsignmentBag consignmentBag = consignmentBags.get(j);
+                    List<Consignment> consignments = Consignment.getByBagId(consignmentBag.getId());
+                    if (consignmentBag.bagcode.equals("none")) {
+                        for (int k = 0; k < consignments.size(); k++) {
+                            JsonObject Detail = new JsonObject();
+                            Detail.addProperty("ItemType", "Consignments");
+                            consignmentSealNoList.add(consignments.get(k).barcode);
+                            consignmentQty++;
+                        }
+                    } else {
+                        List<String> consignmentList = new ArrayList<>();
+                        for (int k = 0; k < consignments.size(); k++) {
+                            consignmentList.add(consignments.get(k).barcode);
+                        }
+                        Denomination consignmentDeno = new Denomination();
+                        consignmentInBagQty++;
+                        consignmentDeno.setBagName("Sealed Bag " + consignmentInBagQty);
+                        consignmentDeno.setSealNo(consignmentBag.bagcode);
+                        consignmentDeno.setEnvelopsList(consignmentList);
+                        consignmentDeno.setType("ConsignmentInBag");
+                        consignmentDenomination.add(consignmentDeno);
+
+                    }
+                }
+                if (consignmentQty > 0) {
+                    consignmentContent.setDescription("Consignment");
+                    consignmentContent.setQty(consignmentQty);
+                    Constants.BOX_QUANTITY += consignmentQty;
+                    consignmentContent.setSealNoList(consignmentSealNoList);
+                    printContent.add(consignmentContent);
+                }
+                if (consignmentInBagQty > 0) {
+                    consignmentInBagContent.setDescription("CONSIGNMENT IN BAG");
+                    consignmentInBagContent.setQty(consignmentInBagQty);
+                    Constants.BOX_QUANTITY += consignmentInBagQty;
+                    consignmentInBagContent.setDenominationList(consignmentDenomination);
+                    printContent.add(consignmentInBagContent);
                 }
 
             }
@@ -1775,6 +1915,7 @@ public class Job extends Model implements Comparable<Job> {
                         envelopDeno.setBagName("Sealed Bag " + enveInBagQty);
                         envelopDeno.setSealNo(envelopeBag.bagcode);
                         envelopDeno.setEnvelopsList(envelopList);
+                        envelopDeno.setType("EnvelopInBag");
                         envelopDenomination.add(envelopDeno);
 
                     }
@@ -1792,6 +1933,57 @@ public class Job extends Model implements Comparable<Job> {
 
                     envelopInBagContent.setDenominationList(envelopDenomination);
                     printContent.add(envelopInBagContent);
+                }
+
+            }
+
+            List<ConsignmentBag> consignmentBags = ConsignmentBag.getByTransportMasterIdWithOutCage(transportMasterId);
+            if (!consignmentBags.isEmpty()) {
+                Content consignmentContent = new Content();
+                Content consignmentInBagContent = new Content();
+                List<String> consignmentSealNoList = new ArrayList<>();
+                List<Denomination> consignmentDenomination = new ArrayList<>();
+                int consignmentQty = 0;
+                int consignmentInBagQty = 0;
+
+
+                for (int j = 0; j < consignmentBags.size(); j++) {
+                    ConsignmentBag consignmentBag = consignmentBags.get(j);
+                    List<Consignment> consignments = Consignment.getByBagId(consignmentBag.getId());
+                    if (consignmentBag.bagcode.equals("none")) {
+                        for (int k = 0; k < consignments.size(); k++) {
+                            JsonObject Detail = new JsonObject();
+                            Detail.addProperty("ItemType", "Consignments");
+                            consignmentSealNoList.add(consignments.get(k).barcode);
+                            consignmentQty++;
+                        }
+                    } else {
+                        List<String> consignmentList = new ArrayList<>();
+                        for (int k = 0; k < consignments.size(); k++) {
+                            consignmentList.add(consignments.get(k).barcode);
+                        }
+                        Denomination consignmentDeno = new Denomination();
+                        consignmentInBagQty++;
+                        consignmentDeno.setBagName("Sealed Bag " + consignmentInBagQty);
+                        consignmentDeno.setSealNo(consignmentBag.bagcode);
+                        consignmentDeno.setEnvelopsList(consignmentList);
+                        consignmentDeno.setType("ConsignmentInBag");
+                        consignmentDenomination.add(consignmentDeno);
+                    }
+                }
+                if (consignmentQty > 0) {
+                    consignmentContent.setDescription("Consignments");
+                    consignmentContent.setQty(consignmentQty);
+
+                    consignmentContent.setSealNoList(consignmentSealNoList);
+                    printContent.add(consignmentContent);
+                }
+                if (consignmentInBagQty > 0) {
+                    consignmentInBagContent.setDescription("CONSIGNMENT IN BAG");
+                    consignmentInBagContent.setQty(consignmentInBagQty);
+
+                    consignmentInBagContent.setDenominationList(consignmentDenomination);
+                    printContent.add(consignmentInBagContent);
                 }
 
             }
@@ -1933,6 +2125,12 @@ public class Job extends Model implements Comparable<Job> {
                 .executeSingle();
         if (envelopeBag != null) return true;
 
+
+        ConsignmentBag consignmentBag = new Select().from(ConsignmentBag.class)
+                .where("TransportMasterId=?", TransportMasterId)
+                .executeSingle();
+        if (consignmentBag != null) return true;
+
         Box box = new Select().from(Box.class)
                 .where("TransportMasterId=?", TransportMasterId)
                 .executeSingle();
@@ -1972,6 +2170,17 @@ public class Job extends Model implements Comparable<Job> {
         new Delete().from(EnvelopeBag.class)
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();
+
+        List<ConsignmentBag> consignmentBags = ConsignmentBag.getByTransportMasterId(TransportMasterId);
+        for (int i = 0; i < consignmentBags.size(); i++) {
+            new Delete().from(Consignment.class)
+                    .where("bagid=?", consignmentBags.get(i).getId())
+                    .execute();
+        }
+        new Delete().from(ConsignmentBag.class)
+                .where("TransportMasterId=?", TransportMasterId)
+                .execute();
+
         new Delete().from(Box.class)
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();

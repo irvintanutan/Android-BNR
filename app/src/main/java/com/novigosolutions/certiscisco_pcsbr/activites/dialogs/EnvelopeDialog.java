@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +26,8 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.IOnScannerData;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
+import com.novigosolutions.certiscisco_pcsbr.models.Consignment;
+import com.novigosolutions.certiscisco_pcsbr.models.ConsignmentBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
 import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
@@ -44,13 +48,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnScannerData, ApiCallback,RecyclerViewClickListener {
+public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnScannerData, ApiCallback, RecyclerViewClickListener {
 
     Context context;
     Button btn_scan, btn_done, btn_cancel;
     RecyclerView listView;
-    TextView txt_head, txt_bag_code,txt_count,txt_count_bag;
-    LinearLayout ll_bag, ll_listView;
+    TextView txt_head, txt_bag_code, txt_count, txt_count_bag, type, txt_seal;
+    LinearLayout ll_bag, ll_listView, sealNumbersContainer;
     List<String> bar_code_list = new ArrayList<>();
     DialogResult mDialogResult;
     StringDeleteAdapter listAdapter;
@@ -61,6 +65,8 @@ public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnS
     View l_manual_entry;
     Button btn_ok;
     EditText editText;
+    RadioGroup rg;
+    RadioButton rb1, rb2;
 
     public EnvelopeDialog(Context context, int TransportMasterId, DialogResult mDialogResult, String envelopeType) {
         super(context, R.style.Theme_AppCompat_Light_Dialog);
@@ -76,6 +82,9 @@ public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnS
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.envelope_dialog);
 
+        rg = findViewById(R.id.rg);
+        rb1 = findViewById(R.id.no1);
+        rb2 = findViewById(R.id.no2);
         btn_scan = findViewById(R.id.btn_scan);
         btn_done = findViewById(R.id.btn_done);
         btn_cancel = findViewById(R.id.btn_cancel);
@@ -83,16 +92,26 @@ public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnS
         txt_head = findViewById(R.id.txt_head);
         txt_bag_code = findViewById(R.id.bag_code);
         txt_count = findViewById(R.id.txt_count);
-        txt_count_bag=findViewById(R.id.txt_count_bag);//added line
+        txt_count_bag = findViewById(R.id.txt_count_bag);//added line
+        type = findViewById(R.id.type);
         txt_count_bag.setVisibility(View.GONE);
         ll_bag = findViewById(R.id.ll_bag);
+        sealNumbersContainer = findViewById(R.id.sealNumbersContainer);
+        txt_seal = findViewById(R.id.txt_seal);
         ll_listView = findViewById(R.id.ll_listview);
         if (envelopeType.equals("Envelopes")) {
             txt_head.setText("Envelope(s)");
             btn_done.setText("Done");
+            sealNumbersContainer.setVisibility(View.GONE);
+        } else if (envelopeType.equals("ConsignmentBag")) {
+            txt_head.setText("Consignment(s) In Bag");
+            type.setText("Consignment(s)");
+            btn_done.setText("Add To Bag");
+            sealNumbersContainer.setVisibility(View.VISIBLE);
         } else {
             txt_head.setText("Envelope(s) In Bag");
             btn_done.setText("Add To Bag");
+            sealNumbersContainer.setVisibility(View.GONE);
         }
         img_manual_entry = findViewById(R.id.img_manual_entry);
         l_manual_entry = findViewById(R.id.l_manual_entry);
@@ -103,7 +122,15 @@ public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnS
         btn_ok = findViewById(R.id.btn_ok);
         editText = findViewById(R.id.edittext);
         btn_ok.setOnClickListener(this);
-        listAdapter = new StringDeleteAdapter(bar_code_list,this);
+
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                txt_seal.setText("");
+            }
+        });
+
+        listAdapter = new StringDeleteAdapter(bar_code_list, this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setItemAnimator(new DefaultItemAnimator());
@@ -111,7 +138,7 @@ public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnS
         if (Preferences.getBoolean("EnableManualEntry", context) || Job.getSingle(TransportMasterId).EnableManualEntry) {
             enableManualEntry();
         }
-        ((BarCodeScanActivity)context).registerScannerEvent(this);
+        ((BarCodeScanActivity) context).registerScannerEvent(this);
     }
 
     @Override
@@ -119,7 +146,7 @@ public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnS
         switch (v.getId()) {
             case R.id.btn_scan:
                 try {
-                    ((BarCodeScanActivity)context).scansoft();
+                    ((BarCodeScanActivity) context).scansoft();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -131,43 +158,66 @@ public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnS
                         ll_bag.setVisibility(View.VISIBLE);
                         txt_bag_code.requestFocus();
                         btn_done.setText("Done");
+                        sealNumbersContainer.setVisibility(View.GONE);
                         l_manual_entry.setVisibility(View.GONE);
                         StringAdapter stringAdapter = new StringAdapter(bar_code_list);
                         listView.setAdapter(stringAdapter);
                     } else {
-                        Toast.makeText(context, "Envelope(s) can't be empty", Toast.LENGTH_SHORT).show();
+                        String msg = envelopeType.equals("EnvelopeBag") ? "Envelope(s)" : "Consignment(s)";
+                        Toast.makeText(context, msg + " can't be empty", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     //to include special characters in the barcode entry ,removed regx condition
                     //  String bagcode = txt_bag_code.getText().toString().replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
                     String bagcode = txt_bag_code.getText().toString().trim();
-                    if (envelopeType.equals("EnvelopeBag") && bagcode.length() == 0) {
+                    if ((envelopeType.equals("EnvelopeBag") || envelopeType.equals("ConsignmentBag")) && bagcode.length() == 0) {
                         Toast.makeText(context, "Bag bar" +
                                 "code can't be empty ", Toast.LENGTH_SHORT).show();
-                    } else if (envelopeType.equals("EnvelopeBag") && (bar_code_list.contains(bagcode) || Branch.isExist(bagcode))) {
+                    } else if ((envelopeType.equals("EnvelopeBag") || envelopeType.equals("ConsignmentBag")) &&
+                            (bar_code_list.contains(bagcode) || Branch.isExist(bagcode))) {
                         ((CollectionActivity) context).invalidbarcodealert("Duplicate");
                     } else if (bar_code_list.size() == 0) {
-                        Toast.makeText(context, "Envelope(s) can't be empty", Toast.LENGTH_SHORT).show();
+                        String msg = envelopeType.equals("EnvelopeBag") ? "Envelope(s)" : "Consignment(s)";
+                        Toast.makeText(context, msg + " can't be empty", Toast.LENGTH_SHORT).show();
                     } else {
-                        EnvelopeBag envelopeBag = new EnvelopeBag();
-                        envelopeBag.TransportMasterId = TransportMasterId;
-                        envelopeBag.envolpeType = envelopeType;
-                        if (envelopeType.equals("Envelopes"))
-                            envelopeBag.bagcode = "none";
-                        else
-                            envelopeBag.bagcode = txt_bag_code.getText().toString().trim();
-                        long id = envelopeBag.save();
+                        if (envelopeType.equals("EnvelopeBag") || envelopeType.equals("Envelopes")) {
+                            EnvelopeBag envelopeBag = new EnvelopeBag();
+                            envelopeBag.TransportMasterId = TransportMasterId;
+                            envelopeBag.envolpeType = envelopeType;
+                            if (envelopeType.equals("Envelopes"))
+                                envelopeBag.bagcode = "none";
+                            else
+                                envelopeBag.bagcode = txt_bag_code.getText().toString().trim();
+                            long id = envelopeBag.save();
 
-                        for (int i = 0; i < bar_code_list.size(); i++) {
-                            Envelope envelope = new Envelope();
-                            envelope.bagid = id;
-                            envelope.barcode = bar_code_list.get(i);
-                            envelope.save();
+                            for (int i = 0; i < bar_code_list.size(); i++) {
+                                Envelope envelope = new Envelope();
+                                envelope.bagid = id;
+                                envelope.barcode = bar_code_list.get(i);
+                                envelope.save();
+                            }
+                            if (mDialogResult != null) {
+                                mDialogResult.onResult();
+                            }
+                            dismiss();
+                        } else {
+                            ConsignmentBag consignmentBag = new ConsignmentBag();
+                            consignmentBag.TransportMasterId = TransportMasterId;
+                            consignmentBag.consignmentType = envelopeType;
+                            consignmentBag.bagcode = txt_bag_code.getText().toString().trim();
+                            long id = consignmentBag.save();
+
+                            for (int i = 0; i < bar_code_list.size(); i++) {
+                                Consignment consignment = new Consignment();
+                                consignment.bagid = id;
+                                consignment.barcode = bar_code_list.get(i);
+                                consignment.save();
+                            }
+                            if (mDialogResult != null) {
+                                mDialogResult.onResult();
+                            }
+                            dismiss();
                         }
-                        if (mDialogResult != null) {
-                            mDialogResult.onResult();
-                        }
-                        dismiss();
                     }
                 }
                 break;
@@ -214,31 +264,35 @@ public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnS
         else {
             if (txt_bag_code.isFocused()) {
                 txt_bag_code.setText(data);
-              //  txt_count_bag.setText("Count : "+"1");
-
+                //  txt_count_bag.setText("Count : "+"1");
             } else if (editText.isFocused()) {
                 add(data);
             } else if (isBagCodeScan) {
                 txt_bag_code.setText(data);
-            //    txt_count_bag.setText("Count : "+"1");
+                //    txt_count_bag.setText("Count : "+"1");
             } else {
-                add(data);
+                if (rb1.isChecked()) {
+                    add(data);
+                } else if (txt_seal.length() > 0) {
+                    add(txt_seal.getText().toString() + "," + data);
+                    txt_seal.setText("");
+                } else {
+                    txt_seal.setText(data);
+                }
             }
         }
     }
 
-    private void add(String data)
-    {
+    private void add(String data) {
         bar_code_list.add(data);
         listAdapter.notifyDataSetChanged();
-        txt_count.setText("Count : "+bar_code_list.size());
+        txt_count.setText("Count : " + bar_code_list.size());
     }
 
-    private void remove(int pos)
-    {
+    private void remove(int pos) {
         bar_code_list.remove(pos);
         listAdapter.notifyDataSetChanged();
-        txt_count.setText("Count : "+bar_code_list.size());
+        txt_count.setText("Count : " + bar_code_list.size());
     }
 
     private void enableManualEntry() {
@@ -259,7 +313,7 @@ public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnS
                         Job.EnableManualEntry(TransportMasterId);
                         enableManualEntry();
                     } else if (result_data.replaceAll("\\W", "").equalsIgnoreCase("REJECTED")) {
-                        Job.UpdateRequestId(TransportMasterId,"");
+                        Job.UpdateRequestId(TransportMasterId, "");
                         Toast.makeText(context, "Request is rejected", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(context, "Request is pending", Toast.LENGTH_SHORT).show();

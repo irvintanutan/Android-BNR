@@ -129,11 +129,13 @@ public class Branch extends Model implements Comparable<Branch> {
                 .executeSingle();
 
     }
+
     public static List<Branch> getAllBranch() {
         return new Select().from(Branch.class)
-               .execute();
+                .execute();
 
     }
+
     public static int getAllCount() {
         return new Select().from(Job.class)
                 .execute().size();
@@ -338,7 +340,7 @@ public class Branch extends Model implements Comparable<Branch> {
                 .executeSingle();
 
         Cage cage = new Select().from(Cage.class)
-                .where("CageNo=? or CageSeal=?", ScanValue , ScanValue)
+                .where("CageNo=? or CageSeal=?", ScanValue, ScanValue)
                 .executeSingle();
         if (cage != null) return true;
 
@@ -538,7 +540,7 @@ public class Branch extends Model implements Comparable<Branch> {
 //    }
 
     public static JsonObject getCollection(String GroupKey, Context context, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
-        List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, actualFromTime , actualToTime);
+        List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
 
         String receiptNo = "";
         //List<Job> jobs = Job.getCollectionJobsOfPoint(PointId);
@@ -628,6 +630,28 @@ public class Branch extends Model implements Comparable<Branch> {
                 }
             }
 
+            List<ConsignmentBag> consignmentBags = ConsignmentBag.getByTransportMasterId(TransportMasterId);
+            for (int j = 0; j < consignmentBags.size(); j++) {
+                ConsignmentBag consignmentBag = consignmentBags.get(j);
+                List<Consignment> consignments = Consignment.getByBagId(consignmentBag.getId());
+
+                JsonArray seals = new JsonArray();
+                for (int k = 0; k < consignments.size(); k++) {
+                    seals.add(consignments.get(k).barcode);
+                }
+                JsonObject Detail = new JsonObject();
+                Detail.addProperty("ItemType", "Consignment In Bag");
+                Detail.addProperty("DenoId", 0);
+                Detail.addProperty("SealNo1", consignmentBag.bagcode);
+                Detail.addProperty("SealNo2", "");
+                Detail.addProperty("CageNo", consignmentBag.CageNo);
+                Detail.addProperty("CageSeal", consignmentBag.CageSeal);
+                Detail.addProperty("Qty", consignments.size());
+                Detail.addProperty("CoinSeriesId", 0);
+                Detail.add("EnvelopeSeal", seals);
+                Details.add(Detail);
+            }
+
             List<Box> boxes = Box.getBoxByTransportMasterId(TransportMasterId);
             for (int j = 0; j < boxes.size(); j++) {
                 Box box = boxes.get(j);
@@ -671,7 +695,7 @@ public class Branch extends Model implements Comparable<Branch> {
                 Details.add(Detail);
             }
             jobjson.add("Details", Details);
-            Job.UpdateTime(TransportMasterId, startTime , endTime);
+            Job.UpdateTime(TransportMasterId, startTime, endTime);
             CollectionHeaderList.add(jobjson);
         }
         jsonObject.add("CollectionHeaderList", CollectionHeaderList);
@@ -748,6 +772,7 @@ public class Branch extends Model implements Comparable<Branch> {
         Envelope.remove();
         EnvelopeBag.remove();
         ChatMessage.remove();
+        ConsignmentBag.remove();
         Break.remove();
         Reschedule.remove();
         CoinSeries.remove();

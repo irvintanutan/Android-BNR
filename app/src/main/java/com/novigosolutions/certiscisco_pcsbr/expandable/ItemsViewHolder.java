@@ -12,6 +12,8 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.models.Bags;
 import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.BoxBag;
+import com.novigosolutions.certiscisco_pcsbr.models.Consignment;
+import com.novigosolutions.certiscisco_pcsbr.models.ConsignmentBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
 import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
@@ -25,7 +27,7 @@ public class ItemsViewHolder extends ChildViewHolder {
     private ImageView delete;
     private Context context;
     private Long id;
-    private  String itemType;
+    private String itemType;
     DialogResult mDialogResult;
 
     public ItemsViewHolder(View itemView, Context context) {
@@ -57,8 +59,8 @@ public class ItemsViewHolder extends ChildViewHolder {
         alertDialog.setTitle("Confirm");
         alertDialog.setMessage("Are you sure you want to delete?");
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) { 
-                    delete();
+            public void onClick(DialogInterface dialog, int which) {
+                delete();
 
                 if (mDialogResult != null) {
                     mDialogResult.onResult();
@@ -79,6 +81,8 @@ public class ItemsViewHolder extends ChildViewHolder {
             Envelope.removeSingle(id);
         } else if (itemType.equals("EnvelopeBag")) {
             EnvelopeBag.removeSingle(id);
+        } else if (itemType.equals("ConsignmentBag")) {
+            ConsignmentBag.removeSingle(id);
         } else if (itemType.equals("Box")) {
             Box.removeSingle(id);
         } else if (itemType.equals("Pallet")) {
