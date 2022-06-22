@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -336,9 +337,25 @@ public class APICaller {
     private JsonObject getRequestType(String type, String GroupKey) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("Module", "MC45");
-        Branch branch = Branch.getSingle(GroupKey);
-//        jsonObject.addProperty("RequestType", "MANUAL ENTRY PERMISSION FOR " + type + "|" + branch.FunctionalCode + "|" + branch.CustomerCode + "|" + branch.Tower + "-" + branch.Town + "|" + Preferences.getString("DeviceID", context));
-        jsonObject.addProperty("RequestType", "MANUAL ENTRY PERMISSION FOR " + type + "|" + branch.FunctionalCode + "|" + Preferences.getString("DeviceID", context));
+        Job job = Job.getJobListByGroupKey(GroupKey).get(0);
+        Branch branch = Branch.getSingle(job.GroupKey);
+
+        String address = "";
+        if (!TextUtils.isEmpty(job.BranchStreetName) && job.BranchStreetName != null){
+            address += job.BranchStreetName+" , ";
+        }
+        if (!TextUtils.isEmpty(job.BranchTower) && job.BranchTower != null){
+            address += job.BranchTower+", ";
+        }
+        if (!TextUtils.isEmpty(job.BranchTown) && job.BranchTown != null){
+            address += job.BranchTown+" , ";
+        }
+        if (!TextUtils.isEmpty(job.BranchPinCode) && job.BranchPinCode != null){
+            address += job.BranchPinCode;
+        }
+
+        jsonObject.addProperty("RequestType", "MANUAL ENTRY PERMISSION FOR " + type + " | " + branch.FunctionalCode + " | " + address + "|" + branch.CustomerName  + "|" + Preferences.getString("DeviceID", context));
+        //jsonObject.addProperty("RequestType", "MANUAL ENTRY PERMISSION FOR " + type + "|" + branch.FunctionalCode + "|" + Preferences.getString("DeviceID", context));
         jsonObject.addProperty("RequestedBy", Preferences.getInt("UserId", context));
         jsonObject.addProperty("RequestedOn", CommonMethods.getCurrentDateTime(context));
         Log.e("request body", jsonObject.toString());
