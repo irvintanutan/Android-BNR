@@ -19,7 +19,7 @@ import java.util.List;
 
 public class GridAdapter extends BaseAdapter {
 
-    String[] menuList = {"All Jobs", "Pending Jobs", "Completed Jobs","Message","Break","Printer"};
+    String[] menuList = {"All Jobs", "Pending Jobs", "Completed Jobs","Message", "Scan to Secure","Break","Printer"};
     //int[] count ;
     List<Integer> countList;
     Context context;
@@ -28,6 +28,7 @@ public class GridAdapter extends BaseAdapter {
             R.drawable.pending,
             R.drawable.delivered,
             R.drawable.message,
+            R.drawable.delivered,
             R.drawable.icon_break,
             R.drawable.printer_img
     };

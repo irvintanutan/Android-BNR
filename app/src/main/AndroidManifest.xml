@@ -66,6 +66,10 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".activites.SecureJobActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".activites.SummaryActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
@@ -106,6 +110,7 @@
             android:name=".utils.DatabaseContentProvider"
             android:authorities="com.novigosolutions.certiscisco_pcsbr"
             android:exported="false" />
+
         <receiver android:name=".recivers.ShutDownReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_SHUTDOWN" />
@@ -130,6 +135,7 @@
                 <action android:name="com.novigosolutions.certiscisco_pcsbr.intervalchanged" />
             </intent-filter>
         </receiver>
+
         <service android:name=".service.SyncService" />
         <service android:name=".service.SyncMessageService" />
         <service android:name=".service.OfflineUpdateService" />
@@ -148,12 +154,14 @@
             android:name="com.symbol.emdk"
             android:required="false" />
     </application>
+
     <permission
         android:name="android.permission.BLUETOOTH"
         android:label="BLUETOOTH" />
     <permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE"/> -->
     <permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />

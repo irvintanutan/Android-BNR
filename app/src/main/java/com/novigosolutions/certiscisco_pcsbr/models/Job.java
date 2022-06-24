@@ -244,6 +244,9 @@ public class Job extends Model implements Comparable<Job> {
 
     private boolean isSelected;
 
+    @Column(name = "IsSecured")
+    public boolean IsSecured;
+
 
     public static Job getSingle(int TransportMasterId) {
         return new Select().from(Job.class)
@@ -273,6 +276,14 @@ public class Job extends Model implements Comparable<Job> {
     public static List<Job> getByGroupKey(String GroupKey) {
         return new Select().from(Job.class)
                 .where("GroupKey=?", GroupKey)
+                .orderBy("OrderNo")
+                .execute();
+
+    }
+
+    public static List<Job> getUnSecuredJobs() {
+        return new Select().from(Job.class)
+                .where("IsSecured=?", false)
                 .orderBy("OrderNo")
                 .execute();
 

@@ -153,15 +153,16 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
                     case 3:
                         intent = new Intent(HomeActivity.this, ChatActivity.class);
                         break;
-
                     case 4:
+                        intent = new Intent(HomeActivity.this, SecureJobActivity.class);
+                        Constants.BackDestination = "PENDING";
+                        Constants.isAll = false;
+                        break;
+                    case 5:
                         intent = new Intent(HomeActivity.this, BreakListActivity.class);
                         break;
-//                    case 5:
-//                        logout();
-//                        break;
 
-                    case 5:
+                    case 6:
                         intent = new Intent(HomeActivity.this, PrinterConfigurationActivity.class);
                         break;
 
@@ -259,6 +260,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             countList.add(Branch.getCountByStatus("PENDING"));
             countList.add(Branch.getCountByStatus("COMPLETED"));
             countList.add(ChatMessage.getUnreadMessages().size());
+            countList.add(Job.getUnSecuredJobs().size());
             countList.add(Break.getPendingBreak().size());
             countList.add(0);
             gridadapter = new GridAdapter(HomeActivity.this, countList);
@@ -269,6 +271,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             countList.add(Branch.getCountByStatus("PENDING"));
             countList.add(Branch.getCountByStatus("COMPLETED"));
             countList.add(ChatMessage.getUnreadMessages().size());
+            countList.add(Job.getUnSecuredJobs().size());
             countList.add(Break.getPendingBreak().size());
             countList.add(0);
             gridadapter.notifyDataSetChanged();

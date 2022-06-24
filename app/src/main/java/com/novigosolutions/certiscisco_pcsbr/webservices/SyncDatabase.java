@@ -249,6 +249,7 @@ public class SyncDatabase {
 
     private void saveJob(JSONObject jobObject, int PointId) {
         try {
+            jobObject.put("IsSecured" , false);
             Job job = gson.fromJson(jobObject.toString(), Job.class);
             job.BranchPointId = PointId;
             if (job.Status == null || job.Status.isEmpty()) job.Status = "PENDING";
