@@ -13,6 +13,7 @@ import com.activeandroid.query.Select;
 import com.activeandroid.query.Update;
 import com.google.gson.JsonObject;
 import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
+import com.novigosolutions.certiscisco_pcsbr.objects.SecureObject;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
@@ -283,7 +284,15 @@ public class Job extends Model implements Comparable<Job> {
 
     public static List<Job> getUnSecuredJobs() {
         return new Select().from(Job.class)
-                .where("IsSecured=?", false)
+                .where("IsSecured=? AND Status=?", false, "COMPLETED")
+                .orderBy("OrderNo")
+                .execute();
+
+    }
+
+    public static List<Job> getSecuredJobs() {
+        return new Select().from(Job.class)
+                .where("IsSecured=? AND Status=?", true, "COMPLETED")
                 .orderBy("OrderNo")
                 .execute();
 
@@ -947,6 +956,50 @@ public class Job extends Model implements Comparable<Job> {
 
         BoxBag.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
         Wagon.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
+    }
+
+    public static List<SecureObject> getSecureObjects(int TransportMasterId){
+        List<SecureObject> secureObjects = new ArrayList<>();
+
+        List<Bags> bags = Bags.getByTransportMasterIdWithOutCage(TransportMasterId);
+        for (int i = 0; i < bags.size(); i++) {
+            SecureObject secureObject = new SecureObject();
+            secureObject.IsSealed = true;
+            secureObject.Type = "Bag";
+            secureObject.Barcode = bags.get(i).firstbarcode;
+            secureObjects.add(secureObject);
+
+            if (!bags.get(i).secondbarcode.isEmpty()) {
+                secureObject.Barcode = bags.get(i).secondbarcode;
+                secureObjects.add(secureObject);
+            }
+        }
+
+        List<Box> boxes = Box.getByTransportMasterIdWithOutCage(TransportMasterId);
+        for (int i = 0; i < boxes.size(); i++) {
+            SecureObject secureObject = new SecureObject();
+            secureObject.IsSealed = false;
+            secureObject.Type = "Box";
+            secureObject.Quantity = boxes.get(i).count;
+            if ((boxes.get(i).CoinSeriesId) == 0) {
+                secureObject.Barcode = boxes.get(i).ProductName;
+            } else {
+                secureObject.Barcode = boxes.get(i).ProductName + "(" + boxes.get(i).CoinSeries + ")";
+            }
+            secureObjects.add(secureObject);
+        }
+
+        int palletCount = getSingle(TransportMasterId).palletCount;
+        if (palletCount > 0) {
+            SecureObject secureObject = new SecureObject();
+            secureObject.IsSealed = false;
+            secureObject.Type = "Pallet";
+            secureObject.Barcode = "Pallet";
+            secureObject.Quantity = palletCount;
+            secureObjects.add(secureObject);
+        }
+
+        return  secureObjects;
     }
 
     public static List<Summary> getCollectionSummaryWithoutCage(int TransportMasterId) {

@@ -28,7 +28,7 @@ public class GridAdapter extends BaseAdapter {
             R.drawable.pending,
             R.drawable.delivered,
             R.drawable.message,
-            R.drawable.delivered,
+            R.drawable.secure,
             R.drawable.icon_break,
             R.drawable.printer_img
     };

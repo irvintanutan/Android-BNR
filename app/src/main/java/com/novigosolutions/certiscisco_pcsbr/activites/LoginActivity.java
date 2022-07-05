@@ -244,7 +244,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                     json.addProperty("UserCode", false ? "TEST" : teamid);
                     json.addProperty("Password", false ? "TEST" : password);
 
-                    json.addProperty("LoginDate", false ? "2022-03-23": sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
+                    json.addProperty("LoginDate", false ? "2022-06-20": sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

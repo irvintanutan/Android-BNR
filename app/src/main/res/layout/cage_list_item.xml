@@ -4,13 +4,19 @@
     android:id="@+id/ll_main"
     android:layout_width="match_parent"
     android:layout_height="40dp"
-    android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:weightSum="2"
     android:paddingLeft="8dp">
 
     <TextView
-        android:id="@+id/txt_seal"
+        android:id="@+id/cageNo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/black"
+        android:textSize="14dp" />
+
+    <TextView
+        android:id="@+id/cageSeal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

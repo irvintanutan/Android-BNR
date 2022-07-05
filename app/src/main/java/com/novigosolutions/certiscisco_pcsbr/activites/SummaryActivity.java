@@ -208,13 +208,6 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                             txt_cage_count.setVisibility(View.VISIBLE);
                             txt_cage_count.setText("Cage Count : " + cageCount);
                         }
-//                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-//                        recyclerView.setLayoutManager(mLayoutManager);
-//                        recyclerView.setItemAnimator(new DefaultItemAnimator());
-//                        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
-//                        recyclerView.addItemDecoration(dividerItemDecoration);
-//                        CollectionSummaryAdapter mAdapter = new CollectionSummaryAdapter(collectionSummaries, true, this);
-//                        recyclerView.setAdapter(mAdapter);
                     }
                     ll_lists.addView(titleList);
                     itemCounter(collectionSummaries);

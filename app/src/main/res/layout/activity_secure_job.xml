@@ -13,9 +13,24 @@
         android:orientation="vertical">
 
         <include
+            android:id="@+id/app_bar"
             layout="@layout/tool_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/app_bar"
+            app:tabBackground="@drawable/tab_color"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/tabs" />
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

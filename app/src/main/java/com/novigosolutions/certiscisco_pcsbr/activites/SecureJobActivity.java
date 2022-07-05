@@ -20,9 +20,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.tabs.TabLayout;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.GroupGridAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.GroupListAdapter;
+import com.novigosolutions.certiscisco_pcsbr.adapters.ViewPagerAdapterSecure;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.OfflineCallback;
@@ -42,28 +44,34 @@ import java.util.List;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
 
-public class SecureJobActivity extends BaseActivity implements RecyclerViewClickListener2, ApiCallback, OfflineCallback, NetworkChangekListener {
-    private RecyclerView recyclerView;
-    private GroupListAdapter listAdapter;
-    private GroupGridAdapter gridAdapter;
+public class SecureJobActivity extends BaseActivity implements ApiCallback, OfflineCallback, NetworkChangekListener {
+
     String status = "";
-    List<Branch> jobList;
     CardView cardnodata;
     protected MenuItem refreshItem = null;
+    protected MenuItem gridItem = null;
     protected MenuItem print = null;
+
     ImageView imgnetwork;
     CoordinatorLayout cl;
     boolean isgridview = false;
     Handler handler;
     Runnable runnable;
+
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+
+    private ViewPagerAdapterSecure viewPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +82,7 @@ public class SecureJobActivity extends BaseActivity implements RecyclerViewClick
     }
 
     private void setuptoolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(false);
@@ -87,14 +95,69 @@ public class SecureJobActivity extends BaseActivity implements RecyclerViewClick
     }
 
     private void initializeviews() {
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         cardnodata = (CardView) findViewById(R.id.cardviewnodata);
         cl = (CoordinatorLayout) findViewById(R.id.cl);
+        tabLayout = findViewById(R.id.tabs);
+        viewPager = findViewById(R.id.viewpager);
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             status = extras.getString("status");
         }
         isgridview = Preferences.getBoolean("isgridview", this);
+
+        viewPagerAdapter = new ViewPagerAdapterSecure(getSupportFragmentManager());
+        viewPager.setAdapter(viewPagerAdapter);
+
+
+        final TabLayout.Tab secure = tabLayout.newTab();
+        final TabLayout.Tab unsecure = tabLayout.newTab();
+
+        secure.setText("Secured");
+        unsecure.setText("Yet To Secure");
+
+        tabLayout.addTab(secure, 0);
+        tabLayout.addTab(unsecure, 1);
+
+        tabLayout.setTabTextColors(ContextCompat.getColorStateList(this, R.color.colorPrimary));
+        tabLayout.setSelectedTabIndicatorColor(ContextCompat.getColor(this, R.color.white));
+
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+
+        });
+
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     @Override
@@ -103,90 +166,6 @@ public class SecureJobActivity extends BaseActivity implements RecyclerViewClick
         return true;
     }
 
-    @Override
-    public void recyclerViewListClicked(String GroupKey) {
-        gotoprocessjob(GroupKey);
-    }
-
-    private void gotoprocessjob(String GroupKey) {
-        Branch branch = Branch.getSingle(GroupKey);
-        int branchType = 0;
-        if ("ALL".equals(status)) {
-            branchType = branch.getBranchJobType();
-        } else {
-            branchType = branch.getBranchJobTypeByStatus(status);
-        }
-        branch.updateJobStartTime(CommonMethods.getCurrentDateTime(this));
-        Intent intent = null;
-        List<Job> jobsList;
-        if ("ALL".equals(status)) {
-            jobsList = Job.getByGroupKey(GroupKey);
-        } else {
-            jobsList = Job.getByGroupKeyAndStatus(GroupKey, status);
-        }
-        Job j = jobsList.get(0);
-        int jobtype = 0;
-        if (j.IsCollectionOrder && j.IsFloatDeliveryOrder) {
-            jobtype = 3;
-        } else if (j.IsFloatDeliveryOrder) {
-            jobtype = 2;
-        } else if (j.IsCollectionOrder) {
-            jobtype = 1;
-        }
-
-        Log.e("GROUPKEY", GroupKey);
-
-        if (branchType != 2 && jobsList.size() > 1) {
-            intent = new Intent(SecureJobActivity.this, JobListActivity.class);
-            intent.putExtra("GroupKey", GroupKey);
-            intent.putExtra("status", status);
-        } else if (j.Status.equals("COMPLETED") || (jobtype == 1 && j.isOfflineSaved) || (jobtype == 2 && (j.isOfflineSaved || Reschedule.isOfflineRescheduled(GroupKey))) || (branchType == 3 && j.isOfflineSaved && Reschedule.isOfflineRescheduled(GroupKey))) {
-            intent = new Intent(SecureJobActivity.this, SummaryActivity.class);
-            intent.putExtra("TransportMasterId", j.TransportMasterId);
-            intent.putExtra("GroupKey", GroupKey);
-            intent.putExtra("summaryType", jobtype);
-            intent.putExtra("isDelivery", j.IsFloatDeliveryOrder ? 1 : 0);
-            intent.putExtra("isCollection", j.IsCollectionOrder ? 1 : 0);
-            intent.putExtra("isSummary", true);
-        } else if (jobtype == 1) {
-//            || (jobtype == 3 && (Job.getPendingDeliveryJobsOfPoint(GroupKey).size() == 0 || branch.isDelOffline))
-
-            Job.updateJobStartTime(j.TransportMasterId, CommonMethods.getCurrentDateTime(this));
-            intent = new Intent(SecureJobActivity.this, ConfirmationActivity.class);
-            intent.putExtra("TransportMasterId", j.TransportMasterId);
-            intent.putExtra("GroupKey", GroupKey);
-            Preferences.saveString("PROGRESSGROUPKEY", GroupKey, this);
-        } else if (jobtype == 2 || jobtype == 3) {
-            int tmp = 0;
-            for (Job jo : jobsList) {
-                if (!TextUtils.isEmpty(jo.DependentOrderId) && Job.checkPendingDependentCollections(jo.DependentOrderId).size() > 0) {
-                    tmp = 1;
-                } else if (!Delivery.hasPendingDeliveryItems(jo.TransportMasterId)) {
-                    tmp = 2;
-                } else {
-                    tmp = 0;
-                    break;
-                }
-            }
-
-            if (tmp == 1) {
-                alert("Can not perform delivery since item(s) are not collected from pick-up location");
-            } else if (tmp == 2) {
-                alert("No items to deliver");
-            } else {
-                Job.updateDeliveryJobsStartTime(GroupKey, CommonMethods.getCurrentDateTime(this));
-                intent = new Intent(SecureJobActivity.this, ConfirmationActivity.class);
-                intent.putExtra("TransportMasterId", j.TransportMasterId);
-                intent.putExtra("GroupKey", GroupKey);
-            }
-
-            Preferences.saveString("PROGRESSGROUPKEY", GroupKey, this);
-        }
-        if (intent != null) {
-            startActivity(intent);
-            finish();
-        }
-    }
 
     @Override
     protected void onResume() {
@@ -265,6 +244,8 @@ public class SecureJobActivity extends BaseActivity implements RecyclerViewClick
                 onOptionsItemSelected(refreshItem);
             }
         });
+        gridItem = menu.findItem(R.id.action_grid);
+        gridItem.setVisible(false);
         print = menu.findItem(R.id.action_print);
         if (status.equals("COMPLETED"))
             print.setVisible(true);
@@ -283,18 +264,6 @@ public class SecureJobActivity extends BaseActivity implements RecyclerViewClick
             } else {
                 raiseInternetSnakbar();
             }
-        } else if (item.getItemId() == R.id.action_grid) {
-            if (isgridview) {
-                item.setIcon(R.drawable.icon_grid);
-                listAdapter = null;
-            } else {
-                item.setIcon(R.drawable.icon_list);
-                gridAdapter = null;
-            }
-            isgridview = !isgridview;
-            refresh();
-        } else if (item.getItemId() == R.id.action_print) {
-            printAll();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -314,20 +283,6 @@ public class SecureJobActivity extends BaseActivity implements RecyclerViewClick
             Animation rotation = AnimationUtils.loadAnimation(this, R.anim.clockwise_refresh);
             rotation.setRepeatCount(Animation.INFINITE);
             refreshItem.getActionView().startAnimation(rotation);
-        }
-    }
-
-    private void printAll() {
-        // List<Job> competedJobCount = Job.getCompletedJobsByStatus();
-        List<Branch> completedBranchCount = Branch.getCompletedBranches();
-        if (completedBranchCount.size() == 0) {
-            Toast.makeText(SecureJobActivity.this, "No completed jobs to print", Toast.LENGTH_LONG).show();
-        } else {
-            Intent intent = new Intent(SecureJobActivity.this, PrintActivity.class);
-            //  intent.putExtra("status"," SINGLE JOBS");
-            intent.putExtra("status", "COMPLETED");
-            intent.putExtra("transporterMasterId", 123);
-            startActivity(intent);
         }
     }
 
