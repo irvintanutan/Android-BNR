@@ -20,7 +20,7 @@ public class Constants {
     public final static int GETALLMESSAGE = 12;
     public final static int MarkMessageAsRead = 13;
     public final static int GETRECEIPTNUMBER = 14;
-
+    public final static int SECUREVEHICLE = 15;
 
 
     public final static int FINISHONRESULT = 20;
@@ -34,6 +34,9 @@ public class Constants {
     public static int TRANSPORT_MASTER_ID = 0;
     public static boolean isAll = false;
     public static String BackDestination = "";
+    public static boolean showSecureAlert = false;
+    public static long secureTimer = System.currentTimeMillis();
+    public static boolean isFromSecure = false;
 
 
     public static String SCREEN = "";

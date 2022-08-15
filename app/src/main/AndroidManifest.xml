@@ -12,13 +12,12 @@
         android:theme="@style/AppBaseTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activites.SelectionActivity"></activity>
+        <activity android:name=".activites.SelectionActivity" />
 
         <activity
             android:name=".activites.GroupJobActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".activites.SplashActivity"
             android:configChanges="orientation"
@@ -109,7 +108,6 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity android:name=".activites.BreakListActivity" />
-
         <provider
             android:name=".utils.DatabaseContentProvider"
             android:authorities="com.novigosolutions.certiscisco_pcsbr"
@@ -120,6 +118,7 @@
                 <action android:name="android.intent.action.ACTION_SHUTDOWN" />
             </intent-filter>
         </receiver>
+
         <receiver
             android:name=".recivers.NetworkChangeReceiver"
             android:enabled="true"
@@ -133,7 +132,6 @@
                 <action android:name="android.net.conn.CONNECTIVITY_ACTION" />
             </intent-filter>
         </receiver>
-
         <receiver android:name=".recivers.IntervalChangedReceiver">
             <intent-filter>
                 <action android:name="com.novigosolutions.certiscisco_pcsbr.intervalchanged" />
@@ -145,7 +143,6 @@
         <service android:name=".service.OfflineUpdateService" />
         <service android:name=".service.DownloadService" />
         <service android:name=".service.BreakService" />
-
         <service
             android:name=".service.SignalRService"
             android:enabled="true"
@@ -158,26 +155,23 @@
             android:name="com.symbol.emdk"
             android:required="false" />
     </application>
-
     <permission
         android:name="android.permission.BLUETOOTH"
-        android:label="BLUETOOTH" />
-    <permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE"/> -->
+        android:label="BLUETOOTH" /> <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE"/> -->
+    <permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="com.symbol.emdk.permission.EMDK" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />

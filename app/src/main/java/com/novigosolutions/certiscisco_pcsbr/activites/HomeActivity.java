@@ -77,6 +77,25 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         startSignaRifNotRunning();
     }
 
+    private void calculateSecureTime() {
+        long seconds = (System.currentTimeMillis() - Constants.secureTimer ) / 1000;
+        Log.e("TIME" , Long.toString(seconds));
+        if (seconds > 360 && Job.getUnSecuredJobs().size() > 0) {
+            Constants.secureTimer = System.currentTimeMillis();
+            Constants.showSecureAlert = true;
+        }
+    }
+
+    private void secureVehicleAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle("Alert");
+        alertDialog.setMessage("You have " + Job.getUnSecuredJobs().size() + " jobs pending to be secured in Vehicle!!!");
+        alertDialog.setPositiveButton("Done", (dialog, which) -> Constants.showSecureAlert = false);
+
+        alertDialog.show();
+    }
+
     private void startBreaks() {
         int breakId = Break.getOnGoingBreak(this);
         if (breakId > 0) {
@@ -199,6 +218,10 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
 //                new IntentFilter("offlinereciverevent"));
         LocalBroadcastManager.getInstance(this).registerReceiver(msgReceiver,
                 new IntentFilter("mesagereciverevent"));
+
+        calculateSecureTime();
+        if (Constants.showSecureAlert)
+            secureVehicleAlert();
     }
 
     @Override

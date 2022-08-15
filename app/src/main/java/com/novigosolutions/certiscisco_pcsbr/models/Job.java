@@ -790,11 +790,15 @@ public class Job extends Model implements Comparable<Job> {
     }
 
     public static void UpdateReceiptNo(int TransportMasterId, String receiptNo) {
-
-        Log.e("FOR TESTING ", TransportMasterId + " " + receiptNo);
-
         new Update(Job.class)
                 .set("ReceiptNo=?", receiptNo)
+                .where("TransportMasterId=?", TransportMasterId)
+                .execute();
+    }
+
+    public static void UpdateSecureVehicle(int TransportMasterId) {
+        new Update(Job.class)
+                .set("IsSecured=?", true)
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();
     }

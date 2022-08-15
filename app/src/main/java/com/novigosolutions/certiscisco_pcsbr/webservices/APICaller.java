@@ -133,6 +133,13 @@ public class APICaller {
         process(Constants.GETRECEIPTNUMBER, call, callback);
     }
 
+    public void secureVehicle(ApiCallback callback, Context context, int jobId) {
+        this.context = context;
+        Call<ResponseBody> call = getService().SecureVehicle(Integer.toString(jobId));
+        Constants.TRANSPORT_MASTER_ID = jobId;
+        process(Constants.SECUREVEHICLE, call, callback);
+    }
+
     public void requestForEdit(ApiCallback callback, Context context, String type, String GroupKey) {
         this.context = context;
         Call<ResponseBody> call = getService().requestForEdit(Preferences.getString("AuthToken", context), getRequestType(type, GroupKey));
@@ -200,8 +207,10 @@ public class APICaller {
                         try {
                             String result_body = response.body().string();
 
+                            if (api_code == Constants.SECUREVEHICLE) {
+                                Job.UpdateSecureVehicle(Constants.TRANSPORT_MASTER_ID);
+                            }
                             if (api_code == Constants.GETRECEIPTNUMBER) {
-                                Log.e("RECEIPT NUMBER", result_body);
                                 Job.UpdateReceiptNo(Constants.TRANSPORT_MASTER_ID, result_body.replace("\"", ""));
                             }
                             if (api_code == Constants.SYNC) {

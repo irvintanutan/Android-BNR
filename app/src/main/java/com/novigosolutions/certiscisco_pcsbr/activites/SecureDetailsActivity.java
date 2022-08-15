@@ -31,6 +31,7 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.IOnScannerData;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Cage;
+import com.novigosolutions.certiscisco_pcsbr.models.Consignment;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.objects.SecureObject;
@@ -58,7 +59,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class SecureDetailsActivity extends BarCodeScanActivity implements IOnScannerData, View.OnClickListener, ApiCallback, DialogResult, NetworkChangekListener, UnsealedListAdapter.UnsealedClickCallback {
+public class SecureDetailsActivity extends BarCodeScanActivity implements IOnScannerData, View.OnClickListener, ApiCallback, NetworkChangekListener, UnsealedListAdapter.UnsealedClickCallback {
     TextView txt_customer_name, txt_functional_code, txt_branch_name;
     TextView txt_branch_address, txt_order_remarks, txt_sealed_item_count, txt_unsealed_item_count;
     //    int PointId;
@@ -93,6 +94,7 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
         }
 
         j = Job.getSingle(TransportMasterId);
+        Constants.TRANSPORT_MASTER_ID = TransportMasterId;
 
         BranchCode = j.BranchCode;
         PFunctionalCode = j.PFunctionalCode;
@@ -299,6 +301,11 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
                 alert2();
                 break;
             case R.id.btn_secure:
+                if (validateItems()) {
+                    secureVehicle();
+                } else {
+                    alertVehicle();
+                }
 
                 break;
             case R.id.img_manual_entry:
@@ -321,6 +328,39 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
                 }
                 break;
         }
+    }
+
+    private boolean validateItems() {
+
+        if (boxList.isEmpty()) isBoxListComplete = true;
+        if (bagList.isEmpty()) isBagListComplete = true;
+        if (cageList.isEmpty()) isCageListComplete = true;
+
+        return isBoxListComplete && isBagListComplete && isCageListComplete;
+    }
+
+    private void secureVehicle() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle("Confirm");
+        alertDialog.setMessage("Are you sure you want to proceeed ? ");
+        alertDialog.setPositiveButton("Yes", (dialog, which) -> {
+            showProgressDialog("Securing Vehicle . . . ");
+            APICaller.instance().secureVehicle(SecureDetailsActivity.this, SecureDetailsActivity.this, j.TransportMasterId);
+        });
+        alertDialog.setNegativeButton("No", (dialog, which) -> {
+        });
+        alertDialog.show();
+    }
+
+    private void alertVehicle() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle("Warning");
+        alertDialog.setMessage("All Items must be scanned");
+        alertDialog.setPositiveButton("Ok", (dialog, which) -> {
+        });
+        alertDialog.show();
     }
 
     @Override
@@ -362,6 +402,16 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
             cageList.set(a, cage);
             cageListAdapter = new SecureCageListAdapter(cageList);
             recyclerViewCage.setAdapter(cageListAdapter);
+        }
+
+        for (int a = 0; a < cageList.size(); a++) {
+            Cage cage = cageList.get(a);
+            if (cage.IsCageSealScanned && cage.IsCageNoScanned) {
+                isCageListComplete = true;
+            } else {
+                isCageListComplete = false;
+                break;
+            }
         }
     }
 
@@ -452,6 +502,14 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
                         if (api_code == Constants.REQUESTFOREDIT) {
                             Branch.UpdateRequestId(GroupKey, obj.getString("Data"));
                             Toast.makeText(this, "Requested", Toast.LENGTH_SHORT).show();
+                        } else if (api_code == Constants.SECUREVEHICLE) {
+                            hideProgressDialog();
+                            Job.UpdateSecureVehicle(TransportMasterId);
+                            Intent intent = new Intent(SecureDetailsActivity.this, SecureJobActivity.class);
+                            Constants.BackDestination = "PENDING";
+                            Constants.isAll = false;
+                            startActivity(intent);
+                            finish();
                         }
                     }
                 }
@@ -469,15 +527,6 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
             imgnetwork.setImageResource(R.drawable.network);
         else
             imgnetwork.setImageResource(R.drawable.no_network);
-    }
-
-    @Override
-    public void onResult() {
-        Branch branch = Branch.getSingle(GroupKey);
-        if (branch.isRescheduled) {
-            Job.setDelivered(GroupKey, BranchCode, PFunctionalCode, Constants.startTime, Constants.endTime);
-            finish();
-        }
     }
 
     @Override

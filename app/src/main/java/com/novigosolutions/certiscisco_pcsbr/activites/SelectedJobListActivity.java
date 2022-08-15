@@ -162,6 +162,7 @@ public class SelectedJobListActivity extends BaseActivity implements RecyclerVie
             Log.e("ACTUALFROMTIME" , job.ActualFromTime);
             Log.e("ACTUALTOTIME" , job.ActualToTime);
             Log.e("GROUP KEY" , job.GroupKey);
+            Log.e("IS SECURED" , String.valueOf(job.IsSecured));
 
             intent.putExtra("TransportMasterId", TransportMasterId);
             intent.putExtra("GroupKey", GroupKey);

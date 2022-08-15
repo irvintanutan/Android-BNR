@@ -48,8 +48,8 @@ public class CertisCISCO extends Application {
             //Preferences.saveString("API_URL", "http://10.8.8.158", mContext);
             //Preferences.saveString("API_URL", "https://pcsbnr-api.certiscslops.local/", mContext);
             //Preferences.saveString("API_URL", "https://pcs-bnruat-mobileapi.certis-cslops-uat.com/", mContext);
-            Preferences.saveString("API_URL", "https://pcs-bnruatapi.certis-cslops-uat.com/", mContext);
-            //Preferences.saveString("API_URL", "https://pcs-bnruat-crapi.certis-cslops-uat.com/", mContext);
+            //Preferences.saveString("API_URL", "https://pcs-bnruatapi.certis-cslops-uat.com/", mContext);
+            Preferences.saveString("API_URL", "https://pcs-bnruat-crapi.certis-cslops-uat.com/", mContext);
         }
     }
 

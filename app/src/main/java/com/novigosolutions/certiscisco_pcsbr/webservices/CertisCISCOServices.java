@@ -42,6 +42,10 @@ public interface CertisCISCOServices {
     Call<ResponseBody> GetReceiptNumber(@Query("jobId") int jobId);
 
     @Headers("Content-Type: application/json")
+    @POST("SecureVehicle")
+    Call<ResponseBody> SecureVehicle(@Query("jobId") String jobId);
+
+    @Headers("Content-Type: application/json")
     @POST("RequestForEditForMC45")
     Call<ResponseBody> requestForEdit(@Header("AuthToken") String AuthToken, @Body JsonObject object);
 
