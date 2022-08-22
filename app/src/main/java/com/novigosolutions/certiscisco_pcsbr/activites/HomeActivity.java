@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -48,7 +49,9 @@ import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -78,19 +81,21 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
     }
 
     private void calculateSecureTime() {
-        long seconds = (System.currentTimeMillis() - Constants.secureTimer ) / 1000;
-        Log.e("TIME" , Long.toString(seconds));
+        long seconds = (System.currentTimeMillis() - Constants.secureTimer) / 1000;
+        Log.e("TIME", Long.toString(seconds));
         if (seconds > 360 && Job.getUnSecuredJobs().size() > 0) {
             Constants.secureTimer = System.currentTimeMillis();
             Constants.showSecureAlert = true;
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void secureVehicleAlert() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setCancelable(false);
         alertDialog.setTitle("Alert");
-        alertDialog.setMessage("You have " + Job.getUnSecuredJobs().size() + " jobs pending to be secured in Vehicle!!!");
+        alertDialog.setMessage("You have " + Job.getAllJobs().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList()).size()
+                + " jobs pending to be secured in Vehicle!!!");
         alertDialog.setPositiveButton("Done", (dialog, which) -> Constants.showSecureAlert = false);
 
         alertDialog.show();
@@ -200,6 +205,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
 //        });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onResume() {
         super.onResume();
@@ -255,6 +261,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
     }
 
     private BroadcastReceiver syncReceiver = new BroadcastReceiver() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void onReceive(Context context, Intent intent) {
             refresh();
@@ -263,6 +270,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
     private BroadcastReceiver offlineupdateReceiver = new NetworkChangeReceiver();
 
     private BroadcastReceiver msgReceiver = new BroadcastReceiver() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void onReceive(Context context, Intent intent) {
             refresh();
@@ -270,12 +278,14 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
     };
 
     private BroadcastReceiver breakReceiver = new BroadcastReceiver() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void onReceive(Context context, Intent intent) {
             refresh();
         }
     };
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void refresh() {
         if (gridadapter == null) {
             countList = new ArrayList<Integer>();
@@ -283,7 +293,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             countList.add(Branch.getCountByStatus("PENDING"));
             countList.add(Branch.getCountByStatus("COMPLETED"));
             countList.add(ChatMessage.getUnreadMessages().size());
-            countList.add(Job.getUnSecuredJobs().size());
+            countList.add(Job.getAllJobs().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList()).size());
             countList.add(Break.getPendingBreak().size());
             countList.add(0);
             gridadapter = new GridAdapter(HomeActivity.this, countList);
@@ -294,7 +304,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             countList.add(Branch.getCountByStatus("PENDING"));
             countList.add(Branch.getCountByStatus("COMPLETED"));
             countList.add(ChatMessage.getUnreadMessages().size());
-            countList.add(Job.getUnSecuredJobs().size());
+            countList.add(Job.getAllJobs().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList()).size());
             countList.add(Break.getPendingBreak().size());
             countList.add(0);
             gridadapter.notifyDataSetChanged();

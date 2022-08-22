@@ -266,7 +266,7 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
         getSupportActionBar().setHomeButtonEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
-        mTitle.setText("DELIVERY");
+        mTitle.setText("Scan to Secure");
         TextView UserName = (TextView) toolbar.findViewById(R.id.UserName);
         UserName.setText(Preferences.getString("UserName", this));
         imgnetwork = (ImageView) toolbar.findViewById(R.id.imgnetwork);

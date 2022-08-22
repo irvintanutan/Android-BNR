@@ -1,6 +1,7 @@
 package com.novigosolutions.certiscisco_pcsbr.adapters.fragments;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,6 +43,7 @@ public class TabFragmentUnSecure extends Fragment {
     SecureAdapter adapter;
     FloatingActionButton fab;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -57,8 +61,9 @@ public class TabFragmentUnSecure extends Fragment {
         return view;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void loadList() {
-        List<Job> unSecuredJobs = Job.getUnSecuredJobs();
+        List<Job> unSecuredJobs = Job.getAllJobs().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList());
         if (!unSecuredJobs.isEmpty()) nothing.setVisibility(View.GONE);
         adapter = new SecureAdapter(unSecuredJobs, getActivity());
         recyclerView.setAdapter(adapter);
@@ -67,7 +72,7 @@ public class TabFragmentUnSecure extends Fragment {
             @Override
             public void onClick(View view, int position) {
 
-                Job job  = unSecuredJobs.get(position);
+                Job job = unSecuredJobs.get(position);
 
                 Intent intent = new Intent(getActivity(), SecureDetailsActivity.class);
                 intent.putExtra("TransportMasterId", job.TransportMasterId);

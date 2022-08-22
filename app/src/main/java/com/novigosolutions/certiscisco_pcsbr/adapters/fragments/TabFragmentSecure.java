@@ -1,6 +1,7 @@
 package com.novigosolutions.certiscisco_pcsbr.adapters.fragments;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,14 +21,15 @@ import com.novigosolutions.certiscisco_pcsbr.models.Job;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
- *
  * @author irvin
  * @date 2/7/17
  */
@@ -38,6 +40,7 @@ public class TabFragmentSecure extends Fragment {
     DecimalFormat dec = new DecimalFormat("#,##0.00");
     SecureAdapter adapter;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.secure_tab, container, false);
@@ -52,8 +55,10 @@ public class TabFragmentSecure extends Fragment {
         return view;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void loadList() {
-        List<Job> unSecuredJobs = Job.getSecuredJobs();
+        List<Job> unSecuredJobs = Job.getAllJobs().stream().filter(job -> job.IsSecured == true).collect(Collectors.toList());
+
         if (!unSecuredJobs.isEmpty()) nothing.setVisibility(View.GONE);
         adapter = new SecureAdapter(unSecuredJobs, getActivity());
         recyclerView.setAdapter(adapter);
@@ -62,7 +67,7 @@ public class TabFragmentSecure extends Fragment {
             @Override
             public void onClick(View view, int position) {
 
-                Job job  = unSecuredJobs.get(position);
+                Job job = unSecuredJobs.get(position);
 
                 Intent intent = new Intent(getContext(), SummaryActivity.class);
 

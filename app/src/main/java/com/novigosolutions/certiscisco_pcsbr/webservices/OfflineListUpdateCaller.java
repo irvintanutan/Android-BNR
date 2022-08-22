@@ -29,7 +29,6 @@ public class OfflineListUpdateCaller {
 //        final Branch branch = Branch.getOfflineSingleBranche();
         final Job job = Job.getOfflineSingleJob();
         final Boolean isCollectionUpdating;
-        Log.e("^^^^^OfflineUpdate", "single-job:" + (job == null ? "null" : job.TransportMasterId));
         if (job != null) {
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
             httpClient.connectTimeout(30, TimeUnit.SECONDS);
@@ -62,12 +61,12 @@ public class OfflineListUpdateCaller {
                                     if (isCollectionUpdating) {
 //                                        Branch.setColOfflineStatus(branch.GroupKey, 0);
                                         Job.setIncompleteCollectionCollected(job.GroupKey);
-                                        Log.e("^^^^^OfflineUpdate", "setIncompleteCollectionCollected");
+
 //                                        Branch.setCollected(branch.GroupKey);
                                     } else {
 //                                        Branch.setDelOfflineStatus(branch.GroupKey, 0);
                                         Job.setPendingDeliveryDelivered(job.GroupKey);
-                                        Log.e("^^^^^OfflineUpdate", "setPendingDeliveryDelivered");
+
 //                                        Branch.setDelivered(branch.GroupKey);
                                     }
                                     UpdateOfflineList(context);

@@ -798,7 +798,7 @@ public class Job extends Model implements Comparable<Job> {
 
     public static void UpdateSecureVehicle(int TransportMasterId) {
         new Update(Job.class)
-                .set("IsSecured=?", true)
+                .set("IsSecured=?", 1)
                 .where("TransportMasterId=?", TransportMasterId)
                 .execute();
     }
@@ -955,14 +955,14 @@ public class Job extends Model implements Comparable<Job> {
         ConsignmentBag.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
         List<ConsignmentBag> consignmentBags = ConsignmentBag.getByTransportMasterId(TransportMasterId);
         for (int a = 0; a < consignmentBags.size(); a++) {
-                Consignment.setCageNoCageSeal(consignmentBags.get(a).getId(), cageNo, cageSeal);
+            Consignment.setCageNoCageSeal(consignmentBags.get(a).getId(), cageNo, cageSeal);
         }
 
         BoxBag.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
         Wagon.setCageNoCageSeal(TransportMasterId, cageNo, cageSeal);
     }
 
-    public static List<SecureObject> getSecureObjects(int TransportMasterId){
+    public static List<SecureObject> getSecureObjects(int TransportMasterId) {
         List<SecureObject> secureObjects = new ArrayList<>();
 
         List<Bags> bags = Bags.getByTransportMasterIdWithOutCage(TransportMasterId);
@@ -978,6 +978,52 @@ public class Job extends Model implements Comparable<Job> {
                 secureObjects.add(secureObject);
             }
         }
+
+        List<Wagon> wagons = Wagon.getByTransportMasterIdWithOutCage(TransportMasterId);
+        if (!wagons.isEmpty()) {
+            for (int i = 0; i < wagons.size(); i++) {
+                SecureObject secureObject = new SecureObject();
+                secureObject.IsSealed = true;
+                secureObject.Type = "Wagon";
+                secureObject.Barcode = wagons.get(i).firstbarcode;
+                secureObjects.add(secureObject);
+
+                if (!wagons.get(i).secondbarcode.isEmpty()) {
+                    secureObject.Barcode = wagons.get(i).secondbarcode;
+                    secureObjects.add(secureObject);
+                }
+
+            }
+        }
+
+        List<EnvelopeBag> envelopebags = EnvelopeBag.getByTransportMasterIdWithOutCage(TransportMasterId);
+        for (int i = 0; i < envelopebags.size(); i++) {
+            List<Envelope> envelopes = Envelope.getByTransportMasterIdWithOutCage(envelopebags.get(i).getId());
+            for (int j = 0; j < envelopes.size(); j++) {
+                SecureObject secureObject = new SecureObject();
+                secureObject.IsSealed = true;
+                secureObject.Barcode = envelopes.get(j).barcode;
+
+                if (envelopebags.get(i).envolpeType.equals("Envelopes")) {
+                    secureObject.Type = "Envelopes";
+                } else {
+                    secureObject.Type = "EnvelopeBag";
+                }
+                secureObjects.add(secureObject);
+            }
+        }
+
+        List<ConsignmentBag> consignmentBags = ConsignmentBag.getByTransportMasterIdWithOutCage(TransportMasterId);
+        for (int i = 0; i < consignmentBags.size(); i++) {
+            List<Consignment> consignments = Consignment.getByTransportMasterIdWithOutCage(consignmentBags.get(i).getId());
+
+            SecureObject secureObject = new SecureObject();
+            secureObject.IsSealed = true;
+            secureObject.Type = "ConsignmentBag";
+            secureObject.Barcode = consignmentBags.get(i).bagcode;
+            secureObjects.add(secureObject);
+        }
+
 
         List<Box> boxes = Box.getByTransportMasterIdWithOutCage(TransportMasterId);
         for (int i = 0; i < boxes.size(); i++) {
@@ -1003,7 +1049,7 @@ public class Job extends Model implements Comparable<Job> {
             secureObjects.add(secureObject);
         }
 
-        return  secureObjects;
+        return secureObjects;
     }
 
     public static List<Summary> getCollectionSummaryWithoutCage(int TransportMasterId) {

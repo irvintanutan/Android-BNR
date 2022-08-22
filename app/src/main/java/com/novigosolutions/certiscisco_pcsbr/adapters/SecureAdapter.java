@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
+import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.MenuForm;
 
@@ -40,8 +41,8 @@ public class SecureAdapter extends RecyclerView.Adapter<SecureAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         Job job = jobs.get(position);
-
-        holder.location.setText("Location : " + job.StreetName + " " + job.Tower + " " + job.Town + " " + job.PinCode);
+        Branch branch = Branch.getSingle(job.GroupKey);
+        holder.location.setText("Location : " + branch.BranchCode);
         holder.customer.setText("Customer : " + job.CustomerName);
         holder.jobId.setText("Job ID : " + job.OrderNo);
     }

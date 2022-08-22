@@ -114,7 +114,7 @@ public class APICaller {
             jsonArray.add(jobObject);
         }
         jsonObject.add("Orders", jsonArray);
-        Log.e("sync param", jsonObject.toString());
+        //Log.e("sync param", jsonObject.toString());
         Call<ResponseBody> call = getService().Sync(Preferences.getString("AuthToken", context), jsonObject);
         process(Constants.SYNC, call, callback);
     }
@@ -153,7 +153,7 @@ public class APICaller {
     }
 
     public void RequestForReSchedule(ApiCallback callback, Context context, JsonObject jsonObject) {
-        Log.e("request body", jsonObject.toString());
+        //Log.e("request body", jsonObject.toString());
 
         this.context = context;
         Call<ResponseBody> call = getService().RequestForReSchedule(Preferences.getString("AuthToken", context), jsonObject);
@@ -216,7 +216,7 @@ public class APICaller {
                             if (api_code == Constants.SYNC) {
                                 JSONObject obj = new JSONObject(result_body);
                                 String result = obj.getString("Result");
-                                Log.e("RESULT", result_body);
+                                //Log.e("RESULT", result_body);
 
                                 if (result.equals("Success")) {
                                     Boolean ischangeindata = false, hasBreak = false;
@@ -367,7 +367,7 @@ public class APICaller {
         //jsonObject.addProperty("RequestType", "MANUAL ENTRY PERMISSION FOR " + type + "|" + branch.FunctionalCode + "|" + Preferences.getString("DeviceID", context));
         jsonObject.addProperty("RequestedBy", Preferences.getInt("UserId", context));
         jsonObject.addProperty("RequestedOn", CommonMethods.getCurrentDateTime(context));
-        Log.e("request body", jsonObject.toString());
+
         return jsonObject;
     }
 
