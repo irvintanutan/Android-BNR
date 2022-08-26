@@ -227,7 +227,9 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
     private void setSealedScannedCount() {
         int scanned = 0;
         for (SecureObject d : bagList) {
-            if (d.IsScanned) {
+            if (d.IsScanned && d.SecondBarcode == null) {
+                scanned++;
+            } else if (d.IsScanned && d.IsScannedSecond && d.SecondBarcode != null) {
                 scanned++;
             }
         }
@@ -420,6 +422,12 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
             SecureObject secureObject = bagList.get(a);
             if (scan.equals(secureObject.Barcode)) {
                 secureObject.IsScanned = true;
+                bagList.set(a, secureObject);
+                sealedListAdapter = new SecuredSealedListAdapter(bagList);
+                recyclerViewbag.setAdapter(sealedListAdapter);
+                setSealedScannedCount();
+            } else if (scan.equals(secureObject.SecondBarcode)) {
+                secureObject.IsScannedSecond = true;
                 bagList.set(a, secureObject);
                 sealedListAdapter = new SecuredSealedListAdapter(bagList);
                 recyclerViewbag.setAdapter(sealedListAdapter);

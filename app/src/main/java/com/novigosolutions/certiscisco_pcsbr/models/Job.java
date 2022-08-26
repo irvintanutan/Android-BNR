@@ -971,12 +971,11 @@ public class Job extends Model implements Comparable<Job> {
             secureObject.IsSealed = true;
             secureObject.Type = "Bag";
             secureObject.Barcode = bags.get(i).firstbarcode;
+            if (!bags.get(i).secondbarcode.isEmpty()) {
+                secureObject.SecondBarcode = bags.get(i).secondbarcode;
+            }
             secureObjects.add(secureObject);
 
-            if (!bags.get(i).secondbarcode.isEmpty()) {
-                secureObject.Barcode = bags.get(i).secondbarcode;
-                secureObjects.add(secureObject);
-            }
         }
 
         List<Wagon> wagons = Wagon.getByTransportMasterIdWithOutCage(TransportMasterId);
@@ -986,12 +985,10 @@ public class Job extends Model implements Comparable<Job> {
                 secureObject.IsSealed = true;
                 secureObject.Type = "Wagon";
                 secureObject.Barcode = wagons.get(i).firstbarcode;
-                secureObjects.add(secureObject);
-
                 if (!wagons.get(i).secondbarcode.isEmpty()) {
-                    secureObject.Barcode = wagons.get(i).secondbarcode;
-                    secureObjects.add(secureObject);
+                    secureObject.SecondBarcode = wagons.get(i).secondbarcode;
                 }
+                secureObjects.add(secureObject);
 
             }
         }
@@ -1036,6 +1033,16 @@ public class Job extends Model implements Comparable<Job> {
             } else {
                 secureObject.Barcode = boxes.get(i).ProductName + "(" + boxes.get(i).CoinSeries + ")";
             }
+            secureObjects.add(secureObject);
+        }
+
+        List<BoxBag> boxBags = BoxBag.getByTransportMasterIdWithOutCage(TransportMasterId);
+        for (int i = 0; i < boxBags.size(); i++) {
+
+            SecureObject secureObject = new SecureObject();
+            secureObject.IsSealed = true;
+            secureObject.Type = "CoinBag";
+            secureObject.Barcode = boxBags.get(i).bagcode;
             secureObjects.add(secureObject);
         }
 
