@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import androidx.annotation.RequiresApi;
+
 /**
  * Created by dhanrajk on 21-07-17.
  */
@@ -276,6 +278,9 @@ public class SyncDatabase {
             for (int k = 0; k < jsonArray.length(); k++) {
 
                 JSONObject deliveryobject = jsonArray.getJSONObject(k);
+                String value = deliveryobject.getString("ItemType").toUpperCase();
+                deliveryobject.remove("ItemType");
+                deliveryobject.put("ItemType", value);
                 Delivery delivery = gson.fromJson(deliveryobject.toString(), Delivery.class);
                 delivery.save();
 
@@ -475,6 +480,7 @@ public class SyncDatabase {
         //.getJSONObject("Data");
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private boolean isAppIsInBackground(Context context) {
         boolean isInBackground = true;
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
