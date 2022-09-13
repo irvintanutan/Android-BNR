@@ -57,7 +57,7 @@ public class TabFragmentSecure extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void loadList() {
-        List<Job> unSecuredJobs = Job.getAllJobs().stream().filter(job -> job.IsSecured == true).collect(Collectors.toList());
+        List<Job> unSecuredJobs = Job.getAllJobsSecureVehicle().stream().filter(job -> job.IsSecured == true).collect(Collectors.toList());
 
         if (!unSecuredJobs.isEmpty()) nothing.setVisibility(View.GONE);
         adapter = new SecureAdapter(unSecuredJobs, getActivity());

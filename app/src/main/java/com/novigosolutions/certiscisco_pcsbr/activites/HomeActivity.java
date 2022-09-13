@@ -94,7 +94,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setCancelable(false);
         alertDialog.setTitle("Alert");
-        alertDialog.setMessage("You have " + Job.getAllJobs().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList()).size()
+        alertDialog.setMessage("You have " + Job.getAllJobsSecureVehicle().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList()).size()
                 + " jobs pending to be secured in Vehicle!!!");
         alertDialog.setPositiveButton("Done", (dialog, which) -> Constants.showSecureAlert = false);
 
@@ -293,7 +293,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             countList.add(Branch.getCountByStatus("PENDING"));
             countList.add(Branch.getCountByStatus("COMPLETED"));
             countList.add(ChatMessage.getUnreadMessages().size());
-            countList.add(Job.getAllJobs().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList()).size());
+            countList.add(Job.getAllJobsSecureVehicle().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList()).size());
             countList.add(Break.getPendingBreak().size());
             countList.add(0);
             gridadapter = new GridAdapter(HomeActivity.this, countList);
@@ -304,7 +304,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             countList.add(Branch.getCountByStatus("PENDING"));
             countList.add(Branch.getCountByStatus("COMPLETED"));
             countList.add(ChatMessage.getUnreadMessages().size());
-            countList.add(Job.getAllJobs().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList()).size());
+            countList.add(Job.getAllJobsSecureVehicle().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList()).size());
             countList.add(Break.getPendingBreak().size());
             countList.add(0);
             gridadapter.notifyDataSetChanged();

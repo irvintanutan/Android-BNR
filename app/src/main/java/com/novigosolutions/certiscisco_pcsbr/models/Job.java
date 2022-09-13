@@ -261,6 +261,11 @@ public class Job extends Model implements Comparable<Job> {
                 .where("Status=?", "COMPLETED").execute();
     }
 
+    public static List<Job> getAllJobsSecureVehicle() {
+        return new Select().from(Job.class)
+                .where("Status=? AND IsCollectionOrder=?", "COMPLETED", 1).execute();
+    }
+
     public static Job getSingleByReceiptNo(String receiptNo) {
         return new Select().from(Job.class)
                 .where("ReceiptNo=?", receiptNo)
