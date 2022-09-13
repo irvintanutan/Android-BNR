@@ -33,9 +33,9 @@ public class ViewPagerAdapterSecure extends FragmentStatePagerAdapter {
 
         switch (position) {
             case 0:
-                return new TabFragmentSecure();
-            case 1:
                 return new TabFragmentUnSecure();
+            case 1:
+                return new TabFragmentSecure();
             default:
                 return null;
         }

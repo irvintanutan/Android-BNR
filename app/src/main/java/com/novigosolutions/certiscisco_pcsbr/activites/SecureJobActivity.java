@@ -113,11 +113,11 @@ public class SecureJobActivity extends BaseActivity implements ApiCallback, Offl
         final TabLayout.Tab secure = tabLayout.newTab();
         final TabLayout.Tab unsecure = tabLayout.newTab();
 
-        secure.setText("Secured");
         unsecure.setText("Yet To Secure");
+        secure.setText("Secured");
 
-        tabLayout.addTab(secure, 0);
-        tabLayout.addTab(unsecure, 1);
+        tabLayout.addTab(unsecure, 0);
+        tabLayout.addTab(secure, 1);
 
         tabLayout.setTabTextColors(ContextCompat.getColorStateList(this, R.color.colorPrimary));
         tabLayout.setSelectedTabIndicatorColor(ContextCompat.getColor(this, R.color.white));
