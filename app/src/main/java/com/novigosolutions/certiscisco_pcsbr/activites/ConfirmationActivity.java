@@ -1,13 +1,18 @@
 package com.novigosolutions.certiscisco_pcsbr.activites;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
+
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
@@ -18,7 +23,7 @@ import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+
 
 public class ConfirmationActivity extends AppCompatActivity implements NetworkChangekListener {
     TextView txtJobId,txtCustomerName,txtBranchName,txtAddress,txtTime,txtDropOff,txtDropAddress;
@@ -27,6 +32,9 @@ public class ConfirmationActivity extends AppCompatActivity implements NetworkCh
     Intent intent;
     String GroupKey;
     ImageView imgnetwork;
+    private androidx.appcompat.app.AlertDialog finalDialog = null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +44,30 @@ public class ConfirmationActivity extends AppCompatActivity implements NetworkCh
         fetchIntentData();
         checkJobType();
         clickLister();
+        alertEnableBWC();
+    }
+
+    private void alertEnableBWC() {
+
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.bwc_alert, null);
+
+
+        final Button proceed = alertLayout.findViewById(R.id.btn_next);
+
+        proceed.setOnClickListener(view1 -> {
+            finalDialog.dismiss();
+        });
+
+        androidx.appcompat.app.AlertDialog.Builder alert = new androidx.appcompat.app.AlertDialog.Builder(this);
+        // this is set the view from XML inside AlertDialog
+        alert.setView(alertLayout);
+        // disallow cancel of AlertDialog on click of back button and outside touch
+        alert.setCancelable(false);
+        finalDialog = alert.create();
+        finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        finalDialog.show();
+
     }
 
     private void setuptoolbar() {
