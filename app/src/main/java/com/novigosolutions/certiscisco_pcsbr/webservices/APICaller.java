@@ -135,7 +135,7 @@ public class APICaller {
 
     public void secureVehicle(ApiCallback callback, Context context, int jobId) {
         this.context = context;
-        Call<ResponseBody> call = getService().SecureVehicle(Integer.toString(jobId));
+        Call<ResponseBody> call = getService().SecureVehicle(Integer.toString(jobId), Integer.toString(Preferences.getInt("UserId", context)));
         Constants.TRANSPORT_MASTER_ID = jobId;
         process(Constants.SECUREVEHICLE, call, callback);
     }

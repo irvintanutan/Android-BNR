@@ -1000,16 +1000,22 @@ public class Job extends Model implements Comparable<Job> {
 
         List<EnvelopeBag> envelopebags = EnvelopeBag.getByTransportMasterIdWithOutCage(TransportMasterId);
         for (int i = 0; i < envelopebags.size(); i++) {
+            List<Envelope> envelopes = Envelope.getByBagId(envelopebags.get(i).getId());
+            if (envelopebags.get(i).envolpeType.equals("Envelopes")) {
+                for (int j = 0; j < envelopes.size(); j++) {
+                    SecureObject secureObjectEnvelope = new SecureObject();
+                    secureObjectEnvelope.IsSealed = true;
+                    secureObjectEnvelope.Barcode = envelopes.get(j).barcode;
+                    secureObjectEnvelope.Type = "Envelopes";
+                    secureObjects.add(secureObjectEnvelope);
+                }
+            } else {
                 SecureObject secureObject = new SecureObject();
                 secureObject.IsSealed = true;
+                secureObject.Type = "EnvelopeBag";
                 secureObject.Barcode = envelopebags.get(i).bagcode;
-
-                if (envelopebags.get(i).envolpeType.equals("Envelopes")) {
-                    secureObject.Type = "Envelopes";
-                } else {
-                    secureObject.Type = "EnvelopeBag";
-                }
                 secureObjects.add(secureObject);
+            }
         }
 
         List<ConsignmentBag> consignmentBags = ConsignmentBag.getByTransportMasterIdWithOutCage(TransportMasterId);

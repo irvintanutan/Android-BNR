@@ -43,7 +43,7 @@ public interface CertisCISCOServices {
 
     @Headers("Content-Type: application/json")
     @POST("SecureVehicle")
-    Call<ResponseBody> SecureVehicle(@Query("jobId") String jobId);
+    Call<ResponseBody> SecureVehicle(@Query("jobId") String jobId, @Query("staffid") String staffId);
 
     @Headers("Content-Type: application/json")
     @POST("RequestForEditForMC45")
