@@ -1,6 +1,8 @@
 package com.novigosolutions.certiscisco_pcsbr.models;
 
 
+import android.util.Log;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -21,7 +23,7 @@ public class Delivery extends Model {
     public int FloatDeliveryOrderId;
 
     @Column(name = "TotalAmount")
-    public int TotalAmount;
+    public float TotalAmount;
 
     @Column(name = "ItemType")
     public String ItemType;

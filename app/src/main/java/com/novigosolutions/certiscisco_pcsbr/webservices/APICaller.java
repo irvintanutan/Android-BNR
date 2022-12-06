@@ -153,8 +153,7 @@ public class APICaller {
     }
 
     public void RequestForReSchedule(ApiCallback callback, Context context, JsonObject jsonObject) {
-        //Log.e("request body", jsonObject.toString());
-
+        Log.e("request body", jsonObject.toString());
         this.context = context;
         Call<ResponseBody> call = getService().RequestForReSchedule(Preferences.getString("AuthToken", context), jsonObject);
         process(Constants.REQUESTFORRESCHEDULE, call, callback);

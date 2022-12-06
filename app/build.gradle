@@ -8,8 +8,8 @@ android {
         applicationId "com.novigosolutions.certiscisco_pcsbr"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 62
-        versionName "12.7"
+        versionCode 63
+        versionName "12.8"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         renderscriptTargetApi 19
         renderscriptSupportModeEnabled true

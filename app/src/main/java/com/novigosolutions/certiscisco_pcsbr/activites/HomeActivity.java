@@ -35,6 +35,7 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Break;
 import com.novigosolutions.certiscisco_pcsbr.models.ChatMessage;
+import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
@@ -78,6 +79,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         setactions();
         startBreaks();
         startSignaRifNotRunning();
+
     }
 
     private void calculateSecureTime() {
@@ -427,6 +429,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             imgnetwork.setImageResource(R.drawable.no_network);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onResult(int api_code, int result_code, String result_data) {
         stopRefresh();
