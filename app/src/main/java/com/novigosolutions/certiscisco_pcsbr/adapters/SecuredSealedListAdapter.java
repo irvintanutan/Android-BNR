@@ -55,7 +55,7 @@ public class SecuredSealedListAdapter extends RecyclerView.Adapter<SecuredSealed
             holder.type.setText(secureObjects.get(position).Type);
 
         holder.txt_seal.setText("(" + secureObjects.get(position).Barcode + ")");
-        if (secureObjects.get(position).SecondBarcode != null)
+        if (secureObjects.get(position).SecondBarcode != null && !secureObjects.get(position).SecondBarcode.equals("null"))
             holder.txt_seal2.setText("(" + secureObjects.get(position).SecondBarcode + ")");
 
 

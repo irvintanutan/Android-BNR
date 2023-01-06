@@ -24,6 +24,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
 import com.novigosolutions.certiscisco_pcsbr.ui.SignatureView;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
@@ -51,6 +52,8 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
     EditText edt_reason_other;
     ImageView img_erase;
     SignatureView signatureView;
+    String BranchCode, PFunctionalCode, actualFromTime, actualToTime;
+    int TransportMasterId;
 
     public PostponeDialog(Context context, String GroupKey, DialogResult mDialogResult, Job job) {
         super(context, R.style.Theme_AppCompat_Light_Dialog);
@@ -59,6 +62,11 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
 //        this.PointId = PointId;
         this.GroupKey = GroupKey;
         this.mDialogResult = mDialogResult;
+        BranchCode = job.BranchCode;
+        PFunctionalCode = job.PFunctionalCode;
+        actualFromTime = job.ActualFromTime;
+        actualToTime = job.ActualToTime;
+        TransportMasterId = job.TransportMasterId;
     }
 
     @Override
@@ -207,6 +215,7 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
                     if (mDialogResult != null) {
                         mDialogResult.onResult();
                     }
+                    Job.setDelivered(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
                     Toast.makeText(context, "Requested for reschedule", Toast.LENGTH_SHORT).show();
                 }
             } catch (JSONException e) {
