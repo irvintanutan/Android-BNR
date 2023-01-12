@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.activites.CollectionActivity;
 import com.novigosolutions.certiscisco_pcsbr.adapters.StringDeleteAdapter;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.IOnScannerData;
@@ -27,6 +28,7 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListene
 import com.novigosolutions.certiscisco_pcsbr.models.Bags;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
@@ -251,6 +253,7 @@ public class BagDialog extends Dialog implements View.OnClickListener, IOnScanne
 
     @Override
     public void onDataScanned(String data) {
+        UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")" , "SEALED BAG", context);
         if (data.isEmpty()) {
             ((CollectionActivity) context).invalidbarcodealert("Empty");
         } else if (data.equals(txt_seal.getText().toString()) ||isThereInList(data) || Branch.isExist(data))

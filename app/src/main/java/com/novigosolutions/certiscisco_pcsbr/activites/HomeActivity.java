@@ -39,7 +39,9 @@ import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
+import com.novigosolutions.certiscisco_pcsbr.service.AuditService;
 import com.novigosolutions.certiscisco_pcsbr.service.BreakService;
+import com.novigosolutions.certiscisco_pcsbr.service.DownloadService;
 import com.novigosolutions.certiscisco_pcsbr.service.SignalRService;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
@@ -79,7 +81,6 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         setactions();
         startBreaks();
         startSignaRifNotRunning();
-
     }
 
     private void calculateSecureTime() {
@@ -128,6 +129,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             }
         }
         startService(new Intent(getApplicationContext(), SignalRService.class));
+        startService(new Intent(getApplicationContext(), AuditService.class));
     }
 
     private void setuptoolbar() {
@@ -230,6 +232,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         calculateSecureTime();
         if (Constants.showSecureAlert)
             secureVehicleAlert();
+        startService(new Intent(getApplicationContext(), AuditService.class));
     }
 
     @Override

@@ -151,13 +151,6 @@ public class CoinBoxDialog extends Dialog implements View.OnClickListener, IOnSc
             enableManualEntry();
         }
 
-//        listAdapter = new StringDeleteAdapter(bar_code_list, this);
-//        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
-//        recyclerView.setLayoutManager(mLayoutManager);
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
-//        recyclerView.setAdapter(listAdapter);
-  //      txt_count.setText("Count : "+bar_code_list.size());
-
         coinBagAdapter = new CoinBagAdapter(mBarCodeList,mDenominationList,mCoinSeriesList, this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(mLayoutManager);

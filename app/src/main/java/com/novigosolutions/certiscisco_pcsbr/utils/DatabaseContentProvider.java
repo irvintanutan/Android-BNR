@@ -18,6 +18,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
 import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
+import com.novigosolutions.certiscisco_pcsbr.models.UserLogs;
 import com.novigosolutions.certiscisco_pcsbr.models.Wagon;
 
 public class DatabaseContentProvider extends ContentProvider {
@@ -42,6 +43,7 @@ public class DatabaseContentProvider extends ContentProvider {
         builder.addModelClass(Consignment.class);
         builder.addModelClass(ConsignmentBag.class);
         builder.addModelClass(Cage.class);
+        builder.addModelClass(UserLogs.class);
         return builder.create();
     }
 }

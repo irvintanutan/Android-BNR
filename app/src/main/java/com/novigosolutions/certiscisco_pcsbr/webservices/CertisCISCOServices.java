@@ -1,6 +1,7 @@
 package com.novigosolutions.certiscisco_pcsbr.webservices;
 
 
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 import com.google.gson.JsonObject;
 
 import okhttp3.ResponseBody;
@@ -36,6 +37,13 @@ public interface CertisCISCOServices {
     @Headers("Content-Type: application/json")
     @POST("SubmitBulkCollection")
     Call<ResponseBody> SubmitBulkCollection(@Header("AuthToken") String AuthToken, @Header("UserId") int UserId, @Body JsonObject object);
+
+    @Headers("Content-Type: application/json")
+    @POST("UserActivityLog")
+    Call<ResponseBody> UserActivityLog(@Query("entity") String entity, @Query("userAction") String userAction,
+                                       @Query("remarks") String remark,
+                                       @Query("userId") int userId, @Query("source") String source,
+                                       @Query("apkdatetime") String apkdatetime);
 
     @Headers("Content-Type: application/json")
     @POST("GetReceiptNo")

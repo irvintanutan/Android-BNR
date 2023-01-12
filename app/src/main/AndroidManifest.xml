@@ -142,6 +142,7 @@
         <service android:name=".service.SyncMessageService" />
         <service android:name=".service.OfflineUpdateService" />
         <service android:name=".service.DownloadService" />
+        <service android:name=".service.AuditService" />
         <service android:name=".service.BreakService" />
         <service
             android:name=".service.SignalRService"

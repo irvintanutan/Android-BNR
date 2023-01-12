@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.activites.CollectionActivity;
 import com.novigosolutions.certiscisco_pcsbr.adapters.StringDeleteAdapter;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.IOnScannerData;
@@ -28,6 +29,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Bags;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Wagon;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
@@ -252,6 +254,7 @@ public class WagonDialog extends Dialog implements View.OnClickListener, IOnScan
 
     @Override
     public void onDataScanned(String data) {
+        UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")" , "WAGON", context);
         if (data.isEmpty()) {
             ((CollectionActivity) context).invalidbarcodealert("Empty");
         } else if (data.equals(txt_seal.getText().toString()) ||isThereInList(data) || Branch.isExist(data))

@@ -10,8 +10,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 
 
 public class PalletDialog extends Dialog implements View.OnClickListener {
@@ -51,6 +53,8 @@ public class PalletDialog extends Dialog implements View.OnClickListener {
 
             case R.id.btn_done:
                 if (edt_qty.length() > 0) {
+                    UserLogService.save(UserLog.COLLECTION.toString(), "QUANTITY " + edt_qty.getText().toString(), "PALLET", context);
+
                     Job.updatePalletCount(TransportMasterId, Integer.parseInt(edt_qty.getText().toString()));
                     if (mDialogResult != null) {
                         mDialogResult.onResult();
