@@ -22,6 +22,7 @@ import com.novigosolutions.certiscisco_pcsbr.adapters.SealedListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.UnsealedListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.constant.ClickListener;
 import com.novigosolutions.certiscisco_pcsbr.constant.RecyclerTouchListener;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.expandable.CageAdapter;
 import com.novigosolutions.certiscisco_pcsbr.expandable.CageListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
@@ -36,6 +37,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
@@ -230,10 +232,10 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
             @Override
             public void onClick(View view, int position) {
                 Cage cage = cageList.get(position);
-                Intent intent = new Intent(DeliveryActivity.this , CageDeliveryActivity.class);
-                intent.putExtra("CageNo" , cage.CageNo);
-                intent.putExtra("CageSeal" , cage.CageSeal);
-                intent.putExtra("TransportMasterId" , cage.TransportMasterId);
+                Intent intent = new Intent(DeliveryActivity.this, CageDeliveryActivity.class);
+                intent.putExtra("CageNo", cage.CageNo);
+                intent.putExtra("CageSeal", cage.CageSeal);
+                intent.putExtra("TransportMasterId", cage.TransportMasterId);
                 intent.putExtra("GroupKey", GroupKey);
                 startActivity(intent);
                 finish();
@@ -386,6 +388,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
                 bagList.addAll(templist);
                 sealedListAdapter.notifyDataSetChanged();
                 setSealedScannedCount();
+                UserLogService.save(UserLog.DELIVERY.toString(), "JOB_ID ( " + TransportMasterId + " )", "BarCode Scanned ( " + data + " )", getApplicationContext());
             } else {
                 invalidbarcodealert("Invalid");
             }

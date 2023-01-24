@@ -253,7 +253,7 @@ public class BagDialog extends Dialog implements View.OnClickListener, IOnScanne
 
     @Override
     public void onDataScanned(String data) {
-        UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")" , "SEALED BAG", context);
+        UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")" , "SCANNED SEALED BAG", context);
         if (data.isEmpty()) {
             ((CollectionActivity) context).invalidbarcodealert("Empty");
         } else if (data.equals(txt_seal.getText().toString()) ||isThereInList(data) || Branch.isExist(data))

@@ -20,12 +20,14 @@ import com.bumptech.glide.Glide;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.PrintJobListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.PrintSelectedJobListAdapter;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.PrintCallBack;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
@@ -296,7 +298,9 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         if (printer.doConnectionTestForBulk()) {
             bulkImageGenerator = new BulkImageGenerator(PrintSelectedJobActivity.this, printDataArray);
             bulkImageGenerator.execute();
+            UserLogService.save(UserLog.PRINTING.toString(), "JOB_ID ( " + transporterMasterId + " )", "Printing Successful", getApplicationContext());
         } else {
+            UserLogService.save(UserLog.PRINTING.toString(), "JOB_ID ( " + transporterMasterId + " )", "Failed to connect the printer", getApplicationContext());
             Toast.makeText(PrintSelectedJobActivity.this, "Failed to connect the printer", Toast.LENGTH_LONG).show();
         }
     }

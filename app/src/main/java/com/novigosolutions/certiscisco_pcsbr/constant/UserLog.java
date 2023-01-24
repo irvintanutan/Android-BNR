@@ -7,4 +7,5 @@ public enum UserLog {
     SECURE_JOB,
     PRINTING,
     SYNCING,
+    LOGIN
 }

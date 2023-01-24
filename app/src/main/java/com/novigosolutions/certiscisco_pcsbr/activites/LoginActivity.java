@@ -28,11 +28,13 @@ import com.google.gson.JsonObject;
 import com.novigosolutions.certiscisco_pcsbr.BuildConfig;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.applications.CertisCISCO;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.recivers.IntervalChangedReceiver;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
@@ -227,6 +229,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         String teamid, password;
         teamid = edtteamid.getText().toString();
         password = edtpassword.getText().toString();
+        UserLogService.save(UserLog.LOGIN.toString(), "TEAM_ID: " + teamid + ", PASSWORD: " + password, "LOGIN ATTEMPT", getApplicationContext());
+
         if (teamid.isEmpty()) {
             mtxtinUserid.setError("User Id is required");
             failflag = true;
@@ -244,7 +248,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                     json.addProperty("UserCode", false ? "TEST" : teamid);
                     json.addProperty("Password", false ? "TEST" : password);
 
-                    json.addProperty("LoginDate", false ? "2022-07-14": sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
+                    json.addProperty("LoginDate", false ? "2022-07-14" : sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -344,7 +348,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             JSONObject jp = loginJsonArray.getJSONObject(0);
             Preferences.clearAll(LoginActivity.this);
             JSONArray dataArray = jsonArray.getJSONArray(1);
-            Log.e("TOKEN" , jp.getString("Token") + " " + Integer.parseInt(jp.getString("LoggedInUser")));
+            Log.e("TOKEN", jp.getString("Token") + " " + Integer.parseInt(jp.getString("LoggedInUser")));
             Preferences.saveString("AuthToken", jp.getString("Token"), LoginActivity.this);
             Preferences.saveString("LoggedOn", jp.getString("LoginTime"), LoginActivity.this);
             Preferences.saveString("LoggedInDate", sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())), LoginActivity.this);
@@ -391,8 +395,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                     if (messege.equals("LoggedIn")) {
                         if (Preferences.getString("DeviceID", LoginActivity.this).equals("")) {
                             raiseSnakbar("Device ID not set");
+                            UserLogService.save(UserLog.LOGIN.toString(), "Device ID not set", "LOGIN ATTEMPT", getApplicationContext());
                         } else {
                             raiseSnakbar("Same user logged in from another device");
+                            UserLogService.save(UserLog.LOGIN.toString(), "Same user logged in from another device", "LOGIN ATTEMPT", getApplicationContext());
                         }
                     } else {
                         JSONArray jsonArray = obj.getJSONArray("Data");
@@ -408,7 +414,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                                 Preferences.clearAll(LoginActivity.this);
                                 JSONArray dataArray = jsonArray.getJSONArray(1);
 
-                                Log.e("TOKEN" , jp.getString("Token") + " " + Integer.parseInt(jp.getString("LoggedInUser")));
+                                Log.e("TOKEN", jp.getString("Token") + " " + Integer.parseInt(jp.getString("LoggedInUser")));
                                 Preferences.saveString("AuthToken", jp.getString("Token"), LoginActivity.this);
                                 Preferences.saveString("LoggedOn", jp.getString("LoginTime"), LoginActivity.this);
                                 Preferences.saveString("LoggedInDate", sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())), LoginActivity.this);
@@ -424,8 +430,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                                 saveCoinSeries(obj);
                                 SavePrintSetting(obj);
                                 raiseSnakbar(messege);
+                                UserLogService.save(UserLog.LOGIN.toString(), "SUCCESS (USERID: " + jp.getString("LoggedInUser") + ", TEAMID: " + jp.getString("TeamId") + ""
+                                        , "LOGIN ATTEMPT ", getApplicationContext());
                             }
                         } else {
+                            UserLogService.save(UserLog.LOGIN.toString(), "Invalid User Role", "LOGIN ATTEMPT", getApplicationContext());
                             raiseSnakbar("Invalid User Role");
                         }
                     }

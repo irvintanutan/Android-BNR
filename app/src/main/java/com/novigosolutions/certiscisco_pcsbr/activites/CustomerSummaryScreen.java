@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.StringAdapter;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.expandable.Cage;
 import com.novigosolutions.certiscisco_pcsbr.expandable.CageAdapter;
 import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
@@ -29,6 +30,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.ui.SignatureView;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
@@ -574,8 +576,12 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 if (obj.getString("Result").equals("Success")) {
                     if (summaryType == Constants.COLLECTION) {
                         Job.setCollected(GroupKey, BranchCode, PFunctionalCode, Constants.startTime, Constants.endTime);
+                        UserLogService.save(UserLog.SYNCING.toString(), "JOB_ID ( " + TransportMasterId + " )", "Successful Collection", getApplicationContext());
+
                     } else if (summaryType == Constants.DELIVERY) {
                         Job.setDelivered(GroupKey, BranchCode, PFunctionalCode, Constants.startTime, Constants.endTime);
+                        UserLogService.save(UserLog.SYNCING.toString(), "JOB_ID ( " + TransportMasterId + " )", "Successful Delivery", getApplicationContext());
+
                     }
                     APICaller.instance().sync(null, getApplicationContext());
                     setResult(Constants.FINISHONRESULT);

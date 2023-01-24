@@ -23,6 +23,7 @@ import com.novigosolutions.certiscisco_pcsbr.adapters.SecuredUnsealedListAdapter
 import com.novigosolutions.certiscisco_pcsbr.adapters.UnsealedListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.constant.ClickListener;
 import com.novigosolutions.certiscisco_pcsbr.constant.RecyclerTouchListener;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.expandable.CageListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.expandable.SecureCageListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
@@ -36,6 +37,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.objects.SecureObject;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
@@ -415,6 +417,9 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
                 break;
             }
         }
+
+        UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + TransportMasterId + " )", "Cage Scanned ( " + scan + " )", getApplicationContext());
+
     }
 
     private void checkSealedBags(String scan) {
@@ -433,6 +438,7 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
                 recyclerViewbag.setAdapter(sealedListAdapter);
                 setSealedScannedCount();
             }
+            UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + TransportMasterId + " )", "BarCode Scanned ( " + scan + " )", getApplicationContext());
         }
     }
 

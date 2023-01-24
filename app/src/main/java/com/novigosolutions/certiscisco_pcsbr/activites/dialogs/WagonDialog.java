@@ -254,7 +254,7 @@ public class WagonDialog extends Dialog implements View.OnClickListener, IOnScan
 
     @Override
     public void onDataScanned(String data) {
-        UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")" , "WAGON", context);
+        UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")" , "SCANNED WAGON", context);
         if (data.isEmpty()) {
             ((CollectionActivity) context).invalidbarcodealert("Empty");
         } else if (data.equals(txt_seal.getText().toString()) ||isThereInList(data) || Branch.isExist(data))
