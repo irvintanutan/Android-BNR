@@ -12,8 +12,8 @@
         android:theme="@style/AppBaseTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".activites.ChangePasswordActivity"></activity>
         <activity android:name=".activites.SelectionActivity" />
-
         <activity
             android:name=".activites.GroupJobActivity"
             android:configChanges="orientation"
@@ -108,6 +108,7 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity android:name=".activites.BreakListActivity" />
+
         <provider
             android:name=".utils.DatabaseContentProvider"
             android:authorities="com.novigosolutions.certiscisco_pcsbr"
@@ -118,7 +119,6 @@
                 <action android:name="android.intent.action.ACTION_SHUTDOWN" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".recivers.NetworkChangeReceiver"
             android:enabled="true"
@@ -155,10 +155,10 @@
         <uses-library
             android:name="com.symbol.emdk"
             android:required="false" />
-    </application>
+    </application> <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE"/> -->
     <permission
         android:name="android.permission.BLUETOOTH"
-        android:label="BLUETOOTH" /> <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE"/> -->
+        android:label="BLUETOOTH" />
     <permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 

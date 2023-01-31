@@ -249,6 +249,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                     json.addProperty("Password", false ? "TEST" : password);
 
                     json.addProperty("LoginDate", false ? "2022-07-14" : sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
+
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -294,6 +295,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             Intent intent = new Intent(this, IntervalChangedReceiver.class);
             sendBroadcast(intent);
             Preferences.saveBoolean("LoggedIn", true, LoginActivity.this);
+            Preferences.saveString("Password", edtpassword.getText().toString(), LoginActivity.this);
             Intent i = new Intent(LoginActivity.this, HomeActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);

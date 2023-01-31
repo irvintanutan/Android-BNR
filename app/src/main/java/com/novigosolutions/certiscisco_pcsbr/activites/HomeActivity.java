@@ -27,6 +27,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.GridAdapter;
 import com.novigosolutions.certiscisco_pcsbr.applications.CertisCISCO;
@@ -48,6 +50,10 @@ import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -233,6 +239,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         if (Constants.showSecureAlert)
             secureVehicleAlert();
         startService(new Intent(getApplicationContext(), AuditService.class));
+        APICaller.instance().getSystemConfig(this);
     }
 
     @Override
@@ -351,8 +358,14 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             openLegend();
         } else if (item.getItemId() == R.id.action_logout) {
             logout();
+        } else if (item.getItemId() == R.id.action_change_password) {
+            changePassword();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void changePassword() {
+        startActivity(new Intent(HomeActivity.this, ChangePasswordActivity.class));
     }
 
     boolean doubleBackToExitPressedOnce = false;
@@ -440,9 +453,29 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         if (result_code == 409) {
             authalert(this);
         } else if (result_code == 200) {
+            Log.e("RESULT DATE", result_data);
+            saveSystemConfig(result_data);
             refresh();
         } else {
             raiseSnakbar("Error");
         }
+    }
+
+    private void saveSystemConfig(String result) {
+        try {
+            JSONArray jsonArray = new JSONArray(result);
+
+            for (int a = 0; a < jsonArray.length(); a++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(a);
+                String accessKey = jsonObject.getString("AccessKey");
+                String value = jsonObject.getString("Value");
+
+                Preferences.saveString(accessKey , value, this);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 }
