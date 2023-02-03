@@ -127,9 +127,6 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
         switch (v.getId()) {
             case R.id.btn_rescedule:
                 String sign = signatureView.getByteArray();
-//                if (txtDate.getText().toString().isEmpty()) {
-//                    Toast.makeText(context, "Select date", Toast.LENGTH_SHORT).show();
-//                } else
                 if (spinner.getSelectedItemPosition() == 2 && edt_reason_other.getText().toString().isEmpty()) {
                     Toast.makeText(context, "Enter Reason", Toast.LENGTH_SHORT).show();
                 } else if (sign == null) {

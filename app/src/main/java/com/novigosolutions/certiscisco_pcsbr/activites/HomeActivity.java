@@ -27,8 +27,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.GridAdapter;
 import com.novigosolutions.certiscisco_pcsbr.applications.CertisCISCO;
@@ -37,13 +35,11 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Break;
 import com.novigosolutions.certiscisco_pcsbr.models.ChatMessage;
-import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.service.AuditService;
 import com.novigosolutions.certiscisco_pcsbr.service.BreakService;
-import com.novigosolutions.certiscisco_pcsbr.service.DownloadService;
 import com.novigosolutions.certiscisco_pcsbr.service.SignalRService;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
@@ -66,6 +62,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.ISCHANGEPASSWORD;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.SYSTEMCONFIG;
 
 public class HomeActivity extends BaseActivity implements ApiCallback, NetworkChangekListener {
     GridView gridview;
@@ -139,21 +137,20 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
     }
 
     private void setuptoolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        mTitle = toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("HOME");
-        TextView UserName = (TextView) toolbar.findViewById(R.id.UserName);
+        TextView UserName = toolbar.findViewById(R.id.UserName);
         UserName.setText(Preferences.getString("UserName", HomeActivity.this));
-        imgnetwork = (ImageView) toolbar.findViewById(R.id.imgnetwork);
+        imgnetwork = toolbar.findViewById(R.id.imgnetwork);
     }
 
     private void initializeviews() {
-        cl = (CoordinatorLayout) findViewById(R.id.cl);
-        gridview = (GridView) findViewById(R.id.grid_view);
+        cl = findViewById(R.id.cl);
+        gridview = findViewById(R.id.grid_view);
         legend = findViewById(R.id.legend);
-        //  btnLogout=findViewById(R.id.bt_logout);
         if (NetworkUtil.getConnectivityStatusString(HomeActivity.this))
             APICaller.instance().GetMessages(this);
     }
@@ -206,13 +203,6 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
                 if (intent != null) startActivity(intent);
             }
         });
-
-//        btnLogout.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                logout();
-//            }
-//        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -240,6 +230,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             secureVehicleAlert();
         startService(new Intent(getApplicationContext(), AuditService.class));
         APICaller.instance().getSystemConfig(this);
+        APICaller.instance().getPasswordDate(this, getApplicationContext());
     }
 
     @Override
@@ -454,11 +445,28 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             authalert(this);
         } else if (result_code == 200) {
             Log.e("RESULT DATE", result_data);
-            saveSystemConfig(result_data);
+            if (api_code == SYSTEMCONFIG)
+                saveSystemConfig(result_data);
+            else if (api_code == ISCHANGEPASSWORD) {
+                if (saveIsChangePassword(result_data)) {
+                    Toast.makeText(getApplicationContext(), "Your password has expired. Need to update password", Toast.LENGTH_SHORT).show();
+                    changePassword();
+                }
+            }
             refresh();
         } else {
             raiseSnakbar("Error");
         }
+    }
+
+    private boolean saveIsChangePassword(String result) {
+        Preferences.saveInt("isChangePassword", Integer.parseInt(result), getApplicationContext());
+        try {
+            int data = Preferences.getInt("isChangePassword", getApplicationContext());
+            if (data == 1) return true;
+        } catch (Exception e) {
+        }
+        return false;
     }
 
     private void saveSystemConfig(String result) {
@@ -470,7 +478,7 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
                 String accessKey = jsonObject.getString("AccessKey");
                 String value = jsonObject.getString("Value");
 
-                Preferences.saveString(accessKey , value, this);
+                Preferences.saveString(accessKey, value, this);
             }
 
         } catch (JSONException e) {

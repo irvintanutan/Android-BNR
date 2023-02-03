@@ -23,7 +23,7 @@ public class Constants {
     public final static int SECUREVEHICLE = 15;
     public final static int SYSTEMCONFIG = 16;
     public final static int CHANGEPASSWORD = 17;
-
+    public final static int ISCHANGEPASSWORD = 18;
 
     public final static String MAX_PASSWORD_LENGTH = "MAX_PASSWORD_LENGTH";
     public final static String MIN_PASSWORD_UPPERCASE = "MIN_PASSWORD_UPPERCASE";

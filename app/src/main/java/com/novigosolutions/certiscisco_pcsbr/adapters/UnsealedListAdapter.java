@@ -1,5 +1,6 @@
 package com.novigosolutions.certiscisco_pcsbr.adapters;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 
 import java.util.List;
 
@@ -20,6 +23,7 @@ public class UnsealedListAdapter extends RecyclerView.Adapter<UnsealedListAdapte
     String colorGreen = "#43A047";
     String colorWhite = "#FFFFFF";
     UnsealedClickCallback unsealedClickCallback;
+    private Context context;
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView txt_seal;
@@ -38,15 +42,16 @@ public class UnsealedListAdapter extends RecyclerView.Adapter<UnsealedListAdapte
         public void onClick(View v) {
             Delivery.setScanned(deliveries.get(this.getLayoutPosition()).getId());
             deliveries.get(this.getLayoutPosition()).IsScanned = true;
-            if(unsealedClickCallback!=null) {
+            if (unsealedClickCallback != null) {
                 unsealedClickCallback.onSelect();
             }
             notifyDataSetChanged();
         }
     }
 
-    public UnsealedListAdapter(List<Delivery> deliveries) {
+    public UnsealedListAdapter(List<Delivery> deliveries, Context context) {
         this.deliveries = deliveries;
+        this.context = context;
     }
 
     public void setUnsealedClickCallback(UnsealedClickCallback unsealedClickCallback) {
@@ -67,18 +72,19 @@ public class UnsealedListAdapter extends RecyclerView.Adapter<UnsealedListAdapte
 //            holder.txt_seal.setText(type + "(" + deliveries.get(position).Denomination + " * " + deliveries.get(position).Qty + ")");
 //        else
 //            holder.txt_seal.setText(type + "(" + deliveries.get(position).Qty + ")");
-        if (type.equals("BOX")){
-            if(deliveries.get(position).CoinSeriesId==0){
+        if (type.equals("BOX")) {
+            if (deliveries.get(position).CoinSeriesId == 0) {
                 holder.txt_seal.setText(type + "(" + deliveries.get(position).Denomination + " * " + deliveries.get(position).Qty + ")");
-            }else{
-                holder.txt_seal.setText(type + "(" + deliveries.get(position).Denomination + " * " + deliveries.get(position).Qty + ")("+ deliveries.get(position).CoinSeries+")");
+            } else {
+                holder.txt_seal.setText(type + "(" + deliveries.get(position).Denomination + " * " + deliveries.get(position).Qty + ")(" + deliveries.get(position).CoinSeries + ")");
             }
-        }
-        else{
+        } else {
             holder.txt_seal.setText(type + "(" + deliveries.get(position).Qty + ")");
         }
         if (deliveries.get(position).IsScanned) {
             holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
+            UserLogService.save(UserLog.DELIVERY.toString(), "BOX ACKNOWLEDGEMENT", "Box Acknowledged ( " +
+                    "Box: " + deliveries.get(position).Denomination + " , QTY : " + deliveries.get(position).Qty + " )", context);
         } else {
             holder.llmain.setBackgroundColor(Color.parseColor(colorWhite));
         }
@@ -89,9 +95,9 @@ public class UnsealedListAdapter extends RecyclerView.Adapter<UnsealedListAdapte
         return deliveries.size();
     }
 
-   public interface UnsealedClickCallback {
+    public interface UnsealedClickCallback {
         void onSelect();
-   }
+    }
 
 }
 

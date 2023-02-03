@@ -218,7 +218,7 @@ public class CageDeliveryActivity extends BarCodeScanActivity implements IOnScan
         recyclerViewbox.setItemAnimator(new DefaultItemAnimator());
         DividerItemDecoration dividerItemDecoration2 = new DividerItemDecoration(recyclerViewbox.getContext(), DividerItemDecoration.VERTICAL);
         recyclerViewbox.addItemDecoration(dividerItemDecoration2);
-        unsealedListAdapter = new UnsealedListAdapter(boxList);
+        unsealedListAdapter = new UnsealedListAdapter(boxList, this);
         unsealedListAdapter.setUnsealedClickCallback(CageDeliveryActivity.this);
         recyclerViewbox.setAdapter(unsealedListAdapter);
     }

@@ -155,13 +155,6 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
                     if (pos != -1){
                         int newCount  = counts.get(pos)+ Integer.parseInt(edt_count.getText().toString());
                         counts.set(pos, newCount);
-//                        if(currencies.get(spinner.getSelectedItemPosition()).IsCoinValue.equals("Yes")){
-//                            coinseriesDescription.set(pos,spinnerCoinSeries.getSelectedItem().toString());
-//                            coinseriesIds.set(pos,coinSeries.get(spinnerCoinSeries.getSelectedItemPosition()).CoinSeriesId);
-//                        }else {
-//                            coinseriesDescription.set(pos,"null");
-//                            coinseriesIds.set(pos,0);
-//                        }
                         mAdapter.notifyItemChanged(pos);
                     } else {
                         currancyNames.add(spinner.getSelectedItem().toString());
@@ -176,7 +169,6 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
                         }
                         mAdapter.notifyItemInserted(mAdapter.getItemCount()-1);
                     }
-                    //  txt_count.setText("Count : "+currancyNames.size());
                     txt_count.setText("Count : "+itemCount());
                     edt_count.setText("");
                 } else {

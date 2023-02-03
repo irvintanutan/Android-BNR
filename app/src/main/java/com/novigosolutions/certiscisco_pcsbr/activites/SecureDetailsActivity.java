@@ -399,8 +399,10 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
             Cage cage = cageList.get(a);
             if (cage.CageNo.equals(scan)) {
                 cage.IsCageNoScanned = true;
+                UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + TransportMasterId + " )", "Cage Scanned ( " + scan + " )", getApplicationContext());
             } else if (cage.CageSeal.equals(scan)) {
                 cage.IsCageSealScanned = true;
+                UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + TransportMasterId + " )", "Cage Scanned ( " + scan + " )", getApplicationContext());
             }
 
             cageList.set(a, cage);
@@ -417,9 +419,6 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
                 break;
             }
         }
-
-        UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + TransportMasterId + " )", "Cage Scanned ( " + scan + " )", getApplicationContext());
-
     }
 
     private void checkSealedBags(String scan) {
@@ -431,14 +430,15 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
                 sealedListAdapter = new SecuredSealedListAdapter(bagList);
                 recyclerViewbag.setAdapter(sealedListAdapter);
                 setSealedScannedCount();
+                UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + TransportMasterId + " )", "BarCode Scanned ( " + scan + " )", getApplicationContext());
             } else if (scan.equals(secureObject.SecondBarcode)) {
                 secureObject.IsScannedSecond = true;
                 bagList.set(a, secureObject);
                 sealedListAdapter = new SecuredSealedListAdapter(bagList);
                 recyclerViewbag.setAdapter(sealedListAdapter);
                 setSealedScannedCount();
+                UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + TransportMasterId + " )", "BarCode Scanned ( " + scan + " )", getApplicationContext());
             }
-            UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + TransportMasterId + " )", "BarCode Scanned ( " + scan + " )", getApplicationContext());
         }
     }
 

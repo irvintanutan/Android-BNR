@@ -60,6 +60,10 @@ public interface CertisCISCOServices {
     Call<ResponseBody> GetReceiptNumber(@Query("jobId") int jobId);
 
     @Headers("Content-Type: application/json")
+    @POST("IsChangePassword")
+    Call<ResponseBody> IsChangePassword(@Query("userid") int userid);
+
+    @Headers("Content-Type: application/json")
     @POST("SecureVehicle")
     Call<ResponseBody> SecureVehicle(@Query("jobId") String jobId, @Query("staffid") String staffId);
 

@@ -22,7 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.models.UserLogs;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
 import com.novigosolutions.certiscisco_pcsbr.webservices.CertisCISCOServer;
@@ -33,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.novigosolutions.certiscisco_pcsbr.constant.UserLog.CHANGE_PASSWORD;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.CHANGEPASSWORD;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MAX_PASSWORD_LENGTH;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_ALPHABET;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_LOWERCASE;
@@ -70,6 +74,10 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
         String originalPassword = Preferences.getString("Password", this);
         int userId = Preferences.getInt("UserId", this);
+
+        UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userId, "CHANGE PASSWORD ATTEMPT", getApplicationContext());
+
+
         next.setOnClickListener(view -> {
             List<String> errors = validate(configs, originalPassword);
             if (errors.isEmpty()) {
@@ -80,6 +88,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
                         try {
                             if (response.code() == 200) {
                                 Toast.makeText(getApplicationContext(), "Password change successful", Toast.LENGTH_LONG).show();
+                                UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userId, "CHANGE PASSWORD SUCCESS", getApplicationContext());
                                 startActivity(new Intent(ChangePasswordActivity.this, HomeActivity.class));
                             }
                         } catch (Exception e) {
@@ -90,6 +99,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
                         Log.e("Failed", "Change Password " + call.toString());
+                        UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userId, "CHANGE PASSWORD FAILED", getApplicationContext());
                     }
                 });
             } else {

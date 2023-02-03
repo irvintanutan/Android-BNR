@@ -248,7 +248,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                     json.addProperty("UserCode", false ? "TEST" : teamid);
                     json.addProperty("Password", false ? "TEST" : password);
 
-                    json.addProperty("LoginDate", false ? "2022-07-14" : sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
+                    json.addProperty("LoginDate", false ? "2023-01-25" : sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
 
                 } catch (ParseException e) {
                     e.printStackTrace();
@@ -432,7 +432,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                                 saveCoinSeries(obj);
                                 SavePrintSetting(obj);
                                 raiseSnakbar(messege);
-                                UserLogService.save(UserLog.LOGIN.toString(), "SUCCESS (USERID: " + jp.getString("LoggedInUser") + ", TEAMID: " + jp.getString("TeamId") + ""
+                                UserLogService.save(UserLog.LOGIN.toString(), "SUCCESS (USERID: " + jp.getString("LoggedInUser") + ", TEAMID: " + jp.getString("TeamId") + ")"
                                         , "LOGIN ATTEMPT ", getApplicationContext());
                             }
                         } else {

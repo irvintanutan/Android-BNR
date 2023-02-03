@@ -17,7 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.objects.SecureObject;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 
 import org.w3c.dom.Text;
 
@@ -81,10 +83,12 @@ public class SecuredUnsealedListAdapter extends RecyclerView.Adapter<SecuredUnse
         }
         if (secureObjects.get(position).IsScanned) {
             holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
+            UserLogService.save(UserLog.SECURE_JOB.toString(), "BOX ACKNOWLEDGEMENT", "Box Acknowledged ( " +
+                    "Box: " + secureObjects.get(position).Barcode + " , QTY : " + secureObjects.get(position).dummyQuantity + " )", context);
+
         } else {
             holder.llmain.setBackgroundColor(Color.parseColor(colorWhite));
         }
-
 
 
     }
@@ -137,7 +141,7 @@ public class SecuredUnsealedListAdapter extends RecyclerView.Adapter<SecuredUnse
             }
             secureObject.dummyQuantity = finalCash;
 
-            if(unsealedClickCallback!=null) {
+            if (unsealedClickCallback != null) {
                 unsealedClickCallback.onSelect();
             }
 

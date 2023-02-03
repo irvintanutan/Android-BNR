@@ -103,6 +103,11 @@ public class APICaller {
         process(Constants.SYSTEMCONFIG, call, callback);
     }
 
+    public void getPasswordDate(ApiCallback callback, Context context) {
+        Call<ResponseBody> call = getService().IsChangePassword(Preferences.getInt("UserId", context));
+        process(Constants.ISCHANGEPASSWORD, call, callback);
+    }
+
     public void sync(ApiCallback callback, Context context) {
         this.context = context;
         JsonObject jsonObject = new JsonObject();

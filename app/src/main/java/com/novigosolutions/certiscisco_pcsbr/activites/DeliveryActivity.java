@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,31 +22,25 @@ import com.novigosolutions.certiscisco_pcsbr.adapters.UnsealedListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.constant.ClickListener;
 import com.novigosolutions.certiscisco_pcsbr.constant.RecyclerTouchListener;
 import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
-import com.novigosolutions.certiscisco_pcsbr.expandable.CageAdapter;
 import com.novigosolutions.certiscisco_pcsbr.expandable.CageListAdapter;
-import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.IOnScannerData;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
-import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
-import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
-import com.novigosolutions.certiscisco_pcsbr.zebra.Print;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,8 +48,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -148,7 +139,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         recyclerViewbox.setItemAnimator(new DefaultItemAnimator());
         DividerItemDecoration dividerItemDecoration2 = new DividerItemDecoration(recyclerViewbox.getContext(), DividerItemDecoration.VERTICAL);
         recyclerViewbox.addItemDecoration(dividerItemDecoration2);
-        unsealedListAdapter = new UnsealedListAdapter(boxList);
+        unsealedListAdapter = new UnsealedListAdapter(boxList, this);
         unsealedListAdapter.setUnsealedClickCallback(DeliveryActivity.this);
         recyclerViewbox.setAdapter(unsealedListAdapter);
         txt_customer_name = (TextView) findViewById(R.id.txt_customer_name);
@@ -441,14 +432,8 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
         alertDialog.setCancelable(false);
         alertDialog.setTitle("Confirm");
         alertDialog.setMessage("Do you want to cancel this delivery?");
-        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                openDialogue();
-            }
-        });
-        alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-            }
+        alertDialog.setPositiveButton("Yes", (dialog, which) -> openDialogue());
+        alertDialog.setNegativeButton("No", (dialog, which) -> {
         });
         alertDialog.show();
     }
