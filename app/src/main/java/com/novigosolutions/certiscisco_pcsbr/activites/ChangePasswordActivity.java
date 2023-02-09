@@ -11,6 +11,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,6 +46,8 @@ import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_UPPERCASE;
 
 public class ChangePasswordActivity extends AppCompatActivity {
+
+    private ProgressDialog progressDialog;
 
     EditText oldPassword, newPassword, confirmPassword;
     Button next;
@@ -81,13 +84,16 @@ public class ChangePasswordActivity extends AppCompatActivity {
         next.setOnClickListener(view -> {
             List<String> errors = validate(configs, originalPassword);
             if (errors.isEmpty()) {
+                showProgressDialog("Changing password is in progress");
                 Call<ResponseBody> call = getService().CustomerChangePassword(userId, oldPassword.getText().toString(), newPassword.getText().toString());
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         try {
                             if (response.code() == 200) {
+                                hideProgressDialog();
                                 Toast.makeText(getApplicationContext(), "Password change successful", Toast.LENGTH_LONG).show();
+                                Preferences.saveString("Password", newPassword.getText().toString(), getApplicationContext());
                                 UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userId, "CHANGE PASSWORD SUCCESS", getApplicationContext());
                                 startActivity(new Intent(ChangePasswordActivity.this, HomeActivity.class));
                             }
@@ -242,5 +248,25 @@ public class ChangePasswordActivity extends AppCompatActivity {
                 .client(UnsafeOkHttpClient.getUnsafeOkHttpClient(httpClient))
                 .build();
         return retrofit.create(CertisCISCOServices.class);
+    }
+
+    public void showProgressDialog(String message) {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.setMessage(message);
+        } else {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage(message);
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+    }
+
+    public void hideProgressDialog() {
+        try {
+            if (progressDialog != null && progressDialog.isShowing())
+                progressDialog.dismiss();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

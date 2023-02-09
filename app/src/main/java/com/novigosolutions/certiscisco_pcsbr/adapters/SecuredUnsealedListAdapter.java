@@ -83,8 +83,8 @@ public class SecuredUnsealedListAdapter extends RecyclerView.Adapter<SecuredUnse
         }
         if (secureObjects.get(position).IsScanned) {
             holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
-            UserLogService.save(UserLog.SECURE_JOB.toString(), "BOX ACKNOWLEDGEMENT", "Box Acknowledged ( " +
-                    "Box: " + secureObjects.get(position).Barcode + " , QTY : " + secureObjects.get(position).dummyQuantity + " )", context);
+            UserLogService.save(UserLog.SECURE_JOB.toString(), "Box Acknowledged ( " +
+                    "Box: " + secureObjects.get(position).Barcode + " , QTY : " + secureObjects.get(position).dummyQuantity + " )", "BOX ACKNOWLEDGEMENT", context);
 
         } else {
             holder.llmain.setBackgroundColor(Color.parseColor(colorWhite));

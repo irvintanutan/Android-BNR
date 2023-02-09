@@ -351,6 +351,7 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
         alertDialog.setPositiveButton("Yes", (dialog, which) -> {
             showProgressDialog("Securing Vehicle . . . ");
             APICaller.instance().secureVehicle(SecureDetailsActivity.this, SecureDetailsActivity.this, j.TransportMasterId);
+            UserLogService.save(UserLog.SYNCING.toString(), "JOB_ID ( " + TransportMasterId + " )", "Successful Secured Vehicle", getApplicationContext());
         });
         alertDialog.setNegativeButton("No", (dialog, which) -> {
         });
