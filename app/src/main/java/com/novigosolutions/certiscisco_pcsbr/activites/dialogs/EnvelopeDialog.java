@@ -259,12 +259,15 @@ public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnS
 
     @Override
     public void onDataScanned(String data) {
-        UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")" , "SCANNED " + envelopeType.toUpperCase(), context);
         if (data.isEmpty()) {
             ((CollectionActivity) context).invalidbarcodealert("Empty");
-        } else if (bar_code_list.contains(data) || Branch.isExist(data))
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED INVALID (" + data + ")", "SCANNED " + envelopeType.toUpperCase(), context);
+        } else if (bar_code_list.contains(data) || Branch.isExist(data)) {
             ((CollectionActivity) context).invalidbarcodealert("Duplicate");
-        else {
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED INVALID (" + data + ")", "SCANNED " + envelopeType.toUpperCase(), context);
+        } else {
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")", "SCANNED " + envelopeType.toUpperCase(), context);
+
             if (txt_bag_code.isFocused()) {
                 txt_bag_code.setText(data);
                 //  txt_count_bag.setText("Count : "+"1");

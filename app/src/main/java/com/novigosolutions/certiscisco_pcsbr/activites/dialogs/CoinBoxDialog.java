@@ -250,6 +250,7 @@ public class CoinBoxDialog extends Dialog implements View.OnClickListener, IOnSc
 
     private void add(String data) {
         if (mBarCodeList.contains(data) || Branch.isExist(data)) {
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED INVALID (" + data + ")", "COIN BAG", context);
             ((CollectionActivity) context).invalidbarcodealert("Duplicate");
         } else {
             mBarCodeList.add(data);
@@ -283,9 +284,10 @@ public class CoinBoxDialog extends Dialog implements View.OnClickListener, IOnSc
 
     @Override
     public void onDataScanned(String data) {
-        if (Branch.isExist(data))
+        if (Branch.isExist(data)) {
             ((CollectionActivity) context).invalidbarcodealert("Duplicate");
-        else {
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED INVALID (" + data + ")", "COIN BAG", context);
+        } else {
             add(data);
         }
     }

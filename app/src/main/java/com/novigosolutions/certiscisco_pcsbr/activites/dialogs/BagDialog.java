@@ -117,7 +117,7 @@ public class BagDialog extends Dialog implements View.OnClickListener, IOnScanne
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(listAdapter);
-        ((BarCodeScanActivity)context).registerScannerEvent(this);
+        ((BarCodeScanActivity) context).registerScannerEvent(this);
     }
 
     private void openManualEntry() {
@@ -153,7 +153,7 @@ public class BagDialog extends Dialog implements View.OnClickListener, IOnScanne
         switch (v.getId()) {
             case R.id.btn_scan:
                 try {
-                    ((BarCodeScanActivity)context).scansoft();
+                    ((BarCodeScanActivity) context).scansoft();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -161,10 +161,10 @@ public class BagDialog extends Dialog implements View.OnClickListener, IOnScanne
             case R.id.btn_done:
                 if (ll_manual_entry.getVisibility() == View.VISIBLE) {
                     if (rb1.isChecked()) {
-                       // String barcode1 = txtbag1.getText().toString().replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
+                        // String barcode1 = txtbag1.getText().toString().replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
                         String barcode1 = txtbag1.getText().toString().trim();
                         if (barcode1.length() > 0) {
-                            if (isThereInList(barcode1)||Branch.isExist(barcode1))
+                            if (isThereInList(barcode1) || Branch.isExist(barcode1))
                                 ((CollectionActivity) context).invalidbarcodealert("Duplicate");
                             else {
                                 add(barcode1);
@@ -179,7 +179,7 @@ public class BagDialog extends Dialog implements View.OnClickListener, IOnScanne
                         String barcode1 = txtbag1.getText().toString().trim();
                         String barcode2 = txtbag2.getText().toString().trim();
                         if (barcode1.length() > 0 && barcode2.length() > 0) {
-                            if (barcode2.equals(barcode1) ||isThereInList(barcode1)||isThereInList(barcode2)|| Branch.isExist(barcode1) || Branch.isExist(barcode2))
+                            if (barcode2.equals(barcode1) || isThereInList(barcode1) || isThereInList(barcode2) || Branch.isExist(barcode1) || Branch.isExist(barcode2))
                                 ((CollectionActivity) context).invalidbarcodealert("Duplicate");
                             else {
                                 add(barcode1 + "," + barcode2);
@@ -238,14 +238,13 @@ public class BagDialog extends Dialog implements View.OnClickListener, IOnScanne
         }
 
     }
-    private boolean isThereInList(String data)
-    {
+
+    private boolean isThereInList(String data) {
         for (int i = 0; i < bar_code_list.size(); i++) {
             String bagcode = bar_code_list.get(i);
             String[] bagcodes = bagcode.split(",");
-            for(int j=0;j<bagcodes.length;j++)
-            {
-                if(data.equals(bagcodes[j])) return true;
+            for (int j = 0; j < bagcodes.length; j++) {
+                if (data.equals(bagcodes[j])) return true;
             }
         }
         return false;
@@ -253,12 +252,14 @@ public class BagDialog extends Dialog implements View.OnClickListener, IOnScanne
 
     @Override
     public void onDataScanned(String data) {
-        UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")" , "SCANNED SEALED BAG", context);
         if (data.isEmpty()) {
             ((CollectionActivity) context).invalidbarcodealert("Empty");
-        } else if (data.equals(txt_seal.getText().toString()) ||isThereInList(data) || Branch.isExist(data))
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED INVALID (" + data + ")", "SCANNED SEALED BAG", context);
+        } else if (data.equals(txt_seal.getText().toString()) || isThereInList(data) || Branch.isExist(data)) {
             ((CollectionActivity) context).invalidbarcodealert("Duplicate");
-        else {
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED INVALID (" + data + ")", "SCANNED SEALED BAG", context);
+        } else {
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")" , "SCANNED SEALED BAG", context);
             if (rb1.isChecked()) {
                 add(data);
             } else if (txt_seal.length() > 0) {

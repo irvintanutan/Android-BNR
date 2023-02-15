@@ -174,14 +174,16 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
     public void onDataScanned(String data) {
         if (data.isEmpty()) {
             ((CollectionActivity) context).invalidbarcodealert("Empty");
-        } else if (isThereInList(data, scanType) || Branch.isExist(data) && scanType.equalsIgnoreCase("CageSeal"))
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED INVALID (" + data + ")", "SCANNED CAGE SEAL", context);
+        } else if (isThereInList(data, scanType) || Branch.isExist(data) && scanType.equalsIgnoreCase("CageSeal")) {
             ((CollectionActivity) context).invalidbarcodealert("Duplicate");
-        else {
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED INVALID (" + data + ")", "SCANNED CAGE SEAL", context);
+        } else {
             if (scanType.equals("CageNo")) {
-                UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")" , "SCANNED CAGE NO", context);
+                UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")", "SCANNED CAGE NO", context);
                 txt_cage_no.setText(data);
             } else {
-                UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")" , "SCANNED CAGE SEAL", context);
+                UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")", "SCANNED CAGE SEAL", context);
                 txt_cage_seal.setText(data);
             }
         }
