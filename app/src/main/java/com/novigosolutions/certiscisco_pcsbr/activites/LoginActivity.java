@@ -432,7 +432,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                                 saveCoinSeries(obj);
                                 SavePrintSetting(obj);
                                 raiseSnakbar(messege);
-                                UserLogService.save(UserLog.LOGIN.toString(), "SUCCESS (USERID: " + jp.getString("LoggedInUser") + ", TEAMID: " + jp.getString("TeamId") + ")"
+                                UserLogService.save(UserLog.LOGIN.toString(), "SUCCESS (USERID: " + jp.getString("UserName") + ", TEAMID: " + jp.getString("TeamId") + ")"
                                         , "LOGIN ATTEMPT ", getApplicationContext());
                             }
                         } else {

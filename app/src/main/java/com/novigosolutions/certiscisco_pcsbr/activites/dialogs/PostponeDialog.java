@@ -186,17 +186,6 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
         if (date != null) tomarrow.setTime(date);
         tomarrow.add(Calendar.DAY_OF_MONTH, 1);
         return CommonMethods.getPostPoneStringDate(tomarrow.getTime());
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(CommonMethods.getPostPoneDate(txtDate.getText().toString()));
-//        DatePickerDialog dialog = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
-//            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-//                Calendar newDate = Calendar.getInstance();
-//                newDate.set(year, monthOfYear, dayOfMonth);
-//                txtDate.setText(CommonMethods.getPostPoneStringDate(newDate.getTime()));
-//            }
-//        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-//        dialog.getDatePicker().setMinDate(tomarrow.getTimeInMillis());
-//        dialog.show();
     }
 
     @Override
@@ -208,6 +197,7 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
                 obj = new JSONObject(result_data);
                 if (obj.getString("Result").equals("Success")) {
                     Branch.setAsReschedule(GroupKey);
+                    Job.UpdateSecureVehicle(TransportMasterId);
                     dismiss();
                     if (mDialogResult != null) {
                         mDialogResult.onResult();

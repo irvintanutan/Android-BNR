@@ -63,6 +63,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.ISCHANGEPASSWORD;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_LENGTH;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.SYSTEMCONFIG;
 
 public class HomeActivity extends BaseActivity implements ApiCallback, NetworkChangekListener {
@@ -477,9 +478,10 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
                 JSONObject jsonObject = jsonArray.getJSONObject(a);
                 String accessKey = jsonObject.getString("AccessKey");
                 String value = jsonObject.getString("Value");
-
                 Preferences.saveString(accessKey, value, this);
             }
+
+            Preferences.saveString(MIN_PASSWORD_LENGTH, "7", this);
 
         } catch (JSONException e) {
             e.printStackTrace();

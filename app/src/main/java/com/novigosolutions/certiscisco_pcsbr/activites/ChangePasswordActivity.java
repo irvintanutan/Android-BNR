@@ -1,5 +1,26 @@
 package com.novigosolutions.certiscisco_pcsbr.activites;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.novigosolutions.certiscisco_pcsbr.R;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
+import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
+import com.novigosolutions.certiscisco_pcsbr.webservices.CertisCISCOServer;
+import com.novigosolutions.certiscisco_pcsbr.webservices.CertisCISCOServices;
+import com.novigosolutions.certiscisco_pcsbr.webservices.UnsafeOkHttpClient;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import okhttp3.OkHttpClient;
@@ -11,35 +32,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.novigosolutions.certiscisco_pcsbr.R;
-import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
-import com.novigosolutions.certiscisco_pcsbr.models.UserLogs;
-import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
-import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
-import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
-import com.novigosolutions.certiscisco_pcsbr.webservices.CertisCISCOServer;
-import com.novigosolutions.certiscisco_pcsbr.webservices.CertisCISCOServices;
-import com.novigosolutions.certiscisco_pcsbr.webservices.UnsafeOkHttpClient;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import static com.novigosolutions.certiscisco_pcsbr.constant.UserLog.CHANGE_PASSWORD;
-import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.CHANGEPASSWORD;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MAX_PASSWORD_LENGTH;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_ALPHABET;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_LENGTH;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_LOWERCASE;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_NUMERIC;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_SPECIAL_CHARACTER;
@@ -69,6 +65,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
         List<Config> configs = new ArrayList<>();
         configs.add(new Config(MAX_PASSWORD_LENGTH, Integer.parseInt(Preferences.getString(MAX_PASSWORD_LENGTH, this))));
+        configs.add(new Config(MIN_PASSWORD_LENGTH, Integer.parseInt(Preferences.getString(MIN_PASSWORD_LENGTH, this))));
         configs.add(new Config(MIN_PASSWORD_UPPERCASE, Integer.parseInt(Preferences.getString(MIN_PASSWORD_UPPERCASE, this))));
         configs.add(new Config(MIN_PASSWORD_LOWERCASE, Integer.parseInt(Preferences.getString(MIN_PASSWORD_LOWERCASE, this))));
         configs.add(new Config(MIN_PASSWORD_NUMERIC, Integer.parseInt(Preferences.getString(MIN_PASSWORD_NUMERIC, this))));
@@ -77,8 +74,8 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
         String originalPassword = Preferences.getString("Password", this);
         int userId = Preferences.getInt("UserId", this);
-
-        UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userId, "CHANGE PASSWORD ATTEMPT", getApplicationContext());
+        String userName = Preferences.getString("UserName", this);
+        UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userName, "CHANGE PASSWORD ATTEMPT", getApplicationContext());
 
 
         next.setOnClickListener(view -> {
@@ -94,7 +91,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
                                 hideProgressDialog();
                                 Toast.makeText(getApplicationContext(), "Password change successful", Toast.LENGTH_LONG).show();
                                 Preferences.saveString("Password", newPassword.getText().toString(), getApplicationContext());
-                                UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userId, "CHANGE PASSWORD SUCCESS", getApplicationContext());
+                                UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userName, "CHANGE PASSWORD SUCCESS", getApplicationContext());
                                 startActivity(new Intent(ChangePasswordActivity.this, HomeActivity.class));
                             }
                         } catch (Exception e) {
@@ -105,7 +102,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
                         Log.e("Failed", "Change Password " + call.toString());
-                        UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userId, "CHANGE PASSWORD FAILED", getApplicationContext());
+                        UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userName, "CHANGE PASSWORD FAILED", getApplicationContext());
                     }
                 });
             } else {
@@ -135,12 +132,16 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
         for (Config config : configs) {
             switch (config.getConfig()) {
-                case MAX_PASSWORD_LENGTH:
+//                case MAX_PASSWORD_LENGTH:
+//                    if (newPasswordString.length() < config.getValue()) {
+//                        errors.add("The password must be maximum of " + config.getValue());
+//                    }
+//                    break;
+                case MIN_PASSWORD_LENGTH:
                     if (newPasswordString.length() < config.getValue()) {
-                        errors.add("The password must be maximum of " + config.getValue());
+                        errors.add("The password must be minimum of " + config.getValue());
                     }
                     break;
-
                 case MIN_PASSWORD_UPPERCASE:
                     if (upperLowerCaseCount(newPasswordString, true) < config.getValue()) {
                         errors.add("The password must have at least " + config.getValue() + " Upper Case character");

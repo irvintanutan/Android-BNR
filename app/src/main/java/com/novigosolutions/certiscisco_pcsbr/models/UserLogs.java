@@ -37,13 +37,19 @@ public class UserLogs extends Model {
                 .execute();
     }
 
+    public static List<UserLogs> getUserLogsDuplicate(String entity, String userAction, String remarks) {
+        return new Select().from(UserLogs.class)
+                .where("Status=? AND Entity=? AND UserAction=? AND Remarks=?", 0, entity, userAction, remarks)
+                .execute();
+    }
+
     public static void removeUserLogs() {
         new Delete().from(UserLogs.class)
                 .where("Status=?", 1)
                 .execute();
     }
 
-    public static void updateUserLogs(String dateTime){
+    public static void updateUserLogs(String dateTime) {
         new Update(UserLogs.class)
                 .set("Status=?", 1)
                 .where("DateTime=?", dateTime)

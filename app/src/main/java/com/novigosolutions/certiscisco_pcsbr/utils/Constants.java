@@ -26,6 +26,7 @@ public class Constants {
     public final static int ISCHANGEPASSWORD = 18;
 
     public final static String MAX_PASSWORD_LENGTH = "MAX_PASSWORD_LENGTH";
+    public final static String MIN_PASSWORD_LENGTH = "MIN_PASSWORD_LENGTH";
     public final static String MIN_PASSWORD_UPPERCASE = "MIN_PASSWORD_UPPERCASE";
     public final static String MIN_PASSWORD_LOWERCASE = "MIN_PASSWORD_LOWERCASE";
     public final static String MIN_PASSWORD_NUMERIC = "MIN_PASSWORD_NUMERIC";
