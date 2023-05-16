@@ -296,7 +296,8 @@ public class SyncDatabase {
                         Bags bag = new Bags();
                         bag.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         bag.firstbarcode = deliveryobject.getString("SealNo");
-                        bag.secondbarcode = deliveryobject.getString("SealNo2");;
+                        bag.secondbarcode = deliveryobject.getString("SealNo2");
+                        ;
                         bag.CageNo = cageNo;
                         bag.CageSeal = cageSeal;
                         bag.save();
@@ -307,7 +308,8 @@ public class SyncDatabase {
                         Wagon wagon = new Wagon();
                         wagon.TransportMasterId = deliveryobject.getInt("TransportMasterId");
                         wagon.firstbarcode = deliveryobject.getString("SealNo");
-                        wagon.secondbarcode = deliveryobject.getString("SealNo2");;
+                        wagon.secondbarcode = deliveryobject.getString("SealNo2");
+                        ;
                         wagon.CageNo = cageNo;
                         wagon.CageSeal = cageSeal;
                         wagon.save();
@@ -331,13 +333,16 @@ public class SyncDatabase {
                             envelopeBag.CageNo = cageNo;
                             envelopeBag.CageSeal = cageSeal;
                             long id = envelopeBag.save();
+                            Log.e("ENVELOPE ID", Long.toString(id));
                             //add here if envelope array comes
                             Envelope envelope = new Envelope();
                             envelope.bagid = id;
                             envelope.barcode = deliveryobject.getString("SealNo");
-                            envelope.CageNo = deliveryobject.getString("CageNo");
-                            envelope.CageSeal = deliveryobject.getString("CageSeal");
+                            envelope.CageNo = cageNo;
+                            envelope.CageSeal = cageSeal;
                             envelope.save();
+
+                            Log.e("ENVELOPE ID", envelope.getId().toString());
                         }
                         break;
 

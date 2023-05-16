@@ -576,11 +576,11 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                 if (obj.getString("Result").equals("Success")) {
                     if (summaryType == Constants.COLLECTION) {
                         Job.setCollected(GroupKey, BranchCode, PFunctionalCode, Constants.startTime, Constants.endTime);
-                        UserLogService.save(UserLog.SYNCING.toString(), "JOB_ID ( " + TransportMasterId + " )", "Successful Collection", getApplicationContext());
+                        UserLogService.save(UserLog.SYNCING.toString(), "JOB_ID ( " + txt_functional_code.getText().toString() + " )", "Successful Collection", getApplicationContext());
 
                     } else if (summaryType == Constants.DELIVERY) {
                         Job.setDelivered(GroupKey, BranchCode, PFunctionalCode, Constants.startTime, Constants.endTime);
-                        UserLogService.save(UserLog.SYNCING.toString(), "JOB_ID ( " + TransportMasterId + " )", "Successful Delivery", getApplicationContext());
+                        UserLogService.save(UserLog.SYNCING.toString(), "JOB_ID ( " + txt_functional_code.getText().toString() + " )", "Successful Delivery", getApplicationContext());
 
                     }
                     APICaller.instance().sync(null, getApplicationContext());

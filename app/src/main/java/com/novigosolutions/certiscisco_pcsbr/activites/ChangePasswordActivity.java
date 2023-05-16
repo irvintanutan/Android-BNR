@@ -33,6 +33,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.novigosolutions.certiscisco_pcsbr.constant.UserLog.CHANGE_PASSWORD;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MAX_PASSWORD_AGE;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MAX_PASSWORD_LENGTH;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_ALPHABET;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_LENGTH;
@@ -71,11 +72,12 @@ public class ChangePasswordActivity extends AppCompatActivity {
         configs.add(new Config(MIN_PASSWORD_NUMERIC, Integer.parseInt(Preferences.getString(MIN_PASSWORD_NUMERIC, this))));
         configs.add(new Config(MIN_PASSWORD_SPECIAL_CHARACTER, Integer.parseInt(Preferences.getString(MIN_PASSWORD_SPECIAL_CHARACTER, this))));
         configs.add(new Config(MIN_PASSWORD_ALPHABET, Integer.parseInt(Preferences.getString(MIN_PASSWORD_ALPHABET, this))));
+        configs.add(new Config(MAX_PASSWORD_AGE , Integer.parseInt(Preferences.getString(MAX_PASSWORD_AGE, this))));
 
         String originalPassword = Preferences.getString("Password", this);
         int userId = Preferences.getInt("UserId", this);
         String userName = Preferences.getString("UserName", this);
-        UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userName, "CHANGE PASSWORD ATTEMPT", getApplicationContext());
+        UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userId, "CHANGE PASSWORD ATTEMPT", getApplicationContext());
 
 
         next.setOnClickListener(view -> {
@@ -91,7 +93,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
                                 hideProgressDialog();
                                 Toast.makeText(getApplicationContext(), "Password change successful", Toast.LENGTH_LONG).show();
                                 Preferences.saveString("Password", newPassword.getText().toString(), getApplicationContext());
-                                UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userName, "CHANGE PASSWORD SUCCESS", getApplicationContext());
+                                UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userId, "CHANGE PASSWORD SUCCESS", getApplicationContext());
                                 startActivity(new Intent(ChangePasswordActivity.this, HomeActivity.class));
                             }
                         } catch (Exception e) {
@@ -137,7 +139,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
 //                        errors.add("The password must be maximum of " + config.getValue());
 //                    }
 //                    break;
-                case MIN_PASSWORD_LENGTH:
+                case MAX_PASSWORD_LENGTH:
                     if (newPasswordString.length() < config.getValue()) {
                         errors.add("The password must be minimum of " + config.getValue());
                     }

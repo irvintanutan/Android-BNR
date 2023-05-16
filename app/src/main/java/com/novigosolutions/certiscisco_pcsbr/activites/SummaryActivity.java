@@ -136,26 +136,8 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             btnCancel.setOnClickListener(this);
         }
         txt_customer_name.setText(branch.CustomerName);
-//        if (job.IsFloatDeliveryOrder) {
-//            txt_functional_code.setText(Job.getDeliveryOrderNos(branch.GroupKey));
-//        } else {
-//            txt_functional_code.setText(job.OrderNo);
-//        }
 
-        txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey , job.BranchCode , job.PFunctionalCode ,"COMPLETED", job.PDFunctionalCode, job.ActualFromTime, job.ActualToTime));
-
-//        String street_tower = branch.StreetName;
-//        if (!branch.Tower.isEmpty()) {
-//            if (street_tower.isEmpty()) street_tower = branch.Tower;
-//            else street_tower = street_tower + ", " + branch.Tower;
-//        }
-//        txt_street_tower.setText(street_tower);
-//        String town_pin = branch.Town;
-//        if (!branch.PinCode.isEmpty()) {
-//            if (town_pin.isEmpty()) town_pin = branch.PinCode;
-//            else town_pin = town_pin + ", " + branch.PinCode;
-//        }
-//        txt_town_pin.setText(town_pin);
+        txt_functional_code.setText(Job.getAllOrderNos(job.GroupKey, job.BranchCode, job.PFunctionalCode, "COMPLETED", job.PDFunctionalCode, job.ActualFromTime, job.ActualToTime));
         txt_branch_name.setText(branch.BranchCode);
 
         if (summaryType == Constants.COLLECTION || summaryType == Constants.COLLECTIONDELIVERY) {
@@ -165,7 +147,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             ll_lists = findViewById(R.id.ll_lists);
             List<Job> jobs = new ArrayList<>();
             if (isSummary(branch, job))
-                jobs = Job.getCollectionJobsOfPoint(GroupKey, BranchCode ,PFunctionalCode, "COMPLETED", actualFromTime, actualToTime);
+                jobs = Job.getCollectionJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, "COMPLETED", actualFromTime, actualToTime);
                 // jobs.add(Job.getSingle(TransportMasterId));
             else
 //                jobs = Job.getIncompleteCollectionJobsOfPoint(GroupKey);
@@ -175,17 +157,15 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             if (jobs.size() > 0) {
                 for (int i = 0; i < jobs.size(); i++) {
 
-                    Log.e("POINT ID" , jobs.get(i).BranchCode + "");
+                    Log.e("POINT ID", jobs.get(i).BranchCode + "");
 
                     List<Summary> collectionSummaries = Job.getCollectionSummary(jobs.get(i).TransportMasterId);
                     View titleList = this.getLayoutInflater().inflate(R.layout.title_list, null);
                     TextView txt_branch_code = titleList.findViewById(R.id.txt_branch_code);
 
-                    //nidheesh ** start
                     TextView txt_cage_count = titleList.findViewById(R.id.txt_cage_count);
-                    TextView txt_col_box_count = titleList.findViewById(R.id.txt_col_bag_count);  // nidheesh
+                    TextView txt_col_box_count = titleList.findViewById(R.id.txt_col_bag_count);
                     TextView txt_envs_count = titleList.findViewById(R.id.txt_col_env_count);
-                    //nidheesh ** end
 
                     txt_branch_code.setText("" + jobs.get(i).BranchCode + " - " + jobs.get(i).OrderNo);
                     TextView txt_pin = titleList.findViewById(R.id.txt_pin);
@@ -198,7 +178,6 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                         recyclerView.setVisibility(View.GONE);
                     } else if (collectionSummaries.size() < 1) {
                         txt_message.setVisibility(View.VISIBLE);
-//                        txt_message.setText("No Offline Data");
                         txt_message.setText("No Collection");
                         recyclerView.setVisibility(View.GONE);
                     } else {
@@ -212,7 +191,6 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                     ll_lists.addView(titleList);
                     itemCounter(collectionSummaries);
                     boxCounter(jobs.get(i).TransportMasterId);
-                    //nidheesh ** start
                     txt_col_box_count.setVisibility(View.VISIBLE);
                     txt_col_box_count.setText("Items Count : " + total_item_counter);
                     int envCountValue = counter(collectionSummaries);
@@ -222,17 +200,12 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                         txt_envs_count.setVisibility(View.VISIBLE);
                         txt_envs_count.setText("Env-In-Bag : " + envCountValue);
                     }
-                    //nidheesh ** end
-
                 }
             } else {
                 ll_lists.setVisibility(View.GONE);
             }
-
-
         }
         if (summaryType == Constants.DELIVERY || summaryType == Constants.COLLECTIONDELIVERY) {
-//            txt_del_head.setText("Delivery" + " - " + Job.getDeliveryOrderNos(GroupKey));
             txt_del_head.setText("Delivery" + " - " + Job.getSingle(TransportMasterId).OrderNo);
             if (summaryType == Constants.DELIVERY) {
                 ll_lists.setVisibility(View.GONE);
@@ -244,12 +217,14 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                 dlist.setVisibility(View.GONE);
             } else {
                 List<Delivery> bagList = null;
-                if (isSummary(branch, job)) bagList = Delivery.getSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode, job.ActualFromTime , job.ActualToTime);
-                else bagList = Delivery.getPendingSealedByPointId(GroupKey, job.BranchCode , job.PFunctionalCode, job.ActualFromTime, job.ActualToTime);
+                if (isSummary(branch, job))
+                    bagList = Delivery.getSealedByPointId(GroupKey, job.BranchCode, job.PFunctionalCode, job.ActualFromTime, job.ActualToTime);
+                else
+                    bagList = Delivery.getPendingSealedByPointId(GroupKey, job.BranchCode, job.PFunctionalCode, job.ActualFromTime, job.ActualToTime);
                 if (bagList.size() > 0) {
 
-                    bagList =  bagList.stream().filter( distinctByKey(p -> p.SealNo) )
-                            .collect( Collectors.toList() );
+                    bagList = bagList.stream().filter(distinctByKey(p -> p.SealNo))
+                            .collect(Collectors.toList());
 
                     List<String> baglist = new ArrayList<>();
                     RecyclerView baglistView = findViewById(R.id.baglistview);
@@ -278,8 +253,10 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
                 //nidheesh ** end
 
                 List<Delivery> boxList = null;
-                if (isSummary(branch, job)) boxList = Delivery.getUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode, actualFromTime, actualToTime);
-                else boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode , PFunctionalCode, actualFromTime, actualToTime);
+                if (isSummary(branch, job))
+                    boxList = Delivery.getUnSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
+                else
+                    boxList = Delivery.getPendingUnSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
                 if (boxList.size() > 0) {
                     RecyclerView boxlistView = findViewById(R.id.boxlistview);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -322,7 +299,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
     }
 
     public void setCageListView(int transportMasterId, View view) {
-        RecyclerView cageRecyclerView =  view.findViewById(R.id.recyclerview);
+        RecyclerView cageRecyclerView = view.findViewById(R.id.recyclerview);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         cageRecyclerView.setLayoutManager(mLayoutManager);
         cageRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -335,7 +312,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
         List<Cage> cages = new ArrayList<>();
         cageCount = cageList.size();
         for (com.novigosolutions.certiscisco_pcsbr.models.Cage c : cageList) {
-            List<Items> list = Job.getCageCollectionSummary(transportMasterId, c.CageNo , c.CageSeal);
+            List<Items> list = Job.getCageCollectionSummary(transportMasterId, c.CageNo, c.CageSeal);
             String cageTitle = "CAGE (ITEMS IN CAGE : " + cageItemCounter(list) + ")\n" +
                     "CAGENO : " + c.CageNo + "\nCAGESEAL : " + c.CageSeal;
             Cage cage = new Cage(cageTitle, list);
@@ -350,16 +327,15 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             Cage cage = new Cage(id + "\n" + head + "\n" + detail, new ArrayList<>());
             cages.add(cage);
         }
-
         CageAdapter cageAdapter = new CageAdapter(cages, null, false);
         cageRecyclerView.setAdapter(cageAdapter);
     }
 
-    private int cageItemCounter(List<Items> items){
+    private int cageItemCounter(List<Items> items) {
         int count = 0;
         for (Items item : items) {
             if (item.getHead().equals("Box")) {
-                count+=item.getQty();
+                count += item.getQty();
             } else {
                 count++;
             }
@@ -402,11 +378,6 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
         List<Summary> summary = collectionSummaries;
         for (int i = 0; i < summary.size(); i++) {
             if (summary.get(i).Collection_type.equals("Box")) {
-//                int count=0;
-//                count=boxCount(summary.get(i).Message);
-//                if(count>0){
-//                    item_count+=count;
-//                }
             } else if (summary.get(i).Collection_type.equals("Pallet")) {
                 item_count += Integer.parseInt(summary.get(i).Message);
             } else {
@@ -517,7 +488,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             intent.putExtra("status", "COMPLETED");
             intent.putExtra("transporterMasterId", TransportMasterId);
             intent.putExtra("isOffline", isOffline);
-            intent.putExtra("groupKey" , GroupKey);
+            intent.putExtra("groupKey", GroupKey);
             startActivity(intent);
 
         } else if (id == R.id.btn_cancel) {
@@ -598,8 +569,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
 //    }
 
     @SuppressLint("NewApi")
-    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor)
-    {
+    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
         Map<Object, Boolean> map = new ConcurrentHashMap<>();
         return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }

@@ -173,8 +173,7 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
                         mAdapter.notifyItemInserted(mAdapter.getItemCount() - 1);
                     }
                     UserLogService.save(UserLog.COLLECTION.toString(), "Currency : "
-                            + spinner.getSelectedItem().toString() + " , Count : " + Integer.parseInt(edt_count.getText().toString()) + " , Series: "
-                            + spinnerCoinSeries.getSelectedItem().toString(), "BOX SERIES", context);
+                            + spinner.getSelectedItem().toString() + " , Count : " + Integer.parseInt(edt_count.getText().toString()), "BOX SERIES", context);
 
                     txt_count.setText("Count : " + itemCount());
                     edt_count.setText("");

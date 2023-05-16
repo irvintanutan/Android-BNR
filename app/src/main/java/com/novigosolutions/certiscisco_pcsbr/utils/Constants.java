@@ -32,6 +32,7 @@ public class Constants {
     public final static String MIN_PASSWORD_NUMERIC = "MIN_PASSWORD_NUMERIC";
     public final static String MIN_PASSWORD_SPECIAL_CHARACTER = "MIN_PASSWORD_SPECIAL_CHARACTER";
     public final static String MIN_PASSWORD_ALPHABET = "MIN_PASSWORD_ALPHABET";
+    public final static String MAX_PASSWORD_AGE = "MAX_PASSWORD_AGE";
 
 
     public final static int FINISHONRESULT = 20;
