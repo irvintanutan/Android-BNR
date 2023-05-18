@@ -3,6 +3,7 @@ package com.novigosolutions.certiscisco_pcsbr.adapters.fragments;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,7 +64,8 @@ public class TabFragmentUnSecure extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void loadList() {
-        List<Job> unSecuredJobs = Job.getAllJobsSecureVehicle().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList());
+        List<Job> unSecuredJobs = Job.getAllJobsSecureVehicle().stream().filter(job -> job.IsSecured == false &&
+                ((job.IsFloatDeliveryOrder == true && job.finished == false) || job.IsCollectionOrder == true)).collect(Collectors.toList());
         if (!unSecuredJobs.isEmpty()) nothing.setVisibility(View.GONE);
         adapter = new SecureAdapter(unSecuredJobs, getActivity());
         recyclerView.setAdapter(adapter);
