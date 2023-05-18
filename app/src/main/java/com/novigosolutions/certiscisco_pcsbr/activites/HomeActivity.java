@@ -297,7 +297,8 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             countList.add(Branch.getCountByStatus("PENDING"));
             countList.add(Branch.getCountByStatus("COMPLETED"));
             countList.add(ChatMessage.getUnreadMessages().size());
-            countList.add(Job.getAllJobsSecureVehicle().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList()).size());
+            countList.add(Job.getAllJobsSecureVehicle().stream().filter(job -> job.IsSecured == false &&
+                    ((job.IsFloatDeliveryOrder == true && job.finished == false) || job.IsCollectionOrder == true)).collect(Collectors.toList()).size());
             countList.add(Break.getPendingBreak().size());
             countList.add(0);
             gridadapter = new GridAdapter(HomeActivity.this, countList);
@@ -308,7 +309,8 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             countList.add(Branch.getCountByStatus("PENDING"));
             countList.add(Branch.getCountByStatus("COMPLETED"));
             countList.add(ChatMessage.getUnreadMessages().size());
-            countList.add(Job.getAllJobsSecureVehicle().stream().filter(job -> job.IsSecured == false).collect(Collectors.toList()).size());
+            countList.add(Job.getAllJobsSecureVehicle().stream().filter(job -> job.IsSecured == false &&
+                    ((job.IsFloatDeliveryOrder == true && job.finished == false) || job.IsCollectionOrder == true)).collect(Collectors.toList()).size());
             countList.add(Break.getPendingBreak().size());
             countList.add(0);
             gridadapter.notifyDataSetChanged();

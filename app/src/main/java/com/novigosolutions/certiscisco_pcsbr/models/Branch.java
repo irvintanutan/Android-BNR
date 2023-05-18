@@ -195,25 +195,6 @@ public class Branch extends Model implements Comparable<Branch> {
         return branches;
     }
 
-//    public static List<Branch> getBranchesByStatus(String Status) {
-//        List<Branch> branches = new Select().from(Branch.class)
-//                .execute();
-//        List<Branch> filteredbranches = new ArrayList<>();
-//        for (int i = 0; i < branches.size(); i++) {
-//            if(branches.get(i).Status.equals(Status)) {
-//                branches.get(i).pos = i+1;
-//                filteredbranches.add(branches.get(i));
-//            }
-//        }
-//        return filteredbranches;
-//    }
-
-//    public static Branch getOfflineSingleBranche() {
-//        return new Select().from(Branch.class)
-//                .where("isColOffline=? OR isDelOffline=?", 1, 1)
-//                .executeSingle();
-//    }
-
     public boolean hasMultipleJobs(String GroupKey) {
         List<Job> jobs = Job.getByGroupKey(GroupKey);
         if (jobs.size() > 1) {
@@ -255,56 +236,12 @@ public class Branch extends Model implements Comparable<Branch> {
         else return 0;
     }
 
-//    public static void resetStatus(int PointId) {
-//        String Status = (Job.getPendingJobsOfPoint(PointId).size() > 0) ? "PENDING" : "COMPLETED";
-//        new Update(Branch.class)
-//                .set("Status=?", Status)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
-
-//    public static void resetStatus(String GroupKey) {
-//        String Status = (Job.getPendingJobsOfPoint(GroupKey).size() > 0) ? "PENDING" : "COMPLETED";
-//        new Update(Branch.class)
-//                .set("Status=?", Status)
-//                .where("GroupKey=?", GroupKey)
-//                .execute();
-//    }
-
-//    public static void resetBranchValues(int PointId) {
-//        new Update(Branch.class)
-//                .set("isRescheduled=?", 0)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
-
     public static void resetBranchValues(String GroupKey) {
         new Update(Branch.class)
                 .set("isRescheduled=?", 0)
                 .where("GroupKey=?", GroupKey)
                 .execute();
     }
-
-//    public static void resetSequence(int PointId, String SequenceNo) {
-//        new Update(Branch.class)
-//                .set("SequenceNo=?", SequenceNo)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
-
-//    public static void resetSequence(String GroupKey, String SequenceNo) {
-//        new Update(Branch.class)
-//                .set("SequenceNo=?", SequenceNo)
-//                .where("GroupKey=?", GroupKey)
-//                .execute();
-//    }
-
-//    public static void UpdateRequestId(int PointId, String requestId) {
-//        new Update(Branch.class)
-//                .set("requestId=?", requestId)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
 
     public static void UpdateRequestId(String GroupKey, String requestId) {
         new Update(Branch.class)
@@ -313,12 +250,6 @@ public class Branch extends Model implements Comparable<Branch> {
                 .execute();
     }
 
-//    public static void EnableManualEntry(int PointId) {
-//        new Update(Branch.class)
-//                .set("EnableManualEntry=?", 1)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
 
     public static void EnableManualEntry(String GroupKey) {
         new Update(Branch.class)
@@ -361,33 +292,6 @@ public class Branch extends Model implements Comparable<Branch> {
         return false;
     }
 
-//    public static void updateStatus(int PointId, String Status) {
-//        new Update(Branch.class)
-//                .set("Status=?", Status)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
-
-//    public static void setColOfflineStatus(int PointId, int status) {
-//        new Update(Branch.class)
-//                .set("isColOffline=?", status)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
-
-//    public static void setColOfflineStatus(String GroupKey, int status) {
-//        new Update(Branch.class)
-//                .set("isColOffline=?", status)
-//                .where("GroupKey=?", GroupKey)
-//                .execute();
-//    }
-
-//    public static void setAsReschedule(int PointId) {
-//        new Update(Branch.class)
-//                .set("isRescheduled=?", 1)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
 
     public static void setAsReschedule(String GroupKey) {
         new Update(Branch.class)
@@ -396,12 +300,6 @@ public class Branch extends Model implements Comparable<Branch> {
                 .execute();
     }
 
-//    public static void setDelOfflineStatus(int PointId, int status) {
-//        new Update(Branch.class)
-//                .set("isDelOffline=?", status)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
 
     public static void setDelOfflineStatus(String GroupKey, int status) {
         new Update(Branch.class)
@@ -410,56 +308,6 @@ public class Branch extends Model implements Comparable<Branch> {
                 .execute();
     }
 
-//    public static void setCollected(int PointId) {
-//        new Update(Branch.class)
-//                .set("isCollected=?", 1)
-//                .where("PointId=?", PointId)
-//                .execute();
-//
-////        if (Job.hasDeliveryJob(PointId)) {
-////            if (Job.getPendingDeliveryJobsOfPoint(PointId).size() == 0)
-////                updateStatus(PointId, "COMPLETED");
-////        } else {
-////            updateStatus(PointId, "COMPLETED");
-////        }
-//        Job.UpdateCollectionCompleted(PointId);
-//        resetStatus(PointId);
-//
-//    }
-
-//    public static void setCollected(String GroupKey) {
-//        new Update(Branch.class)
-//                .set("isCollected=?", 1)
-//                .where("GroupKey=?", GroupKey)
-//                .execute();
-//        Job.UpdateCollectionCompleted(GroupKey);
-////        resetStatus(GroupKey);
-//
-//    }
-
-//    public static void setDelivered(int PointId) {
-////        if (Job.hasCollectionJob(PointId)) {
-////            if (Branch.getSingle(PointId).isCollected) updateStatus(PointId, "COMPLETED");
-////        } else {
-////            updateStatus(PointId, "COMPLETED");
-////        }
-//        Job.UpdatDeliveryCompleted(PointId);
-//        resetStatus(PointId);
-//
-//    }
-
-//    public static void setDelivered(String GroupKey) {
-//        Job.UpdatDeliveryCompleted(GroupKey);
-////        resetStatus(GroupKey);
-//
-//    }
-
-//    public static void updatecolSignature(int PointId, String signature) {
-//        new Update(Branch.class)
-//                .set("colSignature=?", signature)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
 
     //Transaction officer signature update Coollection
     public static void updatecolSignature(String GroupKey, String signature) {
@@ -469,12 +317,7 @@ public class Branch extends Model implements Comparable<Branch> {
                 .execute();
     }
 
-//    public static void updatedelSignature(int PointId, String signature) {
-//        new Update(Branch.class)
-//                .set("delSignature=?", signature)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
+
 
     //Transaction officer signature update delivery
     public static void updatedelSignature(String GroupKey, String signature) {
@@ -507,13 +350,6 @@ public class Branch extends Model implements Comparable<Branch> {
     }
 
 
-//    public void updateJobStartTime(String JobStartTime) {
-//        new Update(Branch.class)
-//                .set("JobStartTime=?", JobStartTime)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
-
     public void updateJobStartTime(String JobStartTime) {
         new Update(Branch.class)
                 .set("JobStartTime=?", JobStartTime)
@@ -521,12 +357,6 @@ public class Branch extends Model implements Comparable<Branch> {
                 .execute();
     }
 
-    //    public static void updateJobEndTime(int PointId,String JobEndTime) {
-//        new Update(Branch.class)
-//                .set("JobEndTime=?", JobEndTime)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
     public static void updateJobEndTime(String GroupKey, String JobEndTime) {
         new Update(Branch.class)
                 .set("JobEndTime=?", JobEndTime)
@@ -534,10 +364,6 @@ public class Branch extends Model implements Comparable<Branch> {
                 .execute();
     }
 
-//    public static Boolean isOfflineExist() {
-//        if (getOfflineSingleBranche() != null) return true;
-//        return false;
-//    }
 
     public static JsonObject getCollection(String GroupKey, Context context, String BranchCode, String PFunctionalCode, String actualFromTime, String actualToTime) {
         List<Job> jobs = Job.getFinishedIncompleteCollectionJobsOfPoint(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
@@ -777,12 +603,6 @@ public class Branch extends Model implements Comparable<Branch> {
         Reschedule.remove();
         CoinSeries.remove();
     }
-
-//    public static void removeSingle(int PointId) {
-//        new Delete().from(Branch.class)
-//                .where("PointId=?", PointId)
-//                .execute();
-//    }
 
     public static void removeSingle(String GroupKey) {
         new Delete().from(Branch.class)
