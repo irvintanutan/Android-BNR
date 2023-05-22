@@ -10,12 +10,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.common.StringUtils;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.CertisCISCOServer;
 import com.novigosolutions.certiscisco_pcsbr.webservices.CertisCISCOServices;
 import com.novigosolutions.certiscisco_pcsbr.webservices.UnsafeOkHttpClient;
+import com.zebra.sdk.util.internal.StringUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,12 +74,13 @@ public class ChangePasswordActivity extends AppCompatActivity {
         configs.add(new Config(MIN_PASSWORD_NUMERIC, Integer.parseInt(Preferences.getString(MIN_PASSWORD_NUMERIC, this))));
         configs.add(new Config(MIN_PASSWORD_SPECIAL_CHARACTER, Integer.parseInt(Preferences.getString(MIN_PASSWORD_SPECIAL_CHARACTER, this))));
         configs.add(new Config(MIN_PASSWORD_ALPHABET, Integer.parseInt(Preferences.getString(MIN_PASSWORD_ALPHABET, this))));
-        configs.add(new Config(MAX_PASSWORD_AGE , Integer.parseInt(Preferences.getString(MAX_PASSWORD_AGE, this))));
+        configs.add(new Config(MAX_PASSWORD_AGE, Integer.parseInt(Preferences.getString(MAX_PASSWORD_AGE, this))));
 
         String originalPassword = Preferences.getString("Password", this);
         int userId = Preferences.getInt("UserId", this);
+        String userCode = Preferences.getString("UserCode", this);
         String userName = Preferences.getString("UserName", this);
-        UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userId, "CHANGE PASSWORD ATTEMPT", getApplicationContext());
+        UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userCode, "CHANGE PASSWORD ATTEMPT", getApplicationContext());
 
 
         next.setOnClickListener(view -> {
@@ -89,11 +92,13 @@ public class ChangePasswordActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         try {
-                            if (response.code() == 200) {
-                                hideProgressDialog();
+                            hideProgressDialog();
+                            if (!response.body().string().replace("\"", "").equals("Success")) {
+                                Toast.makeText(getApplicationContext(), response.body().string().replace("\"", ""), Toast.LENGTH_LONG).show();
+                            } else {
                                 Toast.makeText(getApplicationContext(), "Password change successful", Toast.LENGTH_LONG).show();
                                 Preferences.saveString("Password", newPassword.getText().toString(), getApplicationContext());
-                                UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userId, "CHANGE PASSWORD SUCCESS", getApplicationContext());
+                                UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userCode, "CHANGE PASSWORD SUCCESS", getApplicationContext());
                                 startActivity(new Intent(ChangePasswordActivity.this, HomeActivity.class));
                             }
                         } catch (Exception e) {
@@ -104,7 +109,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
                         Log.e("Failed", "Change Password " + call.toString());
-                        UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userName, "CHANGE PASSWORD FAILED", getApplicationContext());
+                        UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userCode, "CHANGE PASSWORD FAILED", getApplicationContext());
                     }
                 });
             } else {
@@ -199,7 +204,8 @@ public class ChangePasswordActivity extends AppCompatActivity {
             } else if (ch >= '0' && ch <= '9') {
                 numericCount++;
             } else {
-                specialCount++;
+                if (ch != '.')
+                    specialCount++;
             }
         }
         return count;

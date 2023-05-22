@@ -229,8 +229,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
         String teamid, password;
         teamid = edtteamid.getText().toString();
         password = edtpassword.getText().toString();
-        UserLogService.save(UserLog.LOGIN.toString(), "TEAM_ID: " + teamid + ", PASSWORD: " + password, "LOGIN ATTEMPT", getApplicationContext());
-
         if (teamid.isEmpty()) {
             mtxtinUserid.setError("User Id is required");
             failflag = true;
@@ -247,7 +245,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                     json.addProperty("DeviceId", Preferences.getString("DeviceID", LoginActivity.this));
                     json.addProperty("UserCode", false ? "TEST" : teamid);
                     json.addProperty("Password", false ? "TEST" : password);
-                    json.addProperty("LoginDate", false ? "2023-05-12": sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
+                    json.addProperty("LoginDate", false ? "2023-05-12" : sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -430,7 +428,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                                 saveCoinSeries(obj);
                                 SavePrintSetting(obj);
                                 raiseSnakbar(messege);
-                                UserLogService.save(UserLog.LOGIN.toString(), "SUCCESS (USERID: " + jp.getString("UserName") + ", TEAMID: " + jp.getString("TeamId") + ")"
+                                UserLogService.save(UserLog.LOGIN.toString(), "SUCCESS (UserName: " + jp.getString("UserName") + ", UserId: " + jp.getString("UserCode") + ")"
                                         , "LOGIN ATTEMPT ", getApplicationContext());
                             }
                         } else {
@@ -439,6 +437,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                         }
                     }
                 } else {
+                    UserLogService.save(UserLog.LOGIN.toString(), messege, "LOGIN ATTEMPT", getApplicationContext());
                     raiseSnakbar(messege);
                 }
 
