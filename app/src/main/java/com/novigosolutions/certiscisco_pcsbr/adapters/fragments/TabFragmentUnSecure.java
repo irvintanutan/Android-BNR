@@ -64,8 +64,8 @@ public class TabFragmentUnSecure extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void loadList() {
-        List<Job> unSecuredJobs = Job.getAllJobsSecureVehicle().stream().filter(job -> job.IsSecured == false &&
-                ((job.IsFloatDeliveryOrder == true && job.finished == false) || job.IsCollectionOrder == true)).collect(Collectors.toList());
+        List<Job> unSecuredJobs = Job.getAllJobsSecureVehicle().stream().filter(job ->(job.IsFloatDeliveryOrder == true && job.finished == false) ||
+                (job.IsCollectionOrder == true && job.IsSecured == false)).collect(Collectors.toList());
         if (!unSecuredJobs.isEmpty()) nothing.setVisibility(View.GONE);
         adapter = new SecureAdapter(unSecuredJobs, getActivity());
         recyclerView.setAdapter(adapter);

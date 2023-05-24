@@ -525,22 +525,13 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
                         Job.UpdateCustomerSignature(TransportMasterId, sign);
                         Branch.UpdateNameandStaffIdD(GroupKey, name, staffID);
                         Job.UpdateNameAndStaffID(TransportMasterId, name, staffID);
-
                         if (NetworkUtil.getConnectivityStatusString(this)) {
-//                        showProgressDialog("Loading...");
                             APICaller.instance().SubmitDeliveryList(this, this, GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
                         } else {
-//                        Branch.setDelOfflineStatus(GroupKey, 1);
                             Job.setOfflineSaved(TransportMasterId, 1);
                             setResult(Constants.FINISHONRESULT);
                             button_submit.setEnabled(true);
                             hideProgressDialog();
-//                        if (Job.getIncompleteCollectionJobsOfPoint(GroupKey).size() > 0) {
-//                            Intent intent = new Intent(this, CollectionDetailActivity.class);
-////                            intent.putExtra("PointId", PointId);
-//                            intent.putExtra("GroupKey", GroupKey);
-//                            startActivity(intent);
-//                        }
                             finish();
                             Toast.makeText(this, "Saved offline", Toast.LENGTH_SHORT).show();
                         }
@@ -550,9 +541,6 @@ public class CustomerSummaryScreen extends BaseActivity implements View.OnClickL
         } else if (id == R.id.btn_cancel) {
             alert();
         }
-//        else if (id == R.id.btn_ok) {
-//            onBackPressed();
-//        }
     }
 
     @Override
