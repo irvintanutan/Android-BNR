@@ -57,4 +57,6 @@ public class Constants {
     public static String startTime = "";
 
     public static String endTime = "";
+
+    public static String JOB_ID = "";
 }

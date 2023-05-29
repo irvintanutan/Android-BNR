@@ -1,6 +1,7 @@
 package com.novigosolutions.certiscisco_pcsbr.service;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.novigosolutions.certiscisco_pcsbr.models.UserLogs;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
@@ -26,6 +27,7 @@ public class UserLogService {
             userLogs.DateTime = dateTime;
             userLogs.UserId = userId;
             userLogs.save();
+            Log.e("USER LOG : " , userLogs.Entity + " " + userLogs.Remarks);
         }
     }
 

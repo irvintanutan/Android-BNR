@@ -339,7 +339,7 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
         alertDialog.setPositiveButton("Yes", (dialog, which) -> {
             showProgressDialog("Securing Vehicle . . . ");
             APICaller.instance().secureVehicle(SecureDetailsActivity.this, SecureDetailsActivity.this, j.TransportMasterId);
-            UserLogService.save(UserLog.SYNCING.toString(), "JOB_ID ( " + txt_functional_code.getText().toString() + " )", "Successful Secured Vehicle", getApplicationContext());
+            UserLogService.save(UserLog.SYNCING.toString(), "JOB_ID ( " + j.OrderNo + " )", "Successful Secured Vehicle", getApplicationContext());
         });
         alertDialog.setNegativeButton("No", (dialog, which) -> {
         });
@@ -388,10 +388,10 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
             Cage cage = cageList.get(a);
             if (cage.CageNo.equals(scan)) {
                 cage.IsCageNoScanned = true;
-                UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + txt_functional_code.getText().toString() + " )", "Cage Scanned ( " + scan + " )", getApplicationContext());
+                UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + j.OrderNo + " )", "Cage Scanned ( " + scan + " )", getApplicationContext());
             } else if (cage.CageSeal.equals(scan)) {
                 cage.IsCageSealScanned = true;
-                UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + txt_functional_code.getText().toString() + " )", "Cage Scanned ( " + scan + " )", getApplicationContext());
+                UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + j.OrderNo + " )", "Cage Scanned ( " + scan + " )", getApplicationContext());
             }
 
             cageList.set(a, cage);
@@ -419,14 +419,14 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
                 sealedListAdapter = new SecuredSealedListAdapter(bagList);
                 recyclerViewbag.setAdapter(sealedListAdapter);
                 setSealedScannedCount();
-                UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + txt_functional_code.getText().toString() + " )", "BarCode Scanned ( " + scan + " )", getApplicationContext());
+                UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + j.OrderNo + " )", "BarCode Scanned ( " + scan + " )", getApplicationContext());
             } else if (scan.equals(secureObject.SecondBarcode)) {
                 secureObject.IsScannedSecond = true;
                 bagList.set(a, secureObject);
                 sealedListAdapter = new SecuredSealedListAdapter(bagList);
                 recyclerViewbag.setAdapter(sealedListAdapter);
                 setSealedScannedCount();
-                UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + txt_functional_code.getText().toString() + " )", "BarCode Scanned ( " + scan + " )", getApplicationContext());
+                UserLogService.save(UserLog.SECURE_JOB.toString(), "JOB_ID ( " + j.OrderNo + " )", "BarCode Scanned ( " + scan + " )", getApplicationContext());
             }
         }
     }

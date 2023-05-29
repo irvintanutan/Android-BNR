@@ -379,7 +379,7 @@ public class DeliveryActivity extends BarCodeScanActivity implements IOnScannerD
                 bagList.addAll(templist);
                 sealedListAdapter.notifyDataSetChanged();
                 setSealedScannedCount();
-                UserLogService.save(UserLog.DELIVERY.toString(), "JOB_ID ( " + txt_functional_code.getText().toString() + " )", "BarCode Scanned ( " + data + " )", getApplicationContext());
+                UserLogService.save(UserLog.DELIVERY.toString(), "JOB_ID ( " + j.OrderNo + " )", "BarCode Scanned ( " + data + " )", getApplicationContext());
             } else {
                 invalidbarcodealert("Invalid");
             }
