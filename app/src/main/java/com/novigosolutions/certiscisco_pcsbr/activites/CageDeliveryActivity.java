@@ -22,6 +22,7 @@ import com.novigosolutions.certiscisco_pcsbr.adapters.SealedListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.UnsealedListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.constant.ClickListener;
 import com.novigosolutions.certiscisco_pcsbr.constant.RecyclerTouchListener;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.expandable.CageListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
@@ -32,6 +33,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
@@ -360,6 +362,7 @@ public class CageDeliveryActivity extends BarCodeScanActivity implements IOnScan
         if (data.isEmpty()) {
             invalidbarcodealert("Empty");
         } else {
+            UserLogService.save(UserLog.DELIVERY.toString(), "JOB_ID ( " + j.OrderNo + " )", "BarCode Scanned ( " + data + " )", getApplicationContext());
             if (Cage.isCageScanned(TransportMasterId, CageNo, CageSeal)) {
                 if (Delivery.setCageItemScanned(data, TransportMasterId , CageNo, CageSeal)) {
                     List<Delivery> templist = Delivery.getPendingSealedByPointId(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);

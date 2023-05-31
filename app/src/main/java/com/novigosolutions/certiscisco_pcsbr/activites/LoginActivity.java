@@ -35,6 +35,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.recivers.IntervalChangedReceiver;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
 import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
+import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
@@ -245,7 +246,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                     json.addProperty("DeviceId", Preferences.getString("DeviceID", LoginActivity.this));
                     json.addProperty("UserCode", false ? "TEST" : teamid);
                     json.addProperty("Password", false ? "TEST" : password);
-                    json.addProperty("LoginDate", false ? "2023-05-19" : sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
+                    json.addProperty("LoginDate", false ? "2023-05-26" : sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -413,6 +414,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                                 JSONArray dataArray = jsonArray.getJSONArray(1);
 
                                 Log.e("TOKEN", jp.getString("Token") + " " + Integer.parseInt(jp.getString("LoggedInUser")));
+                                Preferences.saveString("LastModifiedPasswordDate", obj.getString("LastModifiedPasswordDate"), LoginActivity.this);
                                 Preferences.saveString("AuthToken", jp.getString("Token"), LoginActivity.this);
                                 Preferences.saveString("LoggedOn", jp.getString("LoginTime"), LoginActivity.this);
                                 Preferences.saveString("LoggedInDate", sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())), LoginActivity.this);
@@ -431,6 +433,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                                 UserLogService.save(UserLog.LOGIN.toString(), "SUCCESS (USERID: " +
                                                 jp.getString("UserCode") + ", TEAMID: " + jp.getString("TeamId") + ")"
                                         , "LOGIN ATTEMPT ", getApplicationContext());
+                                Constants.showExpirationAlert = false;
                             }
                         } else {
                             UserLogService.save(UserLog.LOGIN.toString(), "Invalid User Role", "LOGIN ATTEMPT", getApplicationContext());

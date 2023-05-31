@@ -51,6 +51,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -62,7 +65,9 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.CHANGE_PASSWORD_NOTIFY;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.ISCHANGEPASSWORD;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MAX_PASSWORD_AGE;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_LENGTH;
 import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.SYSTEMCONFIG;
 
@@ -431,6 +436,23 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         alertDialog.show();
     }
 
+    private void alertChangePassword(String message) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle("Confirm");
+        alertDialog.setMessage(message);
+        alertDialog.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                changePassword();
+            }
+        });
+        alertDialog.setNegativeButton("Not Now", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        alertDialog.show();
+    }
+
     @Override
     public void onNetworkChanged() {
         if (NetworkUtil.getConnectivityStatusString(HomeActivity.this))
@@ -450,12 +472,12 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             Log.e("RESULT DATE", result_data);
             if (api_code == SYSTEMCONFIG)
                 saveSystemConfig(result_data);
-            else if (api_code == ISCHANGEPASSWORD) {
-                if (saveIsChangePassword(result_data)) {
-                    Toast.makeText(getApplicationContext(), "Your password has expired. Need to update password", Toast.LENGTH_SHORT).show();
-                    changePassword();
-                }
-            }
+//            else if (api_code == ISCHANGEPASSWORD) {
+//                if (saveIsChangePassword(result_data)) {
+//                    Toast.makeText(getApplicationContext(), "Your password has expired. Need to update password", Toast.LENGTH_SHORT).show();
+//                    changePassword();
+//                }
+//            }
             refresh();
         } else {
             raiseSnakbar("Error");
@@ -484,10 +506,40 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             }
 
             Preferences.saveString(MIN_PASSWORD_LENGTH, "7", this);
-
+            if (!Constants.showExpirationAlert) {
+                checkPasswordExpiry(Integer.parseInt(Preferences.getString(MAX_PASSWORD_AGE, this)),
+                        Integer.parseInt(Preferences.getString(CHANGE_PASSWORD_NOTIFY, this)),
+                        Preferences.getString("LastModifiedPasswordDate", this));
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
     }
+
+    void checkPasswordExpiry(int age, int notify, String passwordDate) {
+        try {
+            //passwordDate = "2023-03-01";
+            Date from = new SimpleDateFormat("yyyy-MM-dd").parse(passwordDate);
+            Date to = new Date();
+            int diff = getDaysDifference(from, to);
+            Log.e("DIFF", Integer.toString(diff));
+            if ((age - diff) == 0) {
+                Toast.makeText(getApplicationContext(), "Your password has expired. Need to update password", Toast.LENGTH_SHORT).show();
+                changePassword();
+            } else if ((age - diff) <= notify) {
+                Constants.showExpirationAlert = true;
+                alertChangePassword(String.format("Your password is about to expire within %d days.", (age - diff)));
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    int getDaysDifference(Date fromDate, Date toDate) {
+        if (fromDate == null || toDate == null)
+            return 0;
+        return (int) ((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24));
+    }
+
 }

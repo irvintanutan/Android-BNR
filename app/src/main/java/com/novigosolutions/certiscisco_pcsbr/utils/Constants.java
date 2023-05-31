@@ -33,6 +33,7 @@ public class Constants {
     public final static String MIN_PASSWORD_SPECIAL_CHARACTER = "MIN_PASSWORD_SPECIAL_CHARACTER";
     public final static String MIN_PASSWORD_ALPHABET = "MIN_PASSWORD_ALPHABET";
     public final static String MAX_PASSWORD_AGE = "MAX_PASSWORD_AGE";
+    public final static String CHANGE_PASSWORD_NOTIFY = "CHANGE_PASSWORD_NOTIFY";
 
 
     public final static int FINISHONRESULT = 20;
@@ -47,6 +48,7 @@ public class Constants {
     public static boolean isAll = false;
     public static String BackDestination = "";
     public static boolean showSecureAlert = false;
+    public static boolean showExpirationAlert = false;
     public static long secureTimer = System.currentTimeMillis();
     public static boolean isFromSecure = false;
 
