@@ -519,12 +519,12 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
 
     void checkPasswordExpiry(int age, int notify, String passwordDate) {
         try {
-            //passwordDate = "2023-03-01";
+            //passwordDate = "2022-03-01";
             Date from = new SimpleDateFormat("yyyy-MM-dd").parse(passwordDate);
             Date to = new Date();
             int diff = getDaysDifference(from, to);
             Log.e("DIFF", Integer.toString(diff));
-            if ((age - diff) == 0) {
+            if ((age - diff) <= 0) {
                 Toast.makeText(getApplicationContext(), "Your password has expired. Need to update password", Toast.LENGTH_SHORT).show();
                 changePassword();
             } else if ((age - diff) <= notify) {
