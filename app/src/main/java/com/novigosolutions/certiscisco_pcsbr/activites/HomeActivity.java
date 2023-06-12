@@ -519,7 +519,6 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
 
     void checkPasswordExpiry(int age, int notify, String passwordDate) {
         try {
-            //passwordDate = "2022-03-01";
             Date from = new SimpleDateFormat("yyyy-MM-dd").parse(passwordDate);
             Date to = new Date();
             int diff = getDaysDifference(from, to);

@@ -19,7 +19,9 @@ import com.novigosolutions.certiscisco_pcsbr.webservices.CertisCISCOServices;
 import com.novigosolutions.certiscisco_pcsbr.webservices.UnsafeOkHttpClient;
 import com.zebra.sdk.util.internal.StringUtilities;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -102,6 +104,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "Password change successful", Toast.LENGTH_LONG).show();
                                 Preferences.saveString("Password", newPassword.getText().toString(), getApplicationContext());
                                 UserLogService.save(CHANGE_PASSWORD.toString(), "USER_ID: " + userCode, "CHANGE PASSWORD SUCCESS", getApplicationContext());
+                                Preferences.saveString("LastModifiedPasswordDate", new SimpleDateFormat("yyyy-MM-dd").format(new Date()), getApplicationContext());
                                 startActivity(new Intent(ChangePasswordActivity.this, HomeActivity.class));
                             }
                         } catch (Exception e) {

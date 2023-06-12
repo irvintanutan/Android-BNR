@@ -246,7 +246,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                     json.addProperty("DeviceId", Preferences.getString("DeviceID", LoginActivity.this));
                     json.addProperty("UserCode", false ? "TEST" : teamid);
                     json.addProperty("Password", false ? "TEST" : password);
-                    json.addProperty("LoginDate", false ? "2023-05-26" : sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
+                    json.addProperty("LoginDate", false ? "2023-06-05" : sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -414,7 +414,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
                                 JSONArray dataArray = jsonArray.getJSONArray(1);
 
                                 Log.e("TOKEN", jp.getString("Token") + " " + Integer.parseInt(jp.getString("LoggedInUser")));
-                                Preferences.saveString("LastModifiedPasswordDate", obj.getString("LastModifiedPasswordDate"), LoginActivity.this);
+                                Preferences.saveString("LastModifiedPasswordDate", false ? "2022-01-01" :obj.getString("LastModifiedPasswordDate"), LoginActivity.this);
                                 Preferences.saveString("AuthToken", jp.getString("Token"), LoginActivity.this);
                                 Preferences.saveString("LoggedOn", jp.getString("LoginTime"), LoginActivity.this);
                                 Preferences.saveString("LoggedInDate", sdf2.format(sdf.parse(mspindate.getSelectedItem().toString())), LoginActivity.this);
