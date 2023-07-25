@@ -11,17 +11,21 @@
 
     <item
         android:id="@+id/action_settings"
-        android:title="Settings"
         android:icon="@drawable/ic_baseline_more_horiz_24"
-        app:showAsAction="always" >
+        android:title="Settings"
+        app:showAsAction="always">
 
         <menu>
             <item
                 android:id="@+id/action_legend"
                 android:title="Legend" />
             <item
+                android:id="@+id/action_change_password"
+                android:title="Change Password" />
+            <item
                 android:id="@+id/action_logout"
                 android:title="Logout" />
+
         </menu>
     </item>
 

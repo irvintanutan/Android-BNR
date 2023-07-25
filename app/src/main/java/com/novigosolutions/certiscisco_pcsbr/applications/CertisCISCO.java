@@ -23,6 +23,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
 import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
+import com.novigosolutions.certiscisco_pcsbr.models.UserLogs;
 import com.novigosolutions.certiscisco_pcsbr.models.Wagon;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 
@@ -41,14 +42,14 @@ public class CertisCISCO extends Application {
         Configuration dbConfiguration = new Configuration.Builder(this).setDatabaseName("certiscisco.db").setDatabaseVersion(3).addModelClasses(
                 Job.class, Bags.class, Box.class, Envelope.class, EnvelopeBag.class,
                 Currency.class, BoxBag.class, Branch.class, Delivery.class, ChatMessage.class,
-                Break.class, Reschedule.class, CoinSeries.class, Wagon.class, Cage.class, Consignment.class, ConsignmentBag.class).create();
+                Break.class, Reschedule.class, CoinSeries.class, Wagon.class, Cage.class, Consignment.class, ConsignmentBag.class, UserLogs.class).create();
         ActiveAndroid.initialize(dbConfiguration);
         mContext = this;
         if (TextUtils.isEmpty(Preferences.getString("API_URL", mContext))) {
             //Preferences.saveString("API_URL", "http://10.8.8.158", mContext);
-            Preferences.saveString("API_URL", "https://pcsbnr-api.certiscslops.local/", mContext);
+            //Preferences.saveString("API_URL", "https://pcsbnr-api.certiscslops.local/", mContext);
             //Preferences.saveString("API_URL", "https://pcs-bnruat-mobileapi.certis-cslops-uat.com/", mContext);
-            //Preferences.saveString("API_URL", "https://pcs-bnruatapi.certis-cslops-uat.com/", mContext);
+            Preferences.saveString("API_URL", "https://pcs-bnruatapi.certis-cslops-uat.com/", mContext);
             //Preferences.saveString("API_URL", "https://pcs-bnruat-crapi.certis-cslops-uat.com/", mContext);
         }
     }

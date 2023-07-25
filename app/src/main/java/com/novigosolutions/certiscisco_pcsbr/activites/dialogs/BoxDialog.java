@@ -16,10 +16,12 @@ import android.widget.Toast;
 
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.CoinAdapter;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.models.Box;
 import com.novigosolutions.certiscisco_pcsbr.models.CoinSeries;
 import com.novigosolutions.certiscisco_pcsbr.models.Currency;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,19 +52,19 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
     int TransportMasterId;
     int pos = 0;
 
-    Spinner spinner,spinnerCoinSeries;
+    Spinner spinner, spinnerCoinSeries;
     LinearLayout ltCoinSpinner;
     List<CoinSeries> coinSeries;
     List<String> coinserieslist = new ArrayList<>();
     List<String> coinseriesDescription = new ArrayList<>();
-    List<Integer> coinseriesIds =new ArrayList<Integer>();
+    List<Integer> coinseriesIds = new ArrayList<Integer>();
 
-    public BoxDialog(Context context, int TransportMasterId, DialogResult mDialogResult,int customerID) {
+    public BoxDialog(Context context, int TransportMasterId, DialogResult mDialogResult, int customerID) {
         super(context, R.style.Theme_AppCompat_Light_Dialog);
         this.context = context;
         this.TransportMasterId = TransportMasterId;
         this.mDialogResult = mDialogResult;
-        this.customerID=customerID;
+        this.customerID = customerID;
     }
 
     @Override
@@ -75,7 +77,7 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
         btn_cancel = findViewById(R.id.btn_cancel);
         spinner = findViewById(R.id.spn_denomination);
         spinnerCoinSeries = findViewById(R.id.spn_coinseries);
-        ltCoinSpinner=findViewById(R.id.lt_coinseries);
+        ltCoinSpinner = findViewById(R.id.lt_coinseries);
         recyclerView = findViewById(R.id.recyclerview);
         edt_count = findViewById(R.id.edt_count);
         txt_count = findViewById(R.id.txt_count);
@@ -93,15 +95,15 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
                 coinseriesIds.add(box.CoinSeriesId);
             }
         }
-      //  currencies = Currency.getByCustomerId(Job.getSingle(TransportMasterId).CustomerId);
-      //  currencies=Currency.getByCustomerId(Job.getSingle(TransportMasterId).TransportMasterId);
-        currencies=Currency.getByCustomerId(customerID);
+        //  currencies = Currency.getByCustomerId(Job.getSingle(TransportMasterId).CustomerId);
+        //  currencies=Currency.getByCustomerId(Job.getSingle(TransportMasterId).TransportMasterId);
+        currencies = Currency.getByCustomerId(customerID);
         for (int i = 0; i < currencies.size(); i++) {
             denominationlist.add(currencies.get(i).ProductName);
         }
-        coinSeries=CoinSeries.getAllCoinSeries();
-        if (coinSeries.size()!= 0){
-            for (int i=0;i<coinSeries.size();i++){
+        coinSeries = CoinSeries.getAllCoinSeries();
+        if (coinSeries.size() != 0) {
+            for (int i = 0; i < coinSeries.size(); i++) {
                 coinserieslist.add(coinSeries.get(i).DataDescription);
             }
         }
@@ -109,7 +111,7 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, denominationlist);
         spinner.setAdapter(dataAdapter);
 
-        ArrayAdapter<String> dataAdapter1 = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_item,coinserieslist);
+        ArrayAdapter<String> dataAdapter1 = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, coinserieslist);
         spinnerCoinSeries.setAdapter(dataAdapter1);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
@@ -118,16 +120,16 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
         //mAdapter = new CoinAdapter(currancyNames, counts);
-        mAdapter = new CoinAdapter(currancyNames, counts,coinseriesDescription);
+        mAdapter = new CoinAdapter(currancyNames, counts, coinseriesDescription);
         recyclerView.setAdapter(mAdapter);
-        txt_count.setText("Count : "+itemCount());
+        txt_count.setText("Count : " + itemCount());
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if(currencies.get(i).IsCoinValue.equals("Yes")){
+                if (currencies.get(i).IsCoinValue.equals("Yes")) {
                     ltCoinSpinner.setVisibility(View.VISIBLE);
-                }else {
+                } else {
                     ltCoinSpinner.setVisibility(View.GONE);
                 }
             }
@@ -136,7 +138,8 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
             public void onNothingSelected(AdapterView<?> adapterView) {
 
             }
-        });;
+        });
+        ;
     }
 
     @Override
@@ -148,36 +151,31 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
                     Toast.makeText(context, "Enter quantity", Toast.LENGTH_SHORT).show();
                 } else if (edt_count.length() > 0) {
                     int count = 0;
-                    if(!ids.isEmpty() && ids!= null && ids.size()>0){
+                    if (!ids.isEmpty() && ids != null && ids.size() > 0) {
                         count = ids.size();
                     }
                     pos = hasDuplicateEntry(count);
-                    if (pos != -1){
-                        int newCount  = counts.get(pos)+ Integer.parseInt(edt_count.getText().toString());
+                    if (pos != -1) {
+                        int newCount = counts.get(pos) + Integer.parseInt(edt_count.getText().toString());
                         counts.set(pos, newCount);
-//                        if(currencies.get(spinner.getSelectedItemPosition()).IsCoinValue.equals("Yes")){
-//                            coinseriesDescription.set(pos,spinnerCoinSeries.getSelectedItem().toString());
-//                            coinseriesIds.set(pos,coinSeries.get(spinnerCoinSeries.getSelectedItemPosition()).CoinSeriesId);
-//                        }else {
-//                            coinseriesDescription.set(pos,"null");
-//                            coinseriesIds.set(pos,0);
-//                        }
                         mAdapter.notifyItemChanged(pos);
                     } else {
                         currancyNames.add(spinner.getSelectedItem().toString());
                         counts.add(Integer.parseInt(edt_count.getText().toString()));
                         ids.add(currencies.get(spinner.getSelectedItemPosition()).ProductId);
-                        if(currencies.get(spinner.getSelectedItemPosition()).IsCoinValue.equals("Yes")){
+                        if (currencies.get(spinner.getSelectedItemPosition()).IsCoinValue.equals("Yes")) {
                             coinseriesDescription.add(spinnerCoinSeries.getSelectedItem().toString());
                             coinseriesIds.add(coinSeries.get(spinnerCoinSeries.getSelectedItemPosition()).CoinSeriesId);
-                        }else{
+                        } else {
                             coinseriesDescription.add("null");
                             coinseriesIds.add(0);
                         }
-                        mAdapter.notifyItemInserted(mAdapter.getItemCount()-1);
+                        mAdapter.notifyItemInserted(mAdapter.getItemCount() - 1);
                     }
-                    //  txt_count.setText("Count : "+currancyNames.size());
-                    txt_count.setText("Count : "+itemCount());
+                    UserLogService.save(UserLog.COLLECTION.toString(), "Currency : "
+                            + spinner.getSelectedItem().toString() + " , Count : " + Integer.parseInt(edt_count.getText().toString()), "BOX SERIES", context);
+
+                    txt_count.setText("Count : " + itemCount());
                     edt_count.setText("");
                 } else {
                     Toast.makeText(context, "Invalid Count", Toast.LENGTH_SHORT).show();
@@ -186,8 +184,8 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
             case R.id.btn_done:
                 if (ids.size() > 0) {
                     for (int i = 0; i < ids.size(); i++) {
-                      //  Box.updateCount(TransportMasterId, ids.get(i), currancyNames.get(i), counts.get(i));
-                        Box.updateCountNew(TransportMasterId, ids.get(i), currancyNames.get(i), counts.get(i),coinseriesDescription.get(i),coinseriesIds.get(i), null , null);
+                        //  Box.updateCount(TransportMasterId, ids.get(i), currancyNames.get(i), counts.get(i));
+                        Box.updateCountNew(TransportMasterId, ids.get(i), currancyNames.get(i), counts.get(i), coinseriesDescription.get(i), coinseriesIds.get(i), null, null);
                     }
 
                     if (mDialogResult != null) {
@@ -208,23 +206,23 @@ public class BoxDialog extends Dialog implements View.OnClickListener {
         }
     }
 
-    public int itemCount(){
-        int count=0;
-        for(Integer e:counts){
-            count+=e;
+    public int itemCount() {
+        int count = 0;
+        for (Integer e : counts) {
+            count += e;
         }
         return count;
     }
 
-    private int hasDuplicateEntry(int count){
-        if (count>0) {
+    private int hasDuplicateEntry(int count) {
+        if (count > 0) {
             for (int i = 0; i < count; i++) {
-                if (ids.get(i).equals(currencies.get(spinner.getSelectedItemPosition()).ProductId) && currancyNames.get(i).equals(spinner.getSelectedItem().toString()) ) {
-                    if(currencies.get(spinner.getSelectedItemPosition()).IsCoinValue.equals("Yes")){
-                        if (coinseriesIds.get(i).equals(coinSeries.get(spinnerCoinSeries.getSelectedItemPosition()).CoinSeriesId)){
+                if (ids.get(i).equals(currencies.get(spinner.getSelectedItemPosition()).ProductId) && currancyNames.get(i).equals(spinner.getSelectedItem().toString())) {
+                    if (currencies.get(spinner.getSelectedItemPosition()).IsCoinValue.equals("Yes")) {
+                        if (coinseriesIds.get(i).equals(coinSeries.get(spinnerCoinSeries.getSelectedItemPosition()).CoinSeriesId)) {
                             return i;
                         }
-                    }else {
+                    } else {
                         return i;
                     }
 

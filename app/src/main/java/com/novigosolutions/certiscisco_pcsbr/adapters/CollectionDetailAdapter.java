@@ -13,10 +13,13 @@ import android.widget.TextView;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 
 import java.util.List;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import static com.novigosolutions.certiscisco_pcsbr.constant.UserLog.COLLECTION;
 
 public class CollectionDetailAdapter extends RecyclerView.Adapter<CollectionDetailAdapter.MyViewHolder> {
     List<Job> jobs;
@@ -108,7 +111,7 @@ public class CollectionDetailAdapter extends RecyclerView.Adapter<CollectionDeta
                 Job.setNoCollection(jobs.get(pos).TransportMasterId);
                 jobs.get(pos).isNoCollection = true;
                 notifyDataSetChanged();
-
+                UserLogService.save(COLLECTION.toString(), "JOB (" +jobs.get(pos).TransportMasterId+")", "NO COLLECTION", context);
             }
         });
         alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {

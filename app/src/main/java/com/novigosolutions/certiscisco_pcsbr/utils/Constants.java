@@ -21,6 +21,19 @@ public class Constants {
     public final static int MarkMessageAsRead = 13;
     public final static int GETRECEIPTNUMBER = 14;
     public final static int SECUREVEHICLE = 15;
+    public final static int SYSTEMCONFIG = 16;
+    public final static int CHANGEPASSWORD = 17;
+    public final static int ISCHANGEPASSWORD = 18;
+
+    public final static String MAX_PASSWORD_LENGTH = "MAX_PASSWORD_LENGTH";
+    public final static String MIN_PASSWORD_LENGTH = "MIN_PASSWORD_LENGTH";
+    public final static String MIN_PASSWORD_UPPERCASE = "MIN_PASSWORD_UPPERCASE";
+    public final static String MIN_PASSWORD_LOWERCASE = "MIN_PASSWORD_LOWERCASE";
+    public final static String MIN_PASSWORD_NUMERIC = "MIN_PASSWORD_NUMERIC";
+    public final static String MIN_PASSWORD_SPECIAL_CHARACTER = "MIN_PASSWORD_SPECIAL_CHARACTER";
+    public final static String MIN_PASSWORD_ALPHABET = "MIN_PASSWORD_ALPHABET";
+    public final static String MAX_PASSWORD_AGE = "MAX_PASSWORD_AGE";
+    public final static String CHANGE_PASSWORD_NOTIFY = "CHANGE_PASSWORD_NOTIFY";
 
 
     public final static int FINISHONRESULT = 20;
@@ -35,6 +48,7 @@ public class Constants {
     public static boolean isAll = false;
     public static String BackDestination = "";
     public static boolean showSecureAlert = false;
+    public static boolean showExpirationAlert = false;
     public static long secureTimer = System.currentTimeMillis();
     public static boolean isFromSecure = false;
 
@@ -45,4 +59,6 @@ public class Constants {
     public static String startTime = "";
 
     public static String endTime = "";
+
+    public static String JOB_ID = "";
 }

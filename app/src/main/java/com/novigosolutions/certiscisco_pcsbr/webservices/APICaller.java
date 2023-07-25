@@ -88,6 +88,16 @@ public class APICaller {
         process(Constants.SIGNIN, call, callback);
     }
 
+    public void getSystemConfig(ApiCallback callback) {
+        Call<ResponseBody> call = getService().getSystemConfig();
+        process(Constants.SYSTEMCONFIG, call, callback);
+    }
+
+    public void getPasswordDate(ApiCallback callback, Context context) {
+        Call<ResponseBody> call = getService().IsChangePassword(Preferences.getInt("UserId", context));
+        process(Constants.ISCHANGEPASSWORD, call, callback);
+    }
+
     public void sync(ApiCallback callback, Context context) {
         this.context = context;
         JsonObject jsonObject = new JsonObject();
@@ -339,20 +349,20 @@ public class APICaller {
         Branch branch = Branch.getSingle(job.GroupKey);
 
         String address = "";
-        if (!TextUtils.isEmpty(job.BranchStreetName) && job.BranchStreetName != null){
-            address += job.BranchStreetName+" , ";
+        if (!TextUtils.isEmpty(job.BranchStreetName) && job.BranchStreetName != null) {
+            address += job.BranchStreetName + " , ";
         }
-        if (!TextUtils.isEmpty(job.BranchTower) && job.BranchTower != null){
-            address += job.BranchTower+", ";
+        if (!TextUtils.isEmpty(job.BranchTower) && job.BranchTower != null) {
+            address += job.BranchTower + ", ";
         }
-        if (!TextUtils.isEmpty(job.BranchTown) && job.BranchTown != null){
-            address += job.BranchTown+" , ";
+        if (!TextUtils.isEmpty(job.BranchTown) && job.BranchTown != null) {
+            address += job.BranchTown + " , ";
         }
-        if (!TextUtils.isEmpty(job.BranchPinCode) && job.BranchPinCode != null){
+        if (!TextUtils.isEmpty(job.BranchPinCode) && job.BranchPinCode != null) {
             address += job.BranchPinCode;
         }
 
-        jsonObject.addProperty("RequestType", "MANUAL ENTRY PERMISSION FOR " + type + " | " + branch.FunctionalCode + " | " + address + "|" + branch.CustomerName  + "|" + Preferences.getString("DeviceID", context));
+        jsonObject.addProperty("RequestType", "MANUAL ENTRY PERMISSION FOR " + type + " | " + branch.FunctionalCode + " | " + address + "|" + branch.CustomerName + "|" + Preferences.getString("DeviceID", context));
         //jsonObject.addProperty("RequestType", "MANUAL ENTRY PERMISSION FOR " + type + "|" + branch.FunctionalCode + "|" + Preferences.getString("DeviceID", context));
         jsonObject.addProperty("RequestedBy", Preferences.getInt("UserId", context));
         jsonObject.addProperty("RequestedOn", CommonMethods.getCurrentDateTime(context));

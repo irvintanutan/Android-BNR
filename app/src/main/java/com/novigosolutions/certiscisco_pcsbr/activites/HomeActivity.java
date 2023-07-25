@@ -35,10 +35,10 @@ import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Break;
 import com.novigosolutions.certiscisco_pcsbr.models.ChatMessage;
-import com.novigosolutions.certiscisco_pcsbr.models.Delivery;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.models.Reschedule;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
+import com.novigosolutions.certiscisco_pcsbr.service.AuditService;
 import com.novigosolutions.certiscisco_pcsbr.service.BreakService;
 import com.novigosolutions.certiscisco_pcsbr.service.SignalRService;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
@@ -47,6 +47,13 @@ import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
 import com.novigosolutions.certiscisco_pcsbr.webservices.APICaller;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -58,6 +65,11 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.CHANGE_PASSWORD_NOTIFY;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.ISCHANGEPASSWORD;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MAX_PASSWORD_AGE;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.MIN_PASSWORD_LENGTH;
+import static com.novigosolutions.certiscisco_pcsbr.utils.Constants.SYSTEMCONFIG;
 
 public class HomeActivity extends BaseActivity implements ApiCallback, NetworkChangekListener {
     GridView gridview;
@@ -79,7 +91,6 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         setactions();
         startBreaks();
         startSignaRifNotRunning();
-
     }
 
     private void calculateSecureTime() {
@@ -128,24 +139,24 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             }
         }
         startService(new Intent(getApplicationContext(), SignalRService.class));
+        startService(new Intent(getApplicationContext(), AuditService.class));
     }
 
     private void setuptoolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        mTitle = toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("HOME");
-        TextView UserName = (TextView) toolbar.findViewById(R.id.UserName);
+        TextView UserName = toolbar.findViewById(R.id.UserName);
         UserName.setText(Preferences.getString("UserName", HomeActivity.this));
-        imgnetwork = (ImageView) toolbar.findViewById(R.id.imgnetwork);
+        imgnetwork = toolbar.findViewById(R.id.imgnetwork);
     }
 
     private void initializeviews() {
-        cl = (CoordinatorLayout) findViewById(R.id.cl);
-        gridview = (GridView) findViewById(R.id.grid_view);
+        cl = findViewById(R.id.cl);
+        gridview = findViewById(R.id.grid_view);
         legend = findViewById(R.id.legend);
-        //  btnLogout=findViewById(R.id.bt_logout);
         if (NetworkUtil.getConnectivityStatusString(HomeActivity.this))
             APICaller.instance().GetMessages(this);
     }
@@ -198,13 +209,6 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
                 if (intent != null) startActivity(intent);
             }
         });
-
-//        btnLogout.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                logout();
-//            }
-//        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -230,6 +234,9 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         calculateSecureTime();
         if (Constants.showSecureAlert)
             secureVehicleAlert();
+        startService(new Intent(getApplicationContext(), AuditService.class));
+        APICaller.instance().getSystemConfig(this);
+        APICaller.instance().getPasswordDate(this, getApplicationContext());
     }
 
     @Override
@@ -350,8 +357,14 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
             openLegend();
         } else if (item.getItemId() == R.id.action_logout) {
             logout();
+        } else if (item.getItemId() == R.id.action_change_password) {
+            changePassword();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void changePassword() {
+        startActivity(new Intent(HomeActivity.this, ChangePasswordActivity.class));
     }
 
     boolean doubleBackToExitPressedOnce = false;
@@ -423,6 +436,23 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         alertDialog.show();
     }
 
+    private void alertChangePassword(String message) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle("Confirm");
+        alertDialog.setMessage(message);
+        alertDialog.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                changePassword();
+            }
+        });
+        alertDialog.setNegativeButton("Not Now", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        alertDialog.show();
+    }
+
     @Override
     public void onNetworkChanged() {
         if (NetworkUtil.getConnectivityStatusString(HomeActivity.this))
@@ -439,9 +469,76 @@ public class HomeActivity extends BaseActivity implements ApiCallback, NetworkCh
         if (result_code == 409) {
             authalert(this);
         } else if (result_code == 200) {
+            Log.e("RESULT DATE", result_data);
+            if (api_code == SYSTEMCONFIG)
+                saveSystemConfig(result_data);
+//            else if (api_code == ISCHANGEPASSWORD) {
+//                if (saveIsChangePassword(result_data)) {
+//                    Toast.makeText(getApplicationContext(), "Your password has expired. Need to update password", Toast.LENGTH_SHORT).show();
+//                    changePassword();
+//                }
+//            }
             refresh();
         } else {
             raiseSnakbar("Error");
         }
     }
+
+    private boolean saveIsChangePassword(String result) {
+        Preferences.saveInt("isChangePassword", Integer.parseInt(result), getApplicationContext());
+        try {
+            int data = Preferences.getInt("isChangePassword", getApplicationContext());
+            if (data == 1) return true;
+        } catch (Exception e) {
+        }
+        return false;
+    }
+
+    private void saveSystemConfig(String result) {
+        try {
+            JSONArray jsonArray = new JSONArray(result);
+
+            for (int a = 0; a < jsonArray.length(); a++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(a);
+                String accessKey = jsonObject.getString("AccessKey");
+                String value = jsonObject.getString("Value");
+                Preferences.saveString(accessKey, value, this);
+            }
+
+            Preferences.saveString(MIN_PASSWORD_LENGTH, "7", this);
+            if (!Constants.showExpirationAlert) {
+                checkPasswordExpiry(Integer.parseInt(Preferences.getString(MAX_PASSWORD_AGE, this)),
+                        Integer.parseInt(Preferences.getString(CHANGE_PASSWORD_NOTIFY, this)),
+                        Preferences.getString("LastModifiedPasswordDate", this));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    void checkPasswordExpiry(int age, int notify, String passwordDate) {
+        try {
+            Date from = new SimpleDateFormat("yyyy-MM-dd").parse(passwordDate);
+            Date to = new Date();
+            int diff = getDaysDifference(from, to);
+            Log.e("DIFF", Integer.toString(diff));
+            if ((age - diff) <= 0) {
+                Toast.makeText(getApplicationContext(), "Your password has expired. Need to update password", Toast.LENGTH_SHORT).show();
+                changePassword();
+            } else if ((age - diff) <= notify) {
+                Constants.showExpirationAlert = true;
+                alertChangePassword(String.format("Your password is about to expire within %d days.", (age - diff)));
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    int getDaysDifference(Date fromDate, Date toDate) {
+        if (fromDate == null || toDate == null)
+            return 0;
+        return (int) ((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24));
+    }
+
 }

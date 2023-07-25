@@ -1,8 +1,10 @@
 package com.novigosolutions.certiscisco_pcsbr.activites;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -20,12 +22,14 @@ import com.bumptech.glide.Glide;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.adapters.PrintJobListAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.PrintSelectedJobListAdapter;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.NetworkChangekListener;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.PrintCallBack;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
 import com.novigosolutions.certiscisco_pcsbr.objects.Summary;
 import com.novigosolutions.certiscisco_pcsbr.recivers.NetworkChangeReceiver;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.CommonMethods;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
@@ -39,7 +43,9 @@ import com.novigosolutions.certiscisco_pcsbr.zebra.PrinterSelected;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -142,7 +148,7 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
                     list = Job.getSpecificJobListByType(transporterMasterId);
                 } else {
                     Job job = Job.getSingle(transporterMasterId);
-                    list = Job.getJobListByType(isDelivered, isCollection, job.GroupKey , job.BranchCode , job.PFunctionalCode, job.ActualFromTime, job.ActualToTime);
+                    list = Job.getJobListByType(isDelivered, isCollection, job.GroupKey, job.BranchCode, job.PFunctionalCode, job.ActualFromTime, job.ActualToTime);
                 }
                 mainContainer.setVisibility(View.GONE);
                 checkBluetoothConnection();
@@ -291,12 +297,16 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
         bulkPrintData.execute();
     }
 
+    @SuppressLint("NewApi")
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void receiptPrint() {
         hideProgressDialog();
         if (printer.doConnectionTestForBulk()) {
             bulkImageGenerator = new BulkImageGenerator(PrintSelectedJobActivity.this, printDataArray);
             bulkImageGenerator.execute();
+            UserLogService.save(UserLog.PRINTING.toString(), "JOB_ID ( " + String.join(",", list.stream().map(job -> job.OrderNo).collect(Collectors.toList())) + " )", "Printing Successful", getApplicationContext());
         } else {
+            UserLogService.save(UserLog.PRINTING.toString(), "JOB_ID ( " + String.join(",", list.stream().map(job -> job.OrderNo).collect(Collectors.toList())) + " )", "Failed to connect the printer", getApplicationContext());
             Toast.makeText(PrintSelectedJobActivity.this, "Failed to connect the printer", Toast.LENGTH_LONG).show();
         }
     }
@@ -436,8 +446,8 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(PrintSelectedJobActivity.this, SelectedJobListActivity.class);
-        intent.putExtra("isCollection", Constants.isCollection ? 1:0);
-        intent.putExtra("isDelivered", Constants.isCollection ? 0:1);
+        intent.putExtra("isCollection", Constants.isCollection ? 1 : 0);
+        intent.putExtra("isDelivered", Constants.isCollection ? 0 : 1);
         startActivity(intent);
         finish();
     }

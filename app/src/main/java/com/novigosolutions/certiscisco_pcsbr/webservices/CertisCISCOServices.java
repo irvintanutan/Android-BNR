@@ -1,6 +1,7 @@
 package com.novigosolutions.certiscisco_pcsbr.webservices;
 
 
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 import com.google.gson.JsonObject;
 
 import okhttp3.ResponseBody;
@@ -30,6 +31,10 @@ public interface CertisCISCOServices {
     Call<ResponseBody> signin(@Body JsonObject object);
 
     @Headers("Content-Type: application/json")
+    @POST("GetSysytemConfig")
+    Call<ResponseBody> getSystemConfig();
+
+    @Headers("Content-Type: application/json")
     @POST("OrderCheckVersionsandroid")
     Call<ResponseBody> Sync(@Header("AuthToken") String AuthToken, @Body JsonObject object);
 
@@ -38,8 +43,25 @@ public interface CertisCISCOServices {
     Call<ResponseBody> SubmitBulkCollection(@Header("AuthToken") String AuthToken, @Header("UserId") int UserId, @Body JsonObject object);
 
     @Headers("Content-Type: application/json")
+    @POST("UserActivityLog")
+    Call<ResponseBody> UserActivityLog(@Query("entity") String entity, @Query("userAction") String userAction,
+                                       @Query("remarks") String remark,
+                                       @Query("userId") int userId, @Query("source") String source,
+                                       @Query("apkdatetime") String apkdatetime);
+
+    @Headers("Content-Type: application/json")
+    @POST("CustomerChangePassword")
+    Call<ResponseBody> CustomerChangePassword(
+            @Query("userid") int userid, @Query("oldpassword") String oldpassword,
+            @Query("newpassword") String newpassword);
+
+    @Headers("Content-Type: application/json")
     @POST("GetReceiptNo")
     Call<ResponseBody> GetReceiptNumber(@Query("jobId") int jobId);
+
+    @Headers("Content-Type: application/json")
+    @POST("IsChangePassword")
+    Call<ResponseBody> IsChangePassword(@Query("userid") int userid);
 
     @Headers("Content-Type: application/json")
     @POST("SecureVehicle")

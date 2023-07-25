@@ -21,6 +21,7 @@ import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.activites.CollectionActivity;
 import com.novigosolutions.certiscisco_pcsbr.adapters.StringAdapter;
 import com.novigosolutions.certiscisco_pcsbr.adapters.StringDeleteAdapter;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.IOnScannerData;
@@ -31,6 +32,7 @@ import com.novigosolutions.certiscisco_pcsbr.models.ConsignmentBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Envelope;
 import com.novigosolutions.certiscisco_pcsbr.models.EnvelopeBag;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
@@ -259,9 +261,13 @@ public class EnvelopeDialog extends Dialog implements View.OnClickListener, IOnS
     public void onDataScanned(String data) {
         if (data.isEmpty()) {
             ((CollectionActivity) context).invalidbarcodealert("Empty");
-        } else if (bar_code_list.contains(data) || Branch.isExist(data))
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED INVALID (" + data + ")", "SCANNED " + envelopeType.toUpperCase(), context);
+        } else if (bar_code_list.contains(data) || Branch.isExist(data)) {
             ((CollectionActivity) context).invalidbarcodealert("Duplicate");
-        else {
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED INVALID (" + data + ")", "SCANNED " + envelopeType.toUpperCase(), context);
+        } else {
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")", "SCANNED " + envelopeType.toUpperCase(), context);
+
             if (txt_bag_code.isFocused()) {
                 txt_bag_code.setText(data);
                 //  txt_count_bag.setText("Count : "+"1");

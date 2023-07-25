@@ -333,6 +333,7 @@ public class SyncDatabase {
                             envelopeBag.CageNo = cageNo;
                             envelopeBag.CageSeal = cageSeal;
                             long id = envelopeBag.save();
+                            Log.e("ENVELOPE ID", Long.toString(id));
                             //add here if envelope array comes
                             Envelope envelope = new Envelope();
                             envelope.bagid = id;
@@ -340,6 +341,8 @@ public class SyncDatabase {
                             envelope.CageNo = cageNo;
                             envelope.CageSeal = cageSeal;
                             envelope.save();
+
+                            Log.e("ENVELOPE ID", envelope.getId().toString());
                         }
                         break;
 

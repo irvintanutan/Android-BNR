@@ -68,7 +68,6 @@ public class CollectionDetailActivity extends BaseActivity implements RecyclerVi
         TransportMasterId = Job.getHigherTransportMasterId(GroupKey, job.BranchCode, job.PFunctionalCode, "PENDING", job.PDFunctionalCode, job.ActualFromTime, job.ActualToTime);
 
         txt_customer_name.setText(branch.CustomerName);
-//        txt_functional_code.setText(Job.getAllOrderNos(branch.PointId));
         txt_functional_code.setText(Job.getAllOrderNos(GroupKey, job.BranchCode, job.PFunctionalCode, "PENDING", job.PDFunctionalCode, job.ActualFromTime, job.ActualToTime));
         txt_branch_name.setText(branch.BranchCode);
         if (!TextUtils.isEmpty(Job.getSingle(TransportMasterId).OrderRemarks)) {
@@ -77,20 +76,6 @@ public class CollectionDetailActivity extends BaseActivity implements RecyclerVi
         } else {
             txt_order_remarks.setVisibility(View.GONE);
         }
-//        String street_tower = branch.StreetName;
-//        if (!branch.Tower.isEmpty()) {
-//            if (street_tower.isEmpty()) street_tower = branch.Tower;
-//            else street_tower = street_tower + ", " + branch.Tower;
-//        }
-//        txt_street_tower.setText(street_tower);
-//        String town_pin = branch.Town;
-//        if (!branch.PinCode.isEmpty()) {
-//            if (town_pin.isEmpty()) town_pin = branch.PinCode;
-//            else town_pin = town_pin + ", " + branch.PinCode;
-//        }
-//        txt_town_pin.setText(town_pin);
-
-//        jobs = Job.getCollectionJobsOfPoint(GroupKey);
         jobs = new ArrayList<>();
         jobs.add(Job.getSingle(TransportMasterId));
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -102,18 +87,13 @@ public class CollectionDetailActivity extends BaseActivity implements RecyclerVi
         btn_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                List<Job> tempjobs = Job.getCollectionJobsOfPoint(GroupKey);
                 Boolean iscomplete = true;
                 Job j = Job.getSingle(TransportMasterId);
-//                for (int i = 0; i < tempjobs.size(); i++) {
                 if (!j.isNoCollection && !Job.isCollected(j.TransportMasterId) && !j.Status.equals("COMPLETED")) {
                     iscomplete = false;
-//                        break;
                 }
-//                }
                 if (iscomplete) {
                     Intent intent = new Intent(CollectionDetailActivity.this, SummaryActivity.class);
-//                    intent.putExtra("PointId", PointId);
                     intent.putExtra("TransportMasterId", TransportMasterId);
                     intent.putExtra("GroupKey", GroupKey);
                     intent.putExtra("summaryType", Constants.COLLECTION);
@@ -172,7 +152,7 @@ public class CollectionDetailActivity extends BaseActivity implements RecyclerVi
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
+        /* super.onActivityResult(requestCode, resultCode, data); */
         Log.e("resultCode", ":" + resultCode);
         if (resultCode == Constants.FINISHONRESULT) //matches the result code passed from B
         {

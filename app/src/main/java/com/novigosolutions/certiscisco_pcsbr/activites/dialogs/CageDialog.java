@@ -1,10 +1,7 @@
 package com.novigosolutions.certiscisco_pcsbr.activites.dialogs;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,28 +9,19 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.activites.CollectionActivity;
 import com.novigosolutions.certiscisco_pcsbr.adapters.StringDeleteAdapter;
+import com.novigosolutions.certiscisco_pcsbr.constant.UserLog;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.IOnScannerData;
-import com.novigosolutions.certiscisco_pcsbr.interfaces.RecyclerViewClickListener;
-import com.novigosolutions.certiscisco_pcsbr.models.Bags;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
 import com.novigosolutions.certiscisco_pcsbr.models.Cage;
 import com.novigosolutions.certiscisco_pcsbr.models.Job;
+import com.novigosolutions.certiscisco_pcsbr.service.UserLogService;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 import com.novigosolutions.certiscisco_pcsbr.utils.NetworkUtil;
 import com.novigosolutions.certiscisco_pcsbr.utils.Preferences;
@@ -44,10 +32,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 
 public class CageDialog extends Dialog implements View.OnClickListener, IOnScannerData, ApiCallback {
@@ -190,12 +174,16 @@ public class CageDialog extends Dialog implements View.OnClickListener, IOnScann
     public void onDataScanned(String data) {
         if (data.isEmpty()) {
             ((CollectionActivity) context).invalidbarcodealert("Empty");
-        } else if (isThereInList(data, scanType) || Branch.isExist(data) && scanType.equalsIgnoreCase("CageSeal"))
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED INVALID (" + data + ")", "SCANNED CAGE SEAL", context);
+        } else if (isThereInList(data, scanType) || Branch.isExist(data) && scanType.equalsIgnoreCase("CageSeal")) {
             ((CollectionActivity) context).invalidbarcodealert("Duplicate");
-        else {
+            UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED INVALID (" + data + ")", "SCANNED CAGE SEAL", context);
+        } else {
             if (scanType.equals("CageNo")) {
+                UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")", "SCANNED CAGE NO", context);
                 txt_cage_no.setText(data);
             } else {
+                UserLogService.save(UserLog.COLLECTION.toString(), "SCANNED (" + data + ")", "SCANNED CAGE SEAL", context);
                 txt_cage_seal.setText(data);
             }
         }
