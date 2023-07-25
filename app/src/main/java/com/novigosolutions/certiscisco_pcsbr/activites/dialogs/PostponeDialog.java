@@ -44,7 +44,7 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
     Button btn_rescedule, btn_cancel;
     DialogResult mDialogResult;
     Job job;
-//    int PointId;
+    //    int PointId;
     String GroupKey;
     View llreasonother;
     //TextView txtDate;
@@ -135,7 +135,7 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
                 } else if (sign == null) {
                     Toast.makeText(context, "Signature is empty", Toast.LENGTH_SHORT).show();
                 } else {
-                    List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, job.BranchCode , job.PFunctionalCode, job.ActualFromTime, job.ActualToTime);
+                    List<Job> jobs = Job.getPendingDeliveryJobsOfPoint(GroupKey, job.BranchCode, job.PFunctionalCode, job.ActualFromTime, job.ActualToTime);
                     String TransportIds = "";
                     for (int i = 0; i < jobs.size(); i++) {
                         if (TransportIds.equals(""))
@@ -155,7 +155,7 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
                         Reschedule reschedule = new Reschedule();
 //                        reschedule.PointId = PointId;
                         reschedule.TransportId = TransportIds;
-                        reschedule.RescheduleDt =getTomarrowDate();
+                        reschedule.RescheduleDt = getTomarrowDate();
                         reschedule.Reason = spinner.getSelectedItemPosition() == 2 ? edt_reason_other.getText().toString() : spinner.getSelectedItem().toString();
                         reschedule.SignImg = sign;
                         reschedule.GroupKey = GroupKey;
@@ -217,6 +217,10 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
                     }
                     Job.setDelivered(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
                     Toast.makeText(context, "Requested for reschedule", Toast.LENGTH_SHORT).show();
+
+                    if (api_code == Constants.REQUESTFORRESCHEDULE) {
+                        Job.setIsNoDelivery(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
+                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

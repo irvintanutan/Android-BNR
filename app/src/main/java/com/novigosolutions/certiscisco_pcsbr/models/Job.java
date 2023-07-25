@@ -248,6 +248,9 @@ public class Job extends Model implements Comparable<Job> {
     @Column(name = "IsSecured")
     public boolean IsSecured;
 
+    @Column(name = "IsNoDelivery")
+    public boolean IsNoDelivery;
+
 
     public static Job getSingle(int TransportMasterId) {
         return new Select().from(Job.class)
@@ -2422,6 +2425,21 @@ public class Job extends Model implements Comparable<Job> {
                 .execute();
     }
 
+    public static void setIsNoDelivery(String GroupKey, String BranchCode, String
+            PFunctionalCode, String startTime, String endTime) {
+        if (PFunctionalCode == null) {
+            new Update(Job.class)
+                    .set("IsNoDelivery=?", 1)
+                    .where("IsFloatDeliveryOrder=1 AND GroupKey=? AND BranchCode=? AND ActualFromTime=? AND ActualToTime=?", GroupKey, BranchCode, startTime, endTime)
+                    .execute();
+        } else {
+            new Update(Job.class)
+                    .set("IsNoDelivery=?", 1)
+                    .where("IsFloatDeliveryOrder=1 AND GroupKey=? AND BranchCode=? AND PFunctionalCode=? AND ActualFromTime=? AND ActualToTime=?", GroupKey, BranchCode, PFunctionalCode
+                            , startTime, endTime)
+                    .execute();
+        }
+    }
 
     public static void setDelivered(String GroupKey, String BranchCode, String
             PFunctionalCode, String startTime, String endTime) {
