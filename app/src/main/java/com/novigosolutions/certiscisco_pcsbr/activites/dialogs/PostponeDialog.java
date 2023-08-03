@@ -204,10 +204,8 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
                     }
                     Job.setDelivered(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
                     Toast.makeText(context, "Requested for reschedule", Toast.LENGTH_SHORT).show();
+                    Job.setIsNoDelivery(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
 
-                    if (api_code == Constants.REQUESTFORRESCHEDULE) {
-                        Job.setIsNoDelivery(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
-                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

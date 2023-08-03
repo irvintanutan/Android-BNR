@@ -59,7 +59,8 @@ public class SecuredSealedListAdapter extends RecyclerView.Adapter<SecuredSealed
             holder.txt_seal2.setText("(" + secureObjects.get(position).SecondBarcode + ")");
 
 
-        if (secureObjects.get(position).IsScanned && secureObjects.get(position).SecondBarcode == null) {
+        if (secureObjects.get(position).IsScanned && (secureObjects.get(position).SecondBarcode == null ||
+                secureObjects.get(position).SecondBarcode.equals("null"))) {
             holder.llmain.setBackgroundColor(Color.parseColor(colorGreen));
         } else {
             if (secureObjects.get(position).IsScannedSecond) {

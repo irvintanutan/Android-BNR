@@ -2429,12 +2429,12 @@ public class Job extends Model implements Comparable<Job> {
             PFunctionalCode, String startTime, String endTime) {
         if (PFunctionalCode == null) {
             new Update(Job.class)
-                    .set("IsNoDelivery=?", 1)
+                    .set("IsNoDelivery=?,IsSecured=?", 1, 0)
                     .where("IsFloatDeliveryOrder=1 AND GroupKey=? AND BranchCode=? AND ActualFromTime=? AND ActualToTime=?", GroupKey, BranchCode, startTime, endTime)
                     .execute();
         } else {
             new Update(Job.class)
-                    .set("IsNoDelivery=?", 1)
+                    .set("IsNoDelivery=?,IsSecured=?", 1, 0)
                     .where("IsFloatDeliveryOrder=1 AND GroupKey=? AND BranchCode=? AND PFunctionalCode=? AND ActualFromTime=? AND ActualToTime=?", GroupKey, BranchCode, PFunctionalCode
                             , startTime, endTime)
                     .execute();

@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.common.StringUtils;
 import com.novigosolutions.certiscisco_pcsbr.R;
 import com.novigosolutions.certiscisco_pcsbr.activites.dialogs.BarCodeScanActivity;
 import com.novigosolutions.certiscisco_pcsbr.adapters.SecuredSealedListAdapter;
@@ -217,9 +218,10 @@ public class SecureDetailsActivity extends BarCodeScanActivity implements IOnSca
     private void setSealedScannedCount() {
         int scanned = 0;
         for (SecureObject d : bagList) {
-            if (d.IsScanned && d.SecondBarcode == null) {
+            if (d.IsScanned && (d.SecondBarcode == null || d.SecondBarcode.equals("null") || d.SecondBarcode.isEmpty())) {
                 scanned++;
-            } else if (d.IsScanned && d.IsScannedSecond && d.SecondBarcode != null) {
+            } else if (d.IsScanned && d.IsScannedSecond &&
+                    (d.SecondBarcode == null || d.SecondBarcode.equals("null") || d.SecondBarcode.isEmpty())) {
                 scanned++;
             }
         }
