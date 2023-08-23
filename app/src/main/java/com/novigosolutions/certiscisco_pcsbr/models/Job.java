@@ -414,6 +414,14 @@ public class Job extends Model implements Comparable<Job> {
         return jl;
     }
 
+    public static List<Job> getSpecificJobListByTypeNoDelivery(int isDelivered, int isCollection, int TransportMasterId) {
+        List<Job> jl = new Select().from(Job.class)
+                .where("IsCollectionOrder=? and IsFloatDeliveryOrder=? and TransportMasterId=?", isCollection, isDelivered, TransportMasterId)
+                .execute();
+
+        return jl;
+    }
+
     public static List<Job> getSpecificJobListByType(int isDelivered, int isCollection, String GroupKey) {
         List<Job> jl = new Select().from(Job.class)
                 .where("status=? AND IsCollectionOrder=? and IsFloatDeliveryOrder=? and GroupKey=?", "COMPLETED", isCollection, isDelivered, GroupKey)

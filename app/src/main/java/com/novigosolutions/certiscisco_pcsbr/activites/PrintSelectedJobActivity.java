@@ -157,7 +157,14 @@ public class PrintSelectedJobActivity extends BaseActivity implements View.OnCli
             if (getSupportActionBar() != null) {
                 getSupportActionBar().hide();
             }
-            list = Job.getSpecificJobListByType(isDelivered, isCollection, transporterMasterId);
+            Job job = Job.getSingle(transporterMasterId);
+            if (job.IsNoDelivery) {
+                list = Job.getSpecificJobListByTypeNoDelivery(isDelivered, isCollection, transporterMasterId);
+            } else {
+                list = Job.getSpecificJobListByTypeNoDelivery(isDelivered, isCollection, transporterMasterId);
+//                list = Job.getSpecificJobListByType(isDelivered, isCollection, transporterMasterId);
+            }
+
             singlePrintViewInit();
         }
     }

@@ -76,6 +76,13 @@ public class BulkPrintData extends AsyncTask<Void,Void, List<Print>> {
                     if (!jobs.get(j).IsFloatDeliveryOrder && jobs.get(j).IsCollectionOrder) {
                         print.setCollection(true);
                     }
+
+                    if (jobs.get(j).IsNoDelivery) {
+                        print.setNoDelivery(true);
+                    } else {
+                        print.setNoDelivery(false);
+                    }
+
                     if (jobs.get(j).CanCollectedBag) {
 //                    List<Bags> bags = Bags.getByTransportMasterId(jobs.get(j).TransportMasterId);
 //                    if(!bags.isEmpty())

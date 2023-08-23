@@ -41,6 +41,16 @@ public class Print {
 
     private boolean isCollection;
 
+    public boolean isNoDelivery() {
+        return isNoDelivery;
+    }
+
+    public void setNoDelivery(boolean noDelivery) {
+        isNoDelivery = noDelivery;
+    }
+
+    private boolean isNoDelivery;
+
     private int quantity;
 
     private String footer;

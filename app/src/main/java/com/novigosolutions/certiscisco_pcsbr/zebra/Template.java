@@ -4,6 +4,7 @@ import com.novigosolutions.certiscisco_pcsbr.BuildConfig;
 import com.novigosolutions.certiscisco_pcsbr.expandable.Items;
 import com.novigosolutions.certiscisco_pcsbr.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Template {
@@ -38,17 +39,17 @@ public class Template {
                 "\t#sp{\n" +
                 "\t\t      margin-top: 20px;\n" +
                 "  margin-bottom: 30px;\n" +
-                "\t\t}"+
+                "\t\t}" +
                 "       body {\n" +
-                "           font-size: " + FONT_SIZE +";"+
-                "           line-height:"+LINE_HEIGHT+";"+
-                "           margin-top: " + START_MARGIN_TOP +";"+
-                "           text-transform:uppercase;"+
+                "           font-size: " + FONT_SIZE + ";" +
+                "           line-height:" + LINE_HEIGHT + ";" +
+                "           margin-top: " + START_MARGIN_TOP + ";" +
+                "           text-transform:uppercase;" +
                 "       }\n" +
                 " table {width: 100%;border-collapse: collapse;}\n" +
                 "           th,td {padding: 4px;" +
-                "border: 3px solid black;"+
-                "}"+
+                "border: 3px solid black;" +
+                "}" +
                 "       p {\n" +
                 "           font-size: " + FONT_SIZE +
                 "       }" +
@@ -69,8 +70,8 @@ public class Template {
                 "        <br><label>RECEIPT NO : " + print.getTransactionId() + " </label>\n" +
                 "        <br><label>Functional Location : " + print.getFunctionalLocation() + " </label>\n" +
                 "        <br><label>Delivery Point : " + print.getDeliveryPoint() + "</label>\n" +
-                "        <br><label>Nature of Transaction : " + print.getNatureOfTransaction() + " </label>\n" ;
-              html+=  "        <br><label>Bank : " + print.getBank() + "</label>\n" +
+                "        <br><label>Nature of Transaction : " + print.getNatureOfTransaction() + " </label>\n";
+        html += "        <br><label>Bank : " + print.getBank() + "</label>\n" +
                 "     \n" +
                 "        <br><br>\n" +
                 "        <b><u>Customer Details</u></b>\n" +
@@ -83,12 +84,12 @@ public class Template {
                 "        <br><br>\n" +
                 "        <table>\n";
 
-        List<Content> contents = print.getContentList();
+        List<Content> contents = print.isNoDelivery() ? new ArrayList<>() : print.getContentList();
         int countListSize = (contents != null && !contents.isEmpty()) ? contents.size() : 0;
-        List<CageContent> cageContentList = print.getCageContentList();
+        List<CageContent> cageContentList = print.isNoDelivery() ? new ArrayList<>() : print.getCageContentList();
         int cageCountListSize = (cageContentList != null && !cageContentList.isEmpty()) ? cageContentList.size() : 0;
 
-        if(countListSize != 0 || (countListSize == 0 && cageCountListSize == 0)) {
+        if (countListSize != 0 || (countListSize == 0 && cageCountListSize == 0)) {
             html += "         <tr>   <th>" + getLabel3(print.isCollection()) + "</th><th>Quantity</th><th>Seal No/Deno</th></tr>\n";
         }
         for (int i = 0; i < countListSize; i++) {
@@ -101,7 +102,7 @@ public class Template {
             int sealNoListSize = (sealNoList != null && !sealNoList.isEmpty()) ? sealNoList.size() : 0;
 
             for (int j = 0; j < sealNoListSize; j++) {
-                if(j > 0){
+                if (j > 0) {
                     html += "<br>";
                 }
                 html += sealNoList.get(j);
@@ -114,46 +115,45 @@ public class Template {
                 String type = denominationList.get(k).getType();
                 String qtyText = type.equals("EnvelopInBag") ? "Env" : "Consignment";
                 String noText = type.equals("EnvelopInBag") ? "Envelopes" : "Consignment";
-                if(k>0){
-                    html+= "<br>";
+                if (k > 0) {
+                    html += "<br>";
                 }
                 List<String> envelopsList = denominationList.get(k).getEnvelopsList();
                 int envelopListSize = (envelopsList != null && !envelopsList.isEmpty()) ? envelopsList.size() : 0;
 
-                html +=  denominationList.get(k).getBagName() +
+                html += denominationList.get(k).getBagName() +
                         "<br> Seal No : " + denominationList.get(k).getSealNo() +
                         "<br>" + qtyText + " Qty : " + envelopListSize +
                         "<br>" + noText + " No :<br> ";
 
                 for (int l = 0; l < envelopListSize; l++) {
-                    if (l>0){
-                        html+=  "<br>" ;
+                    if (l > 0) {
+                        html += "<br>";
                     }
                     html += envelopsList.get(l);
                 }
 
-                html+= "<br>";
+                html += "<br>";
             }
 
             html += "</td>" +
                     "</tr>";
         }
 
-        if(countListSize==0 && cageCountListSize == 0 ){
-            html+=" <td colspan=\"3\"><br><label><center>";
-            if(print.isCollection())
-            {
-                html+="No Collection";
-            }else {
-                html+="No Collection";
+        if (countListSize == 0 && cageCountListSize == 0) {
+            html += " <td colspan=\"3\"><br><label><center>";
+            if (print.isCollection()) {
+                html += "No Collection";
+            } else if (print.isNoDelivery()) {
+                html += "No Delivery";
             }
-            html+="</center></label></td></tr>";
+            html += "</center></label></td></tr>";
         }
 
         html += "</table>";
         html += "<table>";
         if (cageCountListSize > 0 || (countListSize == 0 && cageCountListSize == 0)) {
-           html += "<br>         <tr>   <th>" + "Cage No" + "</th><th>Cage Seal</th><th>Items</th></tr>\n";
+            html += "<br>         <tr>   <th>" + "Cage No" + "</th><th>Cage Seal</th><th>Items</th></tr>\n";
         }
         for (int i = 0; i < cageCountListSize; i++) {
             html += "<tr>" +
@@ -165,24 +165,23 @@ public class Template {
             int sealNoListSize = (sealNoList != null && !sealNoList.isEmpty()) ? sealNoList.size() : 0;
 
             for (int j = 0; j < sealNoListSize; j++) {
-                if(j > 0){
+                if (j > 0) {
                     html += "<br>";
                 }
-                html += sealNoList.get(j).getHead() + "<br>     (" + sealNoList.get(j).getSummary() +")";
+                html += sealNoList.get(j).getHead() + "<br>     (" + sealNoList.get(j).getSummary() + ")";
             }
 
             html += "</td>" +
                     "</tr>";
         }
-        if(countListSize==0 && cageCountListSize == 0){
-            html+=" <td colspan=\"3\"><br><label><center>";
-            if(print.isCollection())
-            {
-                html+="No Collection";
-            }else {
-                html+="No Collection";
+        if (countListSize == 0 && cageCountListSize == 0) {
+            html += " <td colspan=\"3\"><br><label><center>";
+            if (print.isCollection()) {
+                html += "No Collection";
+            } else if (print.isNoDelivery()) {
+                html += "No Delivery";
             }
-            html+="</center></label></td></tr>";
+            html += "</center></label></td></tr>";
         }
 
         html += "</table>";
@@ -192,14 +191,14 @@ public class Template {
         html += "        <br><label><b>" + getLabel1(print.isCollection()) + "</b></label>\n" +
                 "        <br><label>Certis Transaction Officer (TO) : " + print.getCertisTransactionOfficer() + " </label>\n" +
                 "        <br><label>Transaction Officer ID : " + print.getTransactionOfficerId() + " </label>\n" +
-                "        <br><label>To Signature :</label>\n"+
-                "        <br> <img height=\"70\" width=\"220\" src=\"data:image/jpg;base64,"+print.getCustomerAcknowledgment()+"\">\n" +
+                "        <br><label>To Signature :</label>\n" +
+                "        <br> <img height=\"70\" width=\"220\" src=\"data:image/jpg;base64," + print.getCustomerAcknowledgment() + "\">\n" +
                 "        <hr id='sp' style='border: 1px dashed black;' />\n" +
                 "        <label><b>" + getLabel1(!print.isCollection()) + "</b></label>\n" +
-                "        <br><label>Name : "+print.getCName()+"</label>\n" +
-                "        <br><label>Staff ID : "+print.getStaffId()+"</label>\n" +
+                "        <br><label>Name : " + print.getCName() + "</label>\n" +
+                "        <br><label>Staff ID : " + print.getStaffId() + "</label>\n" +
                 "        <br><label>Customer Acknowledgment :</label>\n" +
-                "        <br> <img height=\"70\" width=\"220\" src=\"data:image/jpg;base64,"+print.getCustomerSignature()+"\">\n" +
+                "        <br> <img height=\"70\" width=\"220\" src=\"data:image/jpg;base64," + print.getCustomerSignature() + "\">\n" +
                 "        \n" +
                 "        \n" +
                 "        <hr style='border: 1px dashed black;' />\n" +

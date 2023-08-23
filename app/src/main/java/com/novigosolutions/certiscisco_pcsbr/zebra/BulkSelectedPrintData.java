@@ -83,6 +83,13 @@ public class BulkSelectedPrintData extends AsyncTask<Void, Void, List<Print>> {
                 if (!job.IsFloatDeliveryOrder && job.IsCollectionOrder) {
                     print.setCollection(true);
                 }
+
+                if (job.IsNoDelivery) {
+                    print.setNoDelivery(true);
+                } else {
+                    print.setNoDelivery(false);
+                }
+
                 if (job.CanCollectedBag) {
 //                    List<Bags> bags = Bags.getByTransportMasterId(jobs.get(j).TransportMasterId);
 //                    if(!bags.isEmpty())

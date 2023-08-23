@@ -2,6 +2,7 @@ package com.novigosolutions.certiscisco_pcsbr.activites.dialogs;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -16,7 +17,9 @@ import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.novigosolutions.certiscisco_pcsbr.R;
+import com.novigosolutions.certiscisco_pcsbr.activites.CustomerSummaryScreen;
 import com.novigosolutions.certiscisco_pcsbr.activites.DeliveryActivity;
+import com.novigosolutions.certiscisco_pcsbr.activites.PrintSelectedJobActivity;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.ApiCallback;
 import com.novigosolutions.certiscisco_pcsbr.interfaces.DialogResult;
 import com.novigosolutions.certiscisco_pcsbr.models.Branch;
@@ -206,6 +209,12 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
                     Toast.makeText(context, "Requested for reschedule", Toast.LENGTH_SHORT).show();
                     Job.setIsNoDelivery(GroupKey, BranchCode, PFunctionalCode, actualFromTime, actualToTime);
 
+                    Intent intent = new Intent(context, PrintSelectedJobActivity.class);
+                    intent.putExtra("isCollection", 0);
+                    intent.putExtra("isDelivered", 1);
+                    intent.putExtra("status", "SINGLE");
+                    intent.putExtra("transporterMasterId", TransportMasterId);
+                    context.startActivity(intent);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

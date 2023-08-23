@@ -320,6 +320,13 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener,
         if(!job.IsFloatDeliveryOrder && job.IsCollectionOrder){
             print.setCollection(true);
         }
+
+        if (job.IsNoDelivery) {
+            print.setNoDelivery(true);
+        } else {
+            print.setNoDelivery(false);
+        }
+
         if (job.CanCollectedBag) {
 //            List<Bags> bags = Bags.getByTransportMasterId(job.TransportMasterId);
 //            if(!bags.isEmpty())
