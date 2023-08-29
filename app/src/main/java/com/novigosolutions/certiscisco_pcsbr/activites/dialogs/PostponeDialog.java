@@ -145,11 +145,15 @@ public class PostponeDialog extends Dialog implements View.OnClickListener, ApiC
                     }
                     if (NetworkUtil.getConnectivityStatusString(context)) {
                         ((DeliveryActivity) context).showProgressDialog("Loading...");
+                        Job.UpdateReceiptNo(GroupKey, job.BranchCode, job.PDFunctionalCode, job.ActualFromTime, job.ActualToTime, context);
                         JsonObject rejsonObject = new JsonObject();
                         rejsonObject.addProperty("TransportId", TransportIds);
                         rejsonObject.addProperty("RescheduleDt", getTomarrowDate());
                         rejsonObject.addProperty("Reason", spinner.getSelectedItemPosition() == 2 ? edt_reason_other.getText().toString() : spinner.getSelectedItem().toString());
                         rejsonObject.addProperty("SignImg", sign);
+                        rejsonObject.addProperty("ReceiptNo", Job.getSingle(TransportMasterId).ReceiptNo);
+                        rejsonObject.addProperty("UserId", Preferences.getInt("UserId", context));
+                        rejsonObject.addProperty("StaffID", "");
                         APICaller.instance().RequestForReSchedule(this, context, rejsonObject);
                     } else {
                         Reschedule reschedule = new Reschedule();

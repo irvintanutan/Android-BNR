@@ -210,7 +210,7 @@ public class SummaryActivity extends BaseActivity implements View.OnClickListene
             if (summaryType == Constants.DELIVERY) {
                 ll_lists.setVisibility(View.GONE);
             }
-            if (Branch.getSingle(GroupKey).isRescheduled) {
+            if (Branch.getSingle(GroupKey).isRescheduled || job.IsNoDelivery) {
                 View head = findViewById(R.id.rescheduled);
                 head.setVisibility(View.VISIBLE);
                 View dlist = findViewById(R.id.lldeliveries);
